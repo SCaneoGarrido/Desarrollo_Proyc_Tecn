@@ -1,17 +1,16 @@
-*{
+* {
     padding: 0;
     margin: 0;
     box-sizing: border-box;
     font-family: "Montserrat", sans-serif;
 }
 
-body{
+body {
     display: flex;
     align-items: center;
     justify-content: center;
     height: 100vh;
     background: url(../iconos/muni.jpg) no-repeat center center/cover;
-    
 }
 
 .navbar {
@@ -26,14 +25,14 @@ body{
     align-items: center;
     padding: 0 20px;
     z-index: 1000; /* Asegura que esté sobre otros elementos */
-  }
-  
-  .navbar img {
+}
+
+.navbar img {
     width: 10%;
     height: 100%;
-  }
+}
 
-.container-form{
+.container-form {
     display: flex;
     border-radius: 20px;
     box-shadow: 0 5px 7px rgba(0, 0, 0, .1);
@@ -43,7 +42,7 @@ body{
     margin: 10px;
 }
 
-.information{
+.information {
     width: 44%;
     display: flex;
     align-items: center;
@@ -53,7 +52,7 @@ body{
     border-bottom-left-radius: 20px;
 }
 
-.information-child{
+.information-child {
     width: 100%;
     padding: 0 5px;
 }
@@ -63,12 +62,12 @@ body{
     color: #fff;
 }
 
-.information-child p{
+.information-child p {
     margin: 15px 0;
     color: #fff;
 }
 
-.information-child input{
+.information-child input {
     background-color: transparent;
     outline: none;
     border: solid 2px #9191bd;
@@ -79,14 +78,14 @@ body{
     transition: background-color .3s ease;
 }
 
-.information-child input:hover{
+.information-child input:hover {
     background-color: #9191bd;
     border: none;
     color: #fff;
     box-shadow: 0 2px 5px rgba(0, 0, 0, .1);
 }
 
-.form-information{
+.form-information {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -97,24 +96,24 @@ body{
     border-bottom-right-radius: 20px;
 }
 
-.form-information-childs{
+.form-information-childs {
     padding: 0 30px;
 }
 
-.form-information-childs h2{
+.form-information-childs h2 {
     color: #333;
     font-size: 2rem;
 }
 
-.form-information-childs p{
-    color:#555
+.form-information-childs p {
+    color: #555;
 }
 
-.icons{
+.icons {
     margin: 15px 0;
 }
 
-.icons i{
+.icons i {
     border-radius: 50%;
     padding: 15px;
     margin: 0 10px;
@@ -122,14 +121,13 @@ body{
     transition: background-color 0.3s ease;
     border: solid thin #9191bd;
     box-shadow: 0 2px 5px rgba(0, 0, 0, .1);
-   
 }
 
-.form{
+.form {
     margin: 30px 0 0 0;
 }
 
-.form label{
+.form label {
     display: flex;
     align-items: center;
     margin-bottom: 15px;
@@ -139,7 +137,7 @@ body{
     box-shadow: 0 2px 5px rgba(0, 0, 0, .1);
 }
 
-.form label input{
+.form label input {
     width: 100%;
     padding: 10px;
     background-color: #fff;
@@ -149,11 +147,11 @@ body{
     color: #333;
 }
 
-.form label i{
+.form label i {
     color: #a7a7a7;
 }
 
-.form input[type="submit"]{
+.form input[type="submit"] {
     background-color: #9191bd;
     color: #fff;
     border-radius: 20px;
@@ -164,35 +162,34 @@ body{
     box-shadow: 0 2px 5px rgba(0, 0, 0, .1);
 }
 
-.form input[type="submit"]:hover{
+.form input[type="submit"]:hover {
     background-color: #7a7a9a;
 }
 
-.hide{
+.hide {
     position: absolute;
-    transform: translateY(-300%);  
+    transform: translateY(-300%);
 }
 
 /*Responsive*/
 
-@media screen and (max-width: 750px){
-    html{
+@media screen and (max-width: 750px) {
+    html {
         font-size: 12px;
     }
-    
 }
 
-@media screen and (max-width: 580px){
-    html{
+@media screen and (max-width: 580px) {
+    html {
         font-size: 10px;
     }
 
-    .container-form{
+    .container-form {
         height: auto;
         flex-direction: column;
     }
 
-    .information{
+    .information {
         width: 100%;
         padding: 20px;
         border-top-left-radius: 20px;
@@ -201,11 +198,10 @@ body{
         border-bottom-right-radius: 0;
     }
 
-    .form-information{
+    .form-information {
         width: 100%;
         padding: 20px;
         border-bottom-left-radius: 20px;
         border-top-right-radius: 0;
     }
-    
 }
