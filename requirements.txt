@@ -1,0 +1,5 @@
+pip install psycopg2-binary
+pip install flask-cors
+pip install Flask
+pip install flask_sessions
+pip install python-dotenv
