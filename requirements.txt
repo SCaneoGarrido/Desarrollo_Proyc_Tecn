@@ -1,4 +1,4 @@
-install psycopg2-binary
+install psycopg2
 install flask-cors
 install Flask
 install flask_sessions
