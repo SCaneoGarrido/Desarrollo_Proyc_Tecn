@@ -1,0 +1,10 @@
+sudo -u postgres psql
+
+-- Conectar a la base de datos creada
+\c mun_santiago_fa_db;
+
+
+
+#Conexion con usuario 
+psql -U sebastian -d mun_santiago_fa_db -W
+sebadmin123

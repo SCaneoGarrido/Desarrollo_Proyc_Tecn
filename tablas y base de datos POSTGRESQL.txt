@@ -1,0 +1,34 @@
+-- Crear la base de datos
+CREATE DATABASE mun_santiago_fa_db;
+
+-- Conectar a la base de datos creada
+\c mun_santiago_fa_db;
+
+-- Crear la tabla Usuarios
+CREATE TABLE IF NOT EXISTS Usuarios (
+    id SERIAL PRIMARY KEY,
+    Nombre VARCHAR(50) NOT NULL,
+    Apellido VARCHAR(50) NOT NULL,
+    Correo VARCHAR(100) NOT NULL UNIQUE,
+    hash_clave VARCHAR(255) NOT NULL,
+    salt VARCHAR(50) NOT NULL
+);
+
+-- Crear la tabla Archivos
+CREATE TABLE IF NOT EXISTS Archivos (
+    id SERIAL PRIMARY KEY,
+    nombre_archivo VARCHAR(100) NOT NULL,
+    fecha_subida DATE NOT NULL,
+    usuario_id INT,
+    FOREIGN KEY (usuario_id) REFERENCES Usuarios(id)
+);
+
+-- Crear la tabla Informes_generados
+CREATE TABLE IF NOT EXISTS Informes_generados (
+    id SERIAL PRIMARY KEY,
+    nombre_informe VARCHAR(100) NOT NULL,
+    archivo_origen VARCHAR(100) NOT NULL,
+    fecha_creacion DATE NOT NULL,
+    usuario_id INT,
+    FOREIGN KEY (usuario_id) REFERENCES Usuarios(id)
+);

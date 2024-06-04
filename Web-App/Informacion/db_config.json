@@ -1,0 +1,7 @@
+{
+  "database": "mun_santiago_fa_db",
+  "user": "sebastian",
+  "host": "localhost",
+  "password": "sebadmin123",
+  "port": 5432
+}
