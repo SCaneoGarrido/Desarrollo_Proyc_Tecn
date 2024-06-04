@@ -9,3 +9,5 @@
 
 #### Carpetas de seguridad ###
 /Web-App/informacion
+
+Web-App\Utilidades\__pycache__
