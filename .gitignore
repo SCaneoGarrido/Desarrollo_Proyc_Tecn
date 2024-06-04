@@ -1,1 +1,11 @@
-/Env
+#### AQUI PONGAN SUS ENTORNOS VIRTUALES ######
+/Env  
+
+
+### OTROS ARCHIVOS BASURA ###
+
+/flask_session
+
+
+#### Carpetas de seguridad ###
+/Web-App/informacion
