@@ -1,80 +1,96 @@
-* {
+*{
     padding: 0;
     margin: 0;
     box-sizing: border-box;
     font-family: "Montserrat", sans-serif;
 }
 
-body {
+body{
     display: flex;
     align-items: center;
     justify-content: center;
     height: 100vh;
     background: url(../iconos/fondo.png) no-repeat center center/cover;
+    
 }
 
 .navbar {
+    position: fixed; 
+    top: 0; 
+    width: 100%; 
+    background: transparent;
+    overflow: hidden;
     height: 100px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     padding: 0 20px;
-    z-index: 1000;
-}
+    z-index: 1000; 
+  }
+  
+  .navbar img {
+    width: 10%;
+    height: 100%;
+  }
 
-.navbar .nav-link {
+  .menu-items .item {
+    text-decoration: none;
     color: #fff;
     font-size: 20px;
     transition: color 0.3s;
     margin-right: 10px;
-}
+  }
 
-.navbar .btn-primary {
+  .menu-items input {
     background-color: #9191bd;
+    outline: none;
     border: solid 2px #9191bd;
     border-radius: 20px;
     padding: 10px 20px;
     color: #fff;
     cursor: pointer;
     transition: background-color .3s ease;
-}
+  }
 
-.inicio {
+  .inicio {
     display: flex;
     align-items: center;
     justify-content: center;
     flex-direction: column;
     text-align: center;
-    padding: 50px 0;
+    padding: 50px 0; 
 }
 
 .contenedor-inicio {
     display: flex;
     align-items: center;
     justify-content: center;
-    flex-direction: row-reverse;
-    margin-bottom: 20px;
+    flex-direction: row-reverse; 
+    margin-bottom: 20px; 
 }
 
 .contenedor-inicio img {
-    width: 50%;
+    width: 50%; 
     max-width: 300px;
-    margin-left: 20px;
+    margin-left: 20px; 
 }
 
 .texto-inicio {
-    max-width: 600px;
-    text-align: left;
+    max-width: 600px; 
+    text-align: left; 
     color: #fff;
 }
 
 .texto-inicio h2 {
-    font-size: 60px;
-    font-weight: bold;
+    font-size: 60px; 
+    font-weight: bold; 
 }
 
 .texto-inicio p {
-    font-size: 20px;
+    font-size: 20px; 
 }
 
-.texto-inicio input {
+.texto-inicio input{
     background-color: transparent;
     outline: none;
     border: solid 2px #9191bd;
@@ -83,5 +99,14 @@ body {
     color: #fff;
     cursor: pointer;
     transition: background-color .3s ease;
-    font-size: 30px;
+    font-size: 30px; 
 }
+
+.section {
+    padding-top: 100px; /* Ajusta este valor según la altura de tu barra de navegación */
+    margin-top: -100px;
+}
+
+
+
+
