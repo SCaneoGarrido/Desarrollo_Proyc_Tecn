@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styleHome.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -11,56 +12,77 @@
     <title>Municipalidad de Santiago</title>
 </head>
 <body>
-    <div class="navbar">
-        <img src="{{ url_for('static', filename='iconos/logo-munistgo.png') }}">
-        <div class="menu-items">
-            <div class="menu-group">
-                <a class="item" href="#inicio">Inicio</a>
-                <a class="item" href="#tusCargas">Tus Cargas</a>
-                <a class="item" href="#soporte">Soporte</a>
-                <a class="item" href="#cuenta">Cuenta</a>
-                <input type="submit" value="Cargar Archivo">
+    <nav class="navbar navbar-expand-lg navbar-light bg-transparent fixed-top">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">
+                <img src="{{ url_for('static', filename='iconos/logo-munistgo.png') }}" alt="Logo" style="width: 10%; height: 100%;">
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#inicio">Inicio</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#tusCargas">Tus Cargas</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#soporte">Soporte</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#cuenta">Cuenta</a>
+                    </li>
+                    <li class="nav-item">
+                        <input type="submit" class="btn btn-primary" value="Cargar Archivo">
+                    </li>
+                </ul>
             </div>
         </div>
-    </div>
+    </nav>
 
     <!-- Sección de Inicio -->
-    <section id="inicio" style="display:block;">
-        <div class="contenedor-inicio">
-            <img src="{{ url_for('static', filename='iconos/imagen.png') }}">
-            <div class="texto-inicio">
-                <h2>¿Qué ES FORMULARIO AGIL?</h2>
-                <p>Es una web la cual te permite manejar filtros
-                    de archivos excel cargados. actualizar tus
-                    bases de datos. La funcion de este sitio web
-                    es ayudarte a optimizar tu tiempo en tareas
-                    manuales que mediante filtros mas
-                    automatizados te permiten un mejor flujo de
-                    trabajo.</p>
-                    <br>
-                <input type="button" value="Pruebalo">
+    <section id="inicio" class="section" style="display:block;">
+        <div class="container text-center">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <img src="{{ url_for('static', filename='iconos/imagen.png') }}" class="img-fluid" alt="Imagen">
+                </div>
+                <div class="col-md-6">
+                    <h2>¿Qué ES FORMULARIO AGIL?</h2>
+                    <p>Es una web la cual te permite manejar filtros de archivos excel cargados, actualizar tus bases de datos. La función de este sitio web es ayudarte a optimizar tu tiempo en tareas manuales que mediante filtros más automatizados te permiten un mejor flujo de trabajo.</p>
+                    <input type="button" class="btn btn-outline-primary" value="Pruebalo">
+                </div>
             </div>
         </div>
     </section>
 
     <!-- Sección de Tus Cargas -->
-    <section id="tusCargas" style="display:none;">
-        <h2>Tus Cargas</h2>
-        <p>Esta sección te permitirá gestionar y visualizar todas tus cargas de archivos.</p>
+    <section id="tusCargas" class="section" style="display:none;">
+        <div class="container">
+            <h2>Tus Cargas</h2>
+            <p>Esta sección te permitirá gestionar y visualizar todas tus cargas de archivos.</p>
+        </div>
     </section>
 
     <!-- Sección de Soporte -->
-    <section id="soporte" style="display:none;">
-        <h2>Soporte</h2>
-        <p>¿Necesitas ayuda? Esta sección te proporcionará toda la información y soporte necesario.</p>
+    <section id="soporte" class="section" style="display:none;">
+        <div class="container">
+            <h2>Soporte</h2>
+            <p>¿Necesitas ayuda? Esta sección te proporcionará toda la información y soporte necesario.</p>
+        </div>
     </section>
 
     <!-- Sección de Cuenta -->
-    <section id="cuenta" style="display:none;">
-        <h2>Cuenta</h2>
-        <p>Administra los detalles de tu cuenta, cambia tu contraseña y actualiza tu información personal.</p>
+    <section id="cuenta" class="section" style="display:none;">
+        <div class="container">
+            <h2>Cuenta</h2>
+            <p>Administra los detalles de tu cuenta, cambia tu contraseña y actualiza tu información personal.</p>
+        </div>
     </section>
 
-<script src="{{ url_for('static', filename='js/home.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ url_for('static', filename='js/home.js') }}"></script>
 </body>
 </html>

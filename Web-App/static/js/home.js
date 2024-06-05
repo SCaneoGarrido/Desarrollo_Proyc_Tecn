@@ -14,7 +14,7 @@ function showSection(sectionId) {
 
 // Eventos de clic para los enlaces de la barra de navegación
 document.addEventListener('DOMContentLoaded', function() {
-    document.querySelectorAll('.menu-group .item').forEach(item => {
+    document.querySelectorAll('.nav-link').forEach(item => {
         item.addEventListener('click', function(e) {
             e.preventDefault(); // Previene el comportamiento por defecto de los enlaces
             const sectionId = this.getAttribute('href').substring(1); // Obtiene el ID de la sección desde el href del enlace
