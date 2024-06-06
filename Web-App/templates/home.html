@@ -29,13 +29,13 @@
                         <a class="nav-link" href="#cursos">Cursos</a>
                     </li>
                     <li class="nav-item">
+                        <a class="nav-link" href="#cargar-excels">Cargar Excels</a>
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link" href="#soporte">Soporte</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="#cuenta">Cuenta</a>
-                    </li>
-                    <li class="nav-item">
-                        <input type="submit" class="btn btn-primary" value="Cargar Archivo">
                     </li>
                 </ul>
             </div>
@@ -113,6 +113,21 @@
             </div>
         </div>
     </div>
+
+    <!-- Sección de Cargar Excels -->
+    <section id="cargar-excels" class="section" style="display:none;">
+        <div class="container">
+            <h2>Cargar Excels</h2>
+            <p>Sube tus archivos Excel aquí para procesarlos y actualizar tus bases de datos.</p>
+            <form id="form-cargar-excels" enctype="multipart/form-data">
+                <div class="mb-3">
+                    <label for="archivoExcel" class="form-label">Seleccionar archivo Excel</label>
+                    <input type="file" class="form-control" id="archivoExcel" accept=".xls,.xlsx" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Cargar</button>
+            </form>
+        </div>
+    </section>
 
     <!-- Sección de Soporte -->
     <section id="soporte" class="section" style="display:none;">

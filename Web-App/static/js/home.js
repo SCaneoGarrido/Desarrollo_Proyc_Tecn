@@ -2,6 +2,7 @@
 function hideAllSections() {
     document.getElementById('inicio').style.display = 'none';
     document.getElementById('cursos').style.display = 'none';
+    document.getElementById('cargar-excels').style.display = 'none';
     document.getElementById('soporte').style.display = 'none';
     document.getElementById('cuenta').style.display = 'none';
 }
@@ -35,7 +36,7 @@ document.getElementById('form-inscribir-curso').addEventListener('submit', funct
     const fechaTermino = document.getElementById('fechaTermino').value;
 
     // Aquí puedes agregar la lógica para guardar el curso inscrito
-    // Por ejemplo, puedes agregarlo a una lista de cursos inscritos
+    // Por ejemplo, puedes agregarlo a una lista de cursos inscritos (no se si esta lista la guardamos en la bd o en una lista a nivel de python en el backend, elije tu manin)
 
     // Limpiar el formulario
     this.reset();
@@ -47,4 +48,18 @@ document.getElementById('form-inscribir-curso').addEventListener('submit', funct
     // Actualizar la lista de cursos inscritos
     const cursosLista = document.getElementById('cursos-lista');
     cursosLista.innerHTML = `<p>Curso: ${nombreCurso}, Año: ${anioCurso}, Inicio: ${fechaInicio}, Término: ${fechaTermino}</p>`;
+});
+
+// Manejar el formulario de carga de excels
+document.getElementById('form-cargar-excels').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const archivoExcel = document.getElementById('archivoExcel').files[0];
+
+    // Aqui agregar la lógica para procesar el archivo Excel (esto lo puedes remplazar por la forma que tu manejes elc argar archivos manin)
+    
+
+    // Limpiar el formulario
+    this.reset();
+
+    alert('Archivo cargado exitosamente.');
 });
