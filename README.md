@@ -1,6 +1,5 @@
 # Desarrollo_Proyc_Tecn
 
-
 # Entorno virtual python
 
 - Siga los siguientes comandos para crear el entorno virtual
