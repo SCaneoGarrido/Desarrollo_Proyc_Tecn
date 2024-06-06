@@ -3,8 +3,8 @@ function hideAllSections() {
     document.getElementById('inicio').style.display = 'none';
     document.getElementById('cursos').style.display = 'none';
     document.getElementById('cargar-excels').style.display = 'none';
-    document.getElementById('soporte').style.display = 'none';
-    document.getElementById('cuenta').style.display = 'none';
+    document.getElementById('analisis-cursos').style.display = 'none';
+    document.getElementById('perfil').style.display = 'none';
 }
 
 // Función para mostrar la sección seleccionada
@@ -35,8 +35,8 @@ document.getElementById('form-inscribir-curso').addEventListener('submit', funct
     const fechaInicio = document.getElementById('fechaInicio').value;
     const fechaTermino = document.getElementById('fechaTermino').value;
 
-    // Aquí puedes agregar la lógica para guardar el curso inscrito
-    // Por ejemplo, puedes agregarlo a una lista de cursos inscritos (no se si esta lista la guardamos en la bd o en una lista a nivel de python en el backend, elije tu manin)
+    // Aquí puedes agregar la lógica para guardar el curso inscrito (esto hay que ver como lo vamos a hacer, si lo vamos a buscar a la bd o lo manejamos como una lista en python en el backend)
+    
 
     // Limpiar el formulario
     this.reset();
@@ -55,11 +55,29 @@ document.getElementById('form-cargar-excels').addEventListener('submit', functio
     e.preventDefault();
     const archivoExcel = document.getElementById('archivoExcel').files[0];
 
-    // Aqui agregar la lógica para procesar el archivo Excel (esto lo puedes remplazar por la forma que tu manejes elc argar archivos manin)
-    
+    // Aquí puedes agregar la lógica para procesar el archivo Excel (modifcala si quieres saiko, esto es solo un ejemplo basico)
 
     // Limpiar el formulario
     this.reset();
 
     alert('Archivo cargado exitosamente.');
+});
+
+// Manejar el formulario de edición de perfil
+document.getElementById('form-editar-perfil').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const nombreUsuario = document.getElementById('editarNombreUsuario').value;
+    const cargoUsuario = document.getElementById('editarCargoUsuario').value;
+
+    // Aquí puedes agregar la lógica para guardar los cambios del perfil del usuario
+
+    // Actualizar la información en la tarjeta de perfil
+    document.getElementById('nombreUsuario').textContent = nombreUsuario;
+    document.getElementById('cargoUsuario').textContent = `Cargo: ${cargoUsuario}`;
+
+    // Cerrar el modal
+    const modal = bootstrap.Modal.getInstance(document.getElementById('editarPerfilModal'));
+    modal.hide();
+
+    alert('Perfil actualizado exitosamente.');
 });
