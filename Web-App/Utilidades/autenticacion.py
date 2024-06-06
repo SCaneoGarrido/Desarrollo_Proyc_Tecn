@@ -23,10 +23,10 @@ class autenticacion:
             print(f"Error al generar token de autenticacion: ", e)
 
 
-    def enviar_token(token):
+    def enviar_token(token, destinatario):
         load_dotenv()
         remitente = os.getenv('CORREO_EMISOR')
-        destinatario = 'sebamc403@gmail.com'
+        destinatario = destinatario
         asunto = 'test token para municipalidad'
 
         msg = MIMEMultipart()
