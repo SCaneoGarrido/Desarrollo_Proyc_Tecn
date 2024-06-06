@@ -26,7 +26,7 @@
                         <a class="nav-link" href="#inicio">Inicio</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#tusCargas">Tus Cargas</a>
+                        <a class="nav-link" href="#cursos">Cursos</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="#soporte">Soporte</a>
@@ -58,13 +58,61 @@
         </div>
     </section>
 
-    <!-- Sección de Tus Cargas -->
-    <section id="tusCargas" class="section" style="display:none;">
+    <!-- Sección de Cursos -->
+    <section id="cursos" class="section" style="display:none;">
         <div class="container">
-            <h2>Tus Cargas</h2>
-            <p>Esta sección te permitirá gestionar y visualizar todas tus cargas de archivos.</p>
+            <h2>Cursos</h2>
+            <div class="row">
+                <div class="col-md-6">
+                    <h3>Ver Cursos</h3>
+                    <div id="cursos-lista">
+                        <p>No hay cursos inscritos aún.</p>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <h3>Inscribir Curso</h3>
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#inscribirCursoModal">
+                        Inscribir Curso
+                    </button>
+                </div>
+            </div>
         </div>
     </section>
+
+    <!-- Modal para Inscribir Curso -->
+    <div class="modal fade" id="inscribirCursoModal" tabindex="-1" aria-labelledby="inscribirCursoModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="inscribirCursoModalLabel">Inscribir Curso</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="form-inscribir-curso">
+                        <div class="mb-3">
+                            <label for="nombreCurso" class="form-label">Nombre del Curso</label>
+                            <input type="text" class="form-control" id="nombreCurso" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="anioCurso" class="form-label">Año</label>
+                            <input type="number" class="form-control" id="anioCurso" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="fechaInicio" class="form-label">Fecha de Inicio</label>
+                            <input type="date" class="form-control" id="fechaInicio" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="fechaTermino" class="form-label">Fecha de Término</label>
+                            <input type="date" class="form-control" id="fechaTermino" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Aceptar</button>
+                        <button type="reset" class="btn btn-secondary">Limpiar</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Volver</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Sección de Soporte -->
     <section id="soporte" class="section" style="display:none;">

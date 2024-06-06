@@ -1,3 +1,4 @@
+/* Estilos generales */
 * {
     padding: 0;
     margin: 0;
@@ -97,4 +98,48 @@ body {
     cursor: pointer;
     transition: background-color .3s ease;
     font-size: 30px;
+}
+
+/* Estilos para la sección de Cursos */
+#cursos {
+    padding: 50px 0;
+}
+
+#cursos h2 {
+    font-size: 40px;
+    margin-bottom: 20px;
+}
+
+#cursos h3 {
+    font-size: 30px;
+    margin-bottom: 10px;
+}
+
+#cursos-lista p {
+    font-size: 18px;
+    color: #333;
+}
+
+/* Estilos para el modal de inscripción de cursos */
+.modal-header {
+    background-color: #9191bd;
+    color: #fff;
+}
+
+.modal-body {
+    padding: 20px;
+}
+
+.modal-body .form-label {
+    font-size: 16px;
+    margin-bottom: 5px;
+}
+
+.modal-body .form-control {
+    margin-bottom: 15px;
+}
+
+.modal-footer {
+    display: flex;
+    justify-content: space-between;
 }
