@@ -34,9 +34,9 @@ def recive_data():
                 file_path = os.path.join('temp', file.filename)
                 file.save(file_path)
 
-                # Procesar el archivo y convertirlo a HTML
+                # Procesar el archivo y convertirlo a HTML con clases CSS
                 data = pd.read_excel(file_path)
-                html_data = data.to_html()
+                html_data = data.to_html(classes='table table-bordered table-striped')
 
                 return jsonify({"success": "archivo guardado", "data": html_data}), 200
 
