@@ -35,7 +35,36 @@ document.getElementById('form-inscribir-curso').addEventListener('submit', funct
     const fechaInicio = document.getElementById('fechaInicio').value;
     const fechaTermino = document.getElementById('fechaTermino').value;
 
+    // Validar que los campos no esten vacios
+    if (nombreCurso.trim() === '' || anioCurso.trim() === '' || fechaInicio.trim() === '' || fechaTermino.trim() === '') {
+        alert('Por favor, complete todos los campos.');
+        return;
+    }
+
     // Aquí puedes agregar la lógica para guardar el curso inscrito (esto hay que ver como lo vamos a hacer, si lo vamos a buscar a la bd o lo manejamos como una lista en python en el backend)
+    
+    let data_to_send = {
+        'nombre': nombreCurso,
+        'año': anioCurso,
+        'fechaInicio': fechaInicio,
+        'fechaTermino': fechaTermino
+    };
+    
+    console.log(data_to_send);
+    
+    fetch('http://127.0.0.1:5000/app/register_courses', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data_to_send) // Enviando los datos directamente, sin anidar bajo "data"
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log(data);
+    })
+    .catch(error => console.error(error));
+    
     
 
     // Limpiar el formulario
@@ -54,13 +83,19 @@ document.getElementById('form-inscribir-curso').addEventListener('submit', funct
 document.getElementById('form-cargar-excels').addEventListener('submit', function(e) {
     e.preventDefault();
     const archivoExcel = document.getElementById('archivoExcel').files[0];
-
-    // Aquí puedes agregar la lógica para procesar el archivo Excel (modifcala si quieres saiko, esto es solo un ejemplo basico)
-
-    // Limpiar el formulario
-    this.reset();
-
-    alert('Archivo cargado exitosamente.');
+    console.log("Archivo cargado:", archivoExcel.name);
+    const formData = new FormData();
+    formData.append("file", archivoExcel);
+    fetch('http://127.0.0.1:5000/app/recive_data', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log(data);
+    })
+    .catch(error => console.error(error));
+    
 });
 
 // Manejar el formulario de edición de perfil
