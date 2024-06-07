@@ -1,5 +1,5 @@
 import os
-
+import pandas as pd
 from flask import Flask, request, jsonify, send_file, session, redirect, url_for, render_template # type: ignore
 from flask_cors import CORS # type: ignore
 from datetime import datetime, timedelta
@@ -24,22 +24,25 @@ def recive_data():
     if request.method == 'POST':
         try:
             if 'file' not in request.files:
-                return jsonify({"error":"no se a proporcionado ningun archivo"}), 400
+                return jsonify({"error": "no se ha proporcionado ningún archivo"}), 400
             file = request.files['file']
 
             if file.filename == '':
-                return jsonify({"error":"no se a seleccionado ningun archivo"}), 400
-            
+                return jsonify({"error": "no se ha seleccionado ningún archivo"}), 400
+
             if file:
                 file_path = os.path.join('temp', file.filename)
                 file.save(file_path)
 
-                # AQUI APLICAMOS LOGICA DE PROCESAMIENTO DE ARCHIVO
-                return jsonify({"success":"archivo guardado"}), 200
+                # Procesar el archivo y convertirlo a HTML
+                data = pd.read_excel(file_path)
+                html_data = data.to_html()
+
+                return jsonify({"success": "archivo guardado", "data": html_data}), 200
 
         except Exception as e:
             print(f"Error: {e}")
-            return jsonify({"error":"ocurrio un error al procesar el archivo"}), 400
+            return jsonify({"error": "ocurrió un error al procesar el archivo"}), 400
 
 
 @app.route('/app/register_courses', methods=['POST'])
