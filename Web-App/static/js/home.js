@@ -83,19 +83,31 @@ document.getElementById('form-inscribir-curso').addEventListener('submit', funct
 document.getElementById('form-cargar-excels').addEventListener('submit', function(e) {
     e.preventDefault();
     const archivoExcel = document.getElementById('archivoExcel').files[0];
-    console.log("Archivo cargado:", archivoExcel.name);
+    const uploadStatus = document.getElementById('upload-status');
+    uploadStatus.textContent = "Cargando archivo...";
+
     const formData = new FormData();
     formData.append("file", archivoExcel);
+
     fetch('http://127.0.0.1:5000/app/recive_data', {
         method: 'POST',
         body: formData
     })
     .then(response => response.json())
     .then(data => {
-        console.log(data);
+        if (data.success) {
+            uploadStatus.textContent = "Archivo cargado exitosamente.";
+            uploadStatus.style.color = "#28a745";
+        } else {
+            uploadStatus.textContent = "Error al cargar el archivo.";
+            uploadStatus.style.color = "#dc3545";
+        }
     })
-    .catch(error => console.error(error));
-    
+    .catch(error => {
+        console.error(error);
+        uploadStatus.textContent = "Error al cargar el archivo.";
+        uploadStatus.style.color = "#dc3545";
+    });
 });
 
 // Manejar el formulario de edición de perfil
