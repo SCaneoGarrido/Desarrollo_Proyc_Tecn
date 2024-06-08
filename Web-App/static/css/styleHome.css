@@ -103,21 +103,42 @@ body {
 /* Estilos para la sección de Cursos */
 #cursos {
     padding: 50px 0;
+    background-color: #f8f9fa;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 #cursos h2 {
     font-size: 40px;
     margin-bottom: 20px;
+    color: #343a40;
 }
 
 #cursos h3 {
     font-size: 30px;
     margin-bottom: 10px;
+    color: #495057;
+}
+
+#cursos-lista {
+    max-height: 400px;
+    overflow-y: auto;
+    border: 1px solid #dee2e6;
+    border-radius: 5px;
+    padding: 10px;
+    background-color: #fff;
 }
 
 #cursos-lista p {
     font-size: 18px;
     color: #333;
+    margin-bottom: 10px;
+    padding: 10px;
+    border-bottom: 1px solid #dee2e6;
+}
+
+#cursos-lista p:last-child {
+    border-bottom: none;
 }
 
 /* Estilos para el modal de inscripción de cursos */

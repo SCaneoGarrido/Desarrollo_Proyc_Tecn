@@ -55,6 +55,14 @@ document.getElementById('form-inscribir-curso').addEventListener('submit', funct
     .then(response => response.json())
     .then(data => {
         console.log(data);
+        // Actualizar la lista de cursos inscritos
+        const cursosLista = document.getElementById('cursos-lista');
+        const nuevoCurso = document.createElement('p');
+        nuevoCurso.textContent = `Curso: ${nombreCurso}, Año: ${anioCurso}, Inicio: ${fechaInicio}, Término: ${fechaTermino}`;
+        cursosLista.appendChild(nuevoCurso);
+        // Actualizar el mensaje de estado
+        const estadoCursos = document.getElementById('estado-cursos');
+        estadoCursos.textContent = "Los cursos inscritos son:";
     })
     .catch(error => console.error(error));
     // Limpiar el formulario
@@ -62,10 +70,32 @@ document.getElementById('form-inscribir-curso').addEventListener('submit', funct
     // Cerrar el modal
     const modal = bootstrap.Modal.getInstance(document.getElementById('inscribirCursoModal'));
     modal.hide();
-    // Actualizar la lista de cursos inscritos
-    const cursosLista = document.getElementById('cursos-lista');
-    cursosLista.innerHTML = `<p>Curso: ${nombreCurso}, Año: ${anioCurso}, Inicio: ${fechaInicio}, Término: ${fechaTermino}</p>`;
 });
+
+// Función para cargar los cursos al iniciar
+function cargarCursos() {
+    fetch('/app/get_courses')
+    .then(response => response.json())
+    .then(courses => {
+        const cursosLista = document.getElementById('cursos-lista');
+        const estadoCursos = document.getElementById('estado-cursos');
+        cursosLista.innerHTML = '';
+        if (courses.length > 0) {
+            estadoCursos.textContent = "Los cursos inscritos son:";
+            courses.forEach(course => {
+                const cursoItem = document.createElement('p');
+                cursoItem.textContent = `Curso: ${course.nombre}, Año: ${course.año}, Inicio: ${course.fechaInicio}, Término: ${course.fechaTermino}`;
+                cursosLista.appendChild(cursoItem);
+            });
+        } else {
+            estadoCursos.textContent = "No hay cursos inscritos aún.";
+        }
+    })
+    .catch(error => console.error(error));
+}
+
+// Llamar a la función para cargar los cursos al cargar la página
+document.addEventListener('DOMContentLoaded', cargarCursos);
 
 // Manejar el formulario de carga de excels
 document.getElementById('form-cargar-excels').addEventListener('submit', function(e) {
