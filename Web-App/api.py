@@ -59,9 +59,12 @@ def register_courses():
         fecha_inicio_curso  = data['fechaInicio']
         fecha_termino_curso = data['fechaTermino']
 
+        # Crear el curso_id combinando el nombre del curso y un sufijo _id
+        curso_id = f"{nombre_curso.replace(' ', '_')}_id"
+
         # Agregar el curso a la lista de cursos registrados
         curso = {
-            "id": len(cursos_registrados) + 1,
+            "id": curso_id,
             "nombre": nombre_curso,
             "año": año_curso,
             "fechaInicio": fecha_inicio_curso,
