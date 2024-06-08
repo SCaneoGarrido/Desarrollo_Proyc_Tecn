@@ -101,7 +101,7 @@ document.addEventListener('DOMContentLoaded', cargarCursos);
 document.getElementById('form-cargar-excels').addEventListener('submit', function(e) {
     e.preventDefault();
     const archivoExcel = document.getElementById('archivoExcel').files[0];
-    const uploadStatus = document.getElementById('upload-status');
+    const uploadStatus = document.getElementById('upload-status'); // Definir uploadStatus aquí
     const excelPreview = document.getElementById('excel-preview');
     uploadStatus.textContent = "Cargando archivo...";
     const formData = new FormData();
@@ -184,6 +184,7 @@ document.getElementById('form-seleccionar-curso').addEventListener('submit', fun
             limpiarBtn.addEventListener('click', function() {
                 excelPreview.innerHTML = '';
                 document.getElementById('archivoExcel').value = '';
+                const uploadStatus = document.getElementById('upload-status'); // Definir uploadStatus aquí también
                 uploadStatus.textContent = '';
             });
             excelPreview.appendChild(limpiarBtn);
