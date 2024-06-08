@@ -231,3 +231,27 @@ body {
 .table-striped tbody tr:nth-of-type(odd) {
     background-color: rgba(0, 0, 0, 0.05);
 }
+
+/* Estilos para el modal de selección de curso */
+#seleccionarCursoModal .modal-header {
+    background-color: #007bff;
+    color: #fff;
+}
+
+#seleccionarCursoModal .modal-body {
+    padding: 20px;
+}
+
+#seleccionarCursoModal .form-label {
+    font-size: 16px;
+    margin-bottom: 5px;
+}
+
+#seleccionarCursoModal .form-control {
+    margin-bottom: 15px;
+}
+
+#seleccionarCursoModal .modal-footer {
+    display: flex;
+    justify-content: space-between;
+}
