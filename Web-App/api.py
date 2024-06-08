@@ -9,7 +9,6 @@ CORS(app)
 
 # Lista para almacenar los cursos registrados
 cursos_registrados = []
-
 # Diccionario para almacenar los DataFrames asociados a los cursos
 dataframes_cursos = {}
 
@@ -98,6 +97,9 @@ def vincular_archivo_curso():
             df['curso_id'] = curso_id
             df['nombre_curso'] = next((curso['nombre'] for curso in cursos_registrados if curso['id'] == curso_id), 'Desconocido')
             if os.path.exists(CSV_FILE_PATH):
+                # Agregar una línea de separación antes de concatenar los nuevos datos
+                with open(CSV_FILE_PATH, 'a') as f:
+                    f.write('\n' + '-'*50 + '\n')
                 df.to_csv(CSV_FILE_PATH, mode='a', header=False, index=False)
             else:
                 df.to_csv(CSV_FILE_PATH, mode='w', header=True, index=False)
