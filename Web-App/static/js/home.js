@@ -22,7 +22,6 @@ document.addEventListener('DOMContentLoaded', function() {
             showSection(sectionId);
         });
     });
-
     // Mostrar la sección de landing page por defecto al cargar la página
     showSection('inicio');
 });
@@ -34,22 +33,18 @@ document.getElementById('form-inscribir-curso').addEventListener('submit', funct
     const anioCurso = document.getElementById('anioCurso').value;
     const fechaInicio = document.getElementById('fechaInicio').value;
     const fechaTermino = document.getElementById('fechaTermino').value;
-
     // Validar que los campos no esten vacios
     if (nombreCurso.trim() === '' || anioCurso.trim() === '' || fechaInicio.trim() === '' || fechaTermino.trim() === '') {
         alert('Por favor, complete todos los campos.');
         return;
     }
-
     let data_to_send = {
         'nombre': nombreCurso,
         'año': anioCurso,
         'fechaInicio': fechaInicio,
         'fechaTermino': fechaTermino
     };
-    
     console.log(data_to_send);
-    
     fetch('/app/register_courses', {
         method: 'POST',
         headers: {
@@ -62,14 +57,11 @@ document.getElementById('form-inscribir-curso').addEventListener('submit', funct
         console.log(data);
     })
     .catch(error => console.error(error));
-    
     // Limpiar el formulario
     this.reset();
-
     // Cerrar el modal
     const modal = bootstrap.Modal.getInstance(document.getElementById('inscribirCursoModal'));
     modal.hide();
-
     // Actualizar la lista de cursos inscritos
     const cursosLista = document.getElementById('cursos-lista');
     cursosLista.innerHTML = `<p>Curso: ${nombreCurso}, Año: ${anioCurso}, Inicio: ${fechaInicio}, Término: ${fechaTermino}</p>`;
@@ -82,10 +74,8 @@ document.getElementById('form-cargar-excels').addEventListener('submit', functio
     const uploadStatus = document.getElementById('upload-status');
     const excelPreview = document.getElementById('excel-preview');
     uploadStatus.textContent = "Cargando archivo...";
-
     const formData = new FormData();
     formData.append("file", archivoExcel);
-
     fetch('/app/recive_data', {
         method: 'POST',
         body: formData
@@ -100,21 +90,21 @@ document.getElementById('form-cargar-excels').addEventListener('submit', functio
             seleccionarCursoModal.show();
             // Llenar las opciones del select con los cursos disponibles
             fetch('/app/get_courses')
-                .then(response => response.json())
-                .then(courses => {
-                    const cursoSeleccionado = document.getElementById('cursoSeleccionado');
+            .then(response => response.json())
+            .then(courses => {
+                const cursoSeleccionado = document.getElementById('cursoSeleccionado');
+                cursoSeleccionado.innerHTML = '';
+                if (courses.length > 0) {
+                    courses.forEach(course => {
+                        const option = document.createElement('option');
+                        option.value = course.id;
+                        option.textContent = `${course.nombre} (${course.año})`;
+                        cursoSeleccionado.appendChild(option);
+                    });
+                } else {
                     cursoSeleccionado.innerHTML = '';
-                    if (courses.length > 0) {
-                        courses.forEach(course => {
-                            const option = document.createElement('option');
-                            option.value = course.id;
-                            option.textContent = `${course.nombre} (${course.año})`;
-                            cursoSeleccionado.appendChild(option);
-                        });
-                    } else {
-                        cursoSeleccionado.innerHTML = '<option value="">No hay cursos disponibles</option>';
-                    }
-                });
+                }
+            });
         } else {
             uploadStatus.textContent = "Error al cargar el archivo.";
             uploadStatus.style.color = "#dc3545";
@@ -135,7 +125,6 @@ document.getElementById('form-seleccionar-curso').addEventListener('submit', fun
         alert('Por favor, seleccione un curso.');
         return;
     }
-
     fetch('/app/vincular_archivo_curso', {
         method: 'POST',
         headers: {
@@ -154,12 +143,20 @@ document.getElementById('form-seleccionar-curso').addEventListener('submit', fun
             // Cerrar el modal
             const modal = bootstrap.Modal.getInstance(document.getElementById('seleccionarCursoModal'));
             modal.hide();
-
             // Mostrar el archivo cargado en el frontend
             const excelPreview = document.getElementById('excel-preview');
             excelPreview.innerHTML = data.data; // Asumiendo que `data.data` contiene el HTML del archivo Excel
-
             alert('Archivo vinculado exitosamente al curso.');
+            // Agregar botón para limpiar y cargar otro archivo
+            const limpiarBtn = document.createElement('button');
+            limpiarBtn.textContent = 'Limpiar y cargar otro archivo';
+            limpiarBtn.className = 'btn btn-warning';
+            limpiarBtn.addEventListener('click', function() {
+                excelPreview.innerHTML = '';
+                document.getElementById('archivoExcel').value = '';
+                uploadStatus.textContent = '';
+            });
+            excelPreview.appendChild(limpiarBtn);
         } else {
             alert('Error al vincular el archivo al curso.');
         }
