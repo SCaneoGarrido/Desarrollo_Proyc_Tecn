@@ -125,3 +125,15 @@ body {
     font-size: 20px; /* Aumenta el tamaño de la fuente */
     color: #000; /* Color del texto */
 }
+
+/* Estilos para la tarjeta de vista previa del Excel */
+#excel-preview {
+    max-height: 400px;
+    overflow-y: auto;
+    border: 1px solid rgba(255, 255, 255, 0.3); /* Borde blanco con transparencia */
+    border-radius: 10px;
+    padding: 10px;
+    background-color: rgba(255, 255, 255, 0.2); /* Fondo blanco con transparencia */
+    backdrop-filter: blur(10px); /* Efecto de desenfoque */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra */
+}

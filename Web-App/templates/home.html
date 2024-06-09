@@ -149,20 +149,29 @@
     <section id="cargar-excels" class="section" style="display:none;">
         <div class="container">
             <h2>Cargar Excels</h2>
-            <div class="card">
-                <p>Sube tus archivos Excel aquí para procesarlos y actualizar tus bases de datos.</p>
-                <form id="form-cargar-excels" class="form-cargar-excels">
-                    <div class="mb-3">
-                        <label for="archivoExcel" class="form-label">Seleccionar archivo Excel</label>
-                        <div class="input-group">
-                            <span class="input-group-text"><i class="fas fa-file-excel"></i></span>
-                            <input type="file" class="form-control" id="archivoExcel" accept=".xls,.xlsx" required>
-                        </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card">
+                        <p>Sube tus archivos Excel aquí para procesarlos y actualizar tus bases de datos.</p>
+                        <form id="form-cargar-excels" class="form-cargar-excels">
+                            <div class="mb-3">
+                                <label for="archivoExcel" class="form-label">Seleccionar archivo Excel</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-file-excel"></i></span>
+                                    <input type="file" class="form-control" id="archivoExcel" accept=".xls,.xlsx" required>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-primary btn-lg">Cargar</button>
+                        </form>
+                        <div id="upload-status" class="mt-3"></div>
                     </div>
-                    <button type="submit" class="btn btn-primary btn-lg">Cargar</button>
-                </form>
-                <div id="upload-status" class="mt-3"></div>
-                <div id="excel-preview" class="mt-3"></div> <!-- Área de visualización del archivo Excel -->
+                </div>
+                <div class="col-md-6">
+                    <div class="card">
+                        <h3>Vista Previa del Archivo Excel</h3>
+                        <div id="excel-preview" class="mt-3"></div> <!-- Área de visualización del archivo Excel -->
+                    </div>
+                </div>
             </div>
         </div>
     </section>
