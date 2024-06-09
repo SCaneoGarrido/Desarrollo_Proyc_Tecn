@@ -109,3 +109,19 @@ body {
     background-color: rgba(145, 145, 189, 0.2); /* Fondo con tinte morado al pasar el ratón */
     border-color: rgba(145, 145, 189, 0.3); /* Borde con tinte morado al pasar el ratón */
 }
+
+/* Estilos para la tarjeta de vidrio */
+.glass-card {
+    background-color: rgba(255, 255, 255, 0.2); /* Fondo blanco con transparencia */
+    backdrop-filter: blur(10px); /* Efecto de desenfoque */
+    border: 1px solid rgba(255, 255, 255, 0.3); /* Borde blanco con transparencia */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra */
+    border-radius: 10px; /* Bordes redondeados */
+    padding: 20px; /* Espaciado interno */
+    margin-top: 20px; /* Espaciado superior */
+}
+
+.description {
+    font-size: 20px; /* Aumenta el tamaño de la fuente */
+    color: #000; /* Color del texto */
+}
