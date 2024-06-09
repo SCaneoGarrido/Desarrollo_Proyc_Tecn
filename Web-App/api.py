@@ -1,16 +1,21 @@
-from flask import Flask, request, jsonify, send_file, session, redirect, url_for, render_template # type: ignore
-from flask_cors import CORS # type: ignore
-from datetime import datetime, timedelta
-from flask_session import Session # type: ignore
-from Utilidades.manage_credential import credentialsUser
-from Utilidades.manejo_db import db_manage
-from Utilidades.autenticacion import autenticacion
+import os
+import pandas as pd
+from flask import Flask, request, jsonify, session, render_template
+from flask_cors import CORS
 
 app = Flask(__name__, template_folder='templates', static_folder='static')
+app.secret_key = 'supersecretkey'  # Necesario para usar sesiones
 CORS(app)
 
-# Renderizador
+# Lista para almacenar los cursos registrados
+cursos_registrados = []
+# Diccionario para almacenar los DataFrames asociados a los cursos
+dataframes_cursos = {}
 
+# Ruta del archivo CSV donde se guardarán las vinculaciones
+CSV_FILE_PATH = 'vinculaciones.csv'
+
+# =========== INICIO RENDERIZADOR ====================== #
 @app.route('/')
 def render_login():
     return render_template('login.html')
@@ -18,72 +23,93 @@ def render_login():
 @app.route('/home')
 def home():
     return render_template('home.html')
+# =========== TERMINO DE RENDERIZADOR ====================== #
 
-@app.route('/login', methods=['POST'])
-def handle_login():
-    if request.method == "POST":
+@app.route('/app/recive_data', methods=['POST'])
+def recive_data():
+    if request.method == 'POST':
         try:
-            data = request.get_json()
-            correo = data.get('correo')
-            contraseña = data.get('contraseña')
-
-            # obtener el usuario de la base de datos:
-            user = db_manage.validate(correo, contraseña)
-            if user:
-                user_id = db_manage.get_user_id(correo)
-
-                if user_id:
-                    session['user_id'] = user_id
-                    session['correo'] = correo
-
-                    return jsonify({'user_id': user_id, 'correo': correo, 'redirect_url': url_for('home')})
-            return jsonify({'error': 'Invalid credentials'}), 401
+            if 'file' not in request.files:
+                return jsonify({"error": "no se ha proporcionado ningún archivo"}), 400
+            file = request.files['file']
+            if file.filename == '':
+                return jsonify({"error": "no se ha seleccionado ningún archivo"}), 400
+            if file:
+                # Leer el archivo directamente en un DataFrame
+                data = pd.read_excel(file)
+                # Convertir el DataFrame a HTML
+                html_data = data.to_html(classes='table table-bordered table-striped')
+                # Guardar el DataFrame en una variable de sesión o en memoria
+                session['uploaded_data'] = data.to_dict()
+                return jsonify({"success": "archivo guardado", "data": html_data}), 200
         except Exception as e:
             print(f"Error: {e}")
-            return jsonify({'error': 'Internal Server Error'}), 500
-    return jsonify({'error': 'Bad Request'}), 400
+            return jsonify({"error": "ocurrió un error al procesar el archivo"}), 400
 
-@app.route('/app/registro', methods=['POST'])
-def registro():
+@app.route('/app/register_courses', methods=['POST'])
+def register_courses():
     if request.method == 'POST':
         data = request.get_json()
-        print(data)
-        nombre = data.get('nombre')
-        apellido = data.get('apellido')
-        correo = data.get('correo')
-        contraseña = data.get('contrasena')
-        try:
-            token_generado = autenticacion.generar_token()
-            time_now = datetime.now()
-            tiempo_token_expirado = timedelta(minutes=3)
-            tiempo_creacion_token = time_now - tiempo_token_expirado
-            
-            if autenticacion.enviar_token:
-                if tiempo_creacion_token < tiempo_token_expirado:
-                    validarToken(token_generado)
-                else:
-                    print("El tiempo del token ha expirado")
-            else:
-                print("No se logró enviar el token")
-        except Exception as e:
-            print(f"Algo salió mal... {e}")
-            return jsonify({'message': 'Error interno del servidor.'}), 500
+        # obtenemos los datos ingresados del curso
+        nombre_curso = data['nombre']
+        año_curso = data['año']  # Asegúrate de usar 'año' en lugar de 'anio'
+        fecha_inicio_curso = data['fechaInicio']
+        fecha_termino_curso = data['fechaTermino']
+        # Crear el curso_id combinando el nombre del curso y un sufijo _id
+        curso_id = f"{nombre_curso.replace(' ', '_')}_id"
+        # Agregar el curso a la lista de cursos registrados
+        curso = {
+            "id": curso_id,
+            "nombre": nombre_curso,
+            "año": año_curso,
+            "fechaInicio": fecha_inicio_curso,
+            "fechaTermino": fecha_termino_curso
+        }
+        cursos_registrados.append(curso)
+        print("############ DATA RECIBIDA ############")
+        print(f"Nombre del curso: {nombre_curso}")
+        print(f"Año: {año_curso}")
+        print(f"Fecha de inicio: {fecha_inicio_curso}")
+        print(f"Fecha de termino: {fecha_termino_curso}")
+        print("############ FIN DATA RECIBIDA ############")
+        return jsonify({"success": "curso recibido"}), 200
 
-@app.route('/app/validate_token', methods=['POST'])
-def validarToken(token_generado, nombre, apellido, correo, contraseña):
+@app.route('/app/get_courses', methods=['GET'])
+def get_courses():
+    return jsonify(cursos_registrados), 200
+
+@app.route('/app/vincular_archivo_curso', methods=['POST'])
+def vincular_archivo_curso():
     if request.method == 'POST':
         data = request.get_json()
-        token_ingreso = data.get('token')
-
+        curso_id = data.get('cursoId')
+        if not curso_id:
+            return jsonify({"success": False, "error": "cursoId no proporcionado"}), 400
         try:
-            if token_ingreso == token_generado:
-                if credentialsUser.genCredentials(nombre, apellido, correo, contraseña):
-                    print("Usuario validado y agregado")
-                return True
+            # Obtener el DataFrame de la variable de sesión o memoria
+            if 'uploaded_data' not in session:
+                return jsonify({"success": False, "error": "No hay datos cargados"}), 400
+            df = pd.DataFrame(session['uploaded_data'])
+            # Asociar el DataFrame con el curso
+            dataframes_cursos[curso_id] = df
+            html_data = df.to_html(classes='table table-bordered table-striped')
+            # Guardar la vinculación en un archivo CSV
+            df['curso_id'] = curso_id
+            df['nombre_curso'] = next((curso['nombre'] for curso in cursos_registrados if curso['id'] == curso_id), 'Desconocido')
+            if os.path.exists(CSV_FILE_PATH):
+                # Agregar una línea de separación antes de concatenar los nuevos datos
+                with open(CSV_FILE_PATH, 'a') as f:
+                    f.write('\n' + '-'*50 + '\n')
+                df.to_csv(CSV_FILE_PATH, mode='a', header=False, index=False)
             else:
-                return False
+                df.to_csv(CSV_FILE_PATH, mode='w', header=True, index=False)
+            # Agregar print para ver la vinculación en la terminal
+            print(f"Curso ID: {curso_id} vinculado con el siguiente DataFrame:")
+            print(df)
+            return jsonify({"success": True, "data": html_data}), 200
         except Exception as e:
-            print(f"Hubo un error al validar el token de autenticacion: {e}")
+            print(f"Error: {e}")
+            return jsonify({"success": False, "error": "ocurrió un error al vincular el archivo"}), 400
 
 if __name__ == '__main__':
-    app.run()
+    app.run(debug=True)

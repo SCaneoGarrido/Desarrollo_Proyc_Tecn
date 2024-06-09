@@ -1,3 +1,4 @@
+/* Estilos generales */
 * {
     padding: 0;
     margin: 0;
@@ -49,52 +50,90 @@ body {
     margin-top: -100px;
 }
 
-.inicio {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-direction: column;
-    text-align: center;
+/* Estilos para la sección de Cursos */
+#cursos {
     padding: 50px 0;
+    background-color: transparent; /* Cambiar a transparente */
+    border-radius: 10px;
+    box-shadow: none; /* Eliminar sombra */
 }
 
-.contenedor-inicio {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-direction: row-reverse;
+#cursos h2 {
+    font-size: 45px; /* Aumenta el tamaño de la fuente */
     margin-bottom: 20px;
+    color: #000; /* Cambia el color del texto a negro */
 }
 
-.contenedor-inicio img {
-    width: 50%;
-    max-width: 300px;
-    margin-left: 20px;
+#cursos h3 {
+    font-size: 22px; /* Aumenta el tamaño de la fuente */
+    margin-bottom: 10px;
+    color: #000; /* Cambia el color del texto a negro */
 }
 
-.texto-inicio {
-    max-width: 600px;
-    text-align: left;
-    color: #fff;
+#cursos-lista {
+    max-height: 400px;
+    overflow-y: auto;
+    border: 1px solid rgba(255, 255, 255, 0.3); /* Borde blanco con transparencia */
+    border-radius: 10px;
+    padding: 10px;
+    background-color: rgba(255, 255, 255, 0.2); /* Fondo blanco con transparencia */
+    backdrop-filter: blur(10px); /* Efecto de desenfoque */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra */
 }
 
-.texto-inicio h2 {
-    font-size: 60px;
-    font-weight: bold;
+#cursos-lista p {
+    font-size: 20px; /* Aumenta el tamaño de la fuente */
+    color: #000; /* Cambia el color del texto a negro */
+    margin-bottom: 10px;
+    padding: 10px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.3); /* Borde blanco con transparencia */
 }
 
-.texto-inicio p {
-    font-size: 20px;
+#cursos-lista p:last-child {
+    border-bottom: none;
 }
 
-.texto-inicio input {
-    background-color: transparent;
-    outline: none;
-    border: solid 2px #9191bd;
-    border-radius: 20px;
-    padding: 10px 20px;
-    color: #fff;
-    cursor: pointer;
-    transition: background-color .3s ease;
-    font-size: 30px;
+/* Estilos para las tarjetas con efecto vidrio lechoso */
+.card {
+    background-color: rgba(255, 255, 255, 0.2); /* Fondo blanco con transparencia */
+    backdrop-filter: blur(10px); /* Efecto de desenfoque */
+    border: 1px solid rgba(255, 255, 255, 0.3); /* Borde blanco con transparencia */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra */
+    border-radius: 10px; /* Bordes redondeados */
+    color: #000; /* Color del texto */
+    padding: 20px; /* Espaciado interno */
+    transition: background-color 0.3s, border-color 0.3s; /* Transiciones suaves */
+}
+
+.card:hover {
+    background-color: rgba(145, 145, 189, 0.2); /* Fondo con tinte morado al pasar el ratón */
+    border-color: rgba(145, 145, 189, 0.3); /* Borde con tinte morado al pasar el ratón */
+}
+
+/* Estilos para la tarjeta de vidrio */
+.glass-card {
+    background-color: rgba(255, 255, 255, 0.2); /* Fondo blanco con transparencia */
+    backdrop-filter: blur(10px); /* Efecto de desenfoque */
+    border: 1px solid rgba(255, 255, 255, 0.3); /* Borde blanco con transparencia */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra */
+    border-radius: 10px; /* Bordes redondeados */
+    padding: 20px; /* Espaciado interno */
+    margin-top: 20px; /* Espaciado superior */
+}
+
+.description {
+    font-size: 20px; /* Aumenta el tamaño de la fuente */
+    color: #000; /* Color del texto */
+}
+
+/* Estilos para la tarjeta de vista previa del Excel */
+#excel-preview {
+    max-height: 400px;
+    overflow-y: auto;
+    border: 1px solid rgba(255, 255, 255, 0.3); /* Borde blanco con transparencia */
+    border-radius: 10px;
+    padding: 10px;
+    background-color: rgba(255, 255, 255, 0.2); /* Fondo blanco con transparencia */
+    backdrop-filter: blur(10px); /* Efecto de desenfoque */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra */
 }

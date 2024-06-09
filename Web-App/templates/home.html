@@ -26,22 +26,22 @@
                         <a class="nav-link" href="#inicio">Inicio</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#tusCargas">Tus Cargas</a>
+                        <a class="nav-link" href="#cursos">Cursos</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#soporte">Soporte</a>
+                        <a class="nav-link" href="#cargar-excels">Cargar Excels</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#cuenta">Cuenta</a>
+                        <a class="nav-link" href="#analisis-cursos">Análisis Cursos</a>
                     </li>
                     <li class="nav-item">
-                        <input type="submit" class="btn btn-primary" value="Cargar Archivo">
+                        <a class="nav-link" href="#perfil">Perfil</a>
                     </li>
                 </ul>
             </div>
         </div>
     </nav>
-
+    
     <!-- Sección de Inicio -->
     <section id="inicio" class="section" style="display:block;">
         <div class="container text-center">
@@ -51,36 +51,180 @@
                 </div>
                 <div class="col-md-6">
                     <h2>¿Qué ES FORMULARIO AGIL?</h2>
-                    <p>Es una web la cual te permite manejar filtros de archivos excel cargados, actualizar tus bases de datos. La función de este sitio web es ayudarte a optimizar tu tiempo en tareas manuales que mediante filtros más automatizados te permiten un mejor flujo de trabajo.</p>
-                    <input type="button" class="btn btn-outline-primary" value="Pruebalo">
+                    <div class="glass-card">
+                        <p class="description">Es una web la cual te permite manejar filtros de archivos excel cargados, actualizar tus bases de datos. La función de este sitio web es ayudarte a optimizar tu tiempo en tareas manuales que mediante filtros más automatizados te permiten un mejor flujo de trabajo.</p>
+                    </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Sección de Tus Cargas -->
-    <section id="tusCargas" class="section" style="display:none;">
+    <!-- Sección de Cursos -->
+    <section id="cursos" class="section" style="display:none;">
         <div class="container">
-            <h2>Tus Cargas</h2>
-            <p>Esta sección te permitirá gestionar y visualizar todas tus cargas de archivos.</p>
+            <h2>Cursos</h2>
+            <div class="row">
+                <div class="col-md-6 mb-4">
+                    <div class="card">
+                        <h3>Inscribir Curso</h3>
+                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#inscribirCursoModal">
+                            Inscribir Curso
+                        </button>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card">
+                        <h3>Ver Cursos</h3>
+                        <div id="estado-cursos">No hay cursos inscritos aún.</div>
+                        <div id="cursos-lista">
+                            <!-- Los cursos se agregarán aquí dinámicamente -->
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </section>
 
-    <!-- Sección de Soporte -->
-    <section id="soporte" class="section" style="display:none;">
+    <!-- Modal para Inscribir Curso -->
+    <div class="modal fade" id="inscribirCursoModal" tabindex="-1" aria-labelledby="inscribirCursoModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="inscribirCursoModalLabel">Inscribir Curso</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="form-inscribir-curso">
+                        <div class="mb-3">
+                            <label for="nombreCurso" class="form-label">Nombre del Curso</label>
+                            <input type="text" class="form-control" id="nombreCurso" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="anioCurso" class="form-label">Año</label>
+                            <input type="number" class="form-control" id="anioCurso" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="fechaInicio" class="form-label">Fecha de Inicio</label>
+                            <input type="date" class="form-control" id="fechaInicio" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="fechaTermino" class="form-label">Fecha de Término</label>
+                            <input type="date" class="form-control" id="fechaTermino" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Aceptar</button>
+                        <button type="reset" class="btn btn-secondary">Limpiar</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Volver</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para Seleccionar Curso -->
+    <div class="modal fade" id="seleccionarCursoModal" tabindex="-1" aria-labelledby="seleccionarCursoModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="seleccionarCursoModalLabel">Seleccionar Curso</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="form-seleccionar-curso">
+                        <div class="mb-3">
+                            <label for="cursoSeleccionado" class="form-label">Curso</label>
+                            <select class="form-control" id="cursoSeleccionado" required>
+                                <!-- Opciones de cursos se llenarán dinámicamente -->
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Vincular</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="button" class="btn btn-secondary" id="irAInscribirCurso">Inscribir Curso</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sección de Cargar Excels -->
+    <section id="cargar-excels" class="section" style="display:none;">
         <div class="container">
-            <h2>Soporte</h2>
-            <p>¿Necesitas ayuda? Esta sección te proporcionará toda la información y soporte necesario.</p>
+            <h2>Cargar Excels</h2>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card">
+                        <p>Sube tus archivos Excel aquí para procesarlos y actualizar tus bases de datos.</p>
+                        <form id="form-cargar-excels" class="form-cargar-excels">
+                            <div class="mb-3">
+                                <label for="archivoExcel" class="form-label">Seleccionar archivo Excel</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-file-excel"></i></span>
+                                    <input type="file" class="form-control" id="archivoExcel" accept=".xls,.xlsx" required>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-primary btn-lg">Cargar</button>
+                        </form>
+                        <div id="upload-status" class="mt-3"></div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card">
+                        <h3>Vista Previa del Archivo Excel</h3>
+                        <div id="excel-preview" class="mt-3"></div> <!-- Área de visualización del archivo Excel -->
+                    </div>
+                    <div id="button-container" class="mt-3"></div> <!-- Contenedor para el botón -->
+                </div>
+            </div>
         </div>
     </section>
 
-    <!-- Sección de Cuenta -->
-    <section id="cuenta" class="section" style="display:none;">
+    <!-- Sección de Análisis Cursos -->
+    <section id="analisis-cursos" class="section" style="display:none;">
         <div class="container">
-            <h2>Cuenta</h2>
-            <p>Administra los detalles de tu cuenta, cambia tu contraseña y actualiza tu información personal.</p>
+            <h2>Análisis Cursos</h2>
+            <p>Esta sección está vacía por ahora.</p>
         </div>
     </section>
+
+    <!-- Sección de Perfil -->
+    <section id="perfil" class="section" style="display:none;">
+        <div class="container">
+            <h2>Perfil</h2>
+            <div class="card" style="width: 18rem; margin: auto;">
+                <div class="card-body text-center">
+                    <i class="fas fa-user-circle fa-5x mb-3"></i>
+                    <h5 class="card-title" id="nombreUsuario">Nombre del Usuario</h5>
+                    <p class="card-text" id="emailUsuario">Correo: usuario@ejemplo.com</p>
+                    <p class="card-text" id="cargoUsuario">Cargo: Desarrollador</p>
+                    <a href="#" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#editarPerfilModal">Editar Perfil</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Modal para Editar Perfil -->
+    <div class="modal fade" id="editarPerfilModal" tabindex="-1" aria-labelledby="editarPerfilModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editarPerfilModalLabel">Editar Perfil</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="form-editar-perfil">
+                        <div class="mb-3">
+                            <label for="editarNombreUsuario" class="form-label">Nombre</label>
+                            <input type="text" class="form-control" id="editarNombreUsuario" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editarCargoUsuario" class="form-label">Cargo</label>
+                            <input type="text" class="form-control" id="editarCargoUsuario" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="{{ url_for('static', filename='js/home.js') }}"></script>
