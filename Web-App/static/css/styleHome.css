@@ -103,9 +103,9 @@ body {
 /* Estilos para la sección de Cursos */
 #cursos {
     padding: 50px 0;
-    background-color: #f8f9fa;
+    background-color: transparent; /* Cambiar a transparente */
     border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    box-shadow: none; /* Eliminar sombra */
 }
 
 #cursos h2 {
@@ -123,10 +123,12 @@ body {
 #cursos-lista {
     max-height: 400px;
     overflow-y: auto;
-    border: 1px solid #dee2e6;
-    border-radius: 5px;
+    border: 1px solid rgba(255, 255, 255, 0.3); /* Borde blanco con transparencia */
+    border-radius: 10px;
     padding: 10px;
-    background-color: #fff;
+    background-color: rgba(255, 255, 255, 0.2); /* Fondo blanco con transparencia */
+    backdrop-filter: blur(10px); /* Efecto de desenfoque */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra */
 }
 
 #cursos-lista p {
@@ -134,7 +136,7 @@ body {
     color: #333;
     margin-bottom: 10px;
     padding: 10px;
-    border-bottom: 1px solid #dee2e6;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.3); /* Borde blanco con transparencia */
 }
 
 #cursos-lista p:last-child {
@@ -168,26 +170,26 @@ body {
 /* Estilos para la sección de Cargar Excels */
 #cargar-excels {
     padding: 50px 0;
-    background-color: #f8f9fa;
+    background-color: transparent; /* Cambiar a transparente */
     border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    box-shadow: none; /* Eliminar sombra */
 }
 
 #cargar-excels h2 {
-    font-size: 40px;
+    font-size: 45px; /* Aumenta el tamaño de la fuente */
     margin-bottom: 20px;
-    color: #343a40;
+    color: #000; /* Cambia el color del texto a negro */
 }
 
 #cargar-excels p {
-    font-size: 18px;
-    color: #6c757d;
+    font-size: 22px; /* Aumenta el tamaño de la fuente */
+    color: #000; /* Cambia el color del texto a negro */
 }
 
 #cargar-excels .form-label {
-    font-size: 16px;
+    font-size: 20px; /* Aumenta el tamaño de la fuente */
     margin-bottom: 5px;
-    color: #495057;
+    color: #000; /* Cambia el color del texto a negro */
 }
 
 #cargar-excels .form-control {
@@ -196,9 +198,10 @@ body {
 }
 
 #cargar-excels .input-group-text {
-    background-color: #e9ecef;
-    border: 1px solid #ced4da;
+    background-color: rgba(255, 255, 255, 0.2); /* Fondo blanco con transparencia */
+    border: 1px solid rgba(255, 255, 255, 0.3); /* Borde blanco con transparencia */
     border-radius: 5px 0 0 5px;
+    backdrop-filter: blur(10px); /* Efecto de desenfoque */
 }
 
 #cargar-excels .btn-primary {
@@ -275,4 +278,21 @@ body {
 #seleccionarCursoModal .modal-footer {
     display: flex;
     justify-content: space-between;
+}
+
+/* Estilos para las tarjetas con efecto vidrio lechoso */
+.card {
+    background-color: rgba(255, 255, 255, 0.2); /* Fondo blanco con transparencia */
+    backdrop-filter: blur(10px); /* Efecto de desenfoque */
+    border: 1px solid rgba(255, 255, 255, 0.3); /* Borde blanco con transparencia */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra */
+    border-radius: 10px; /* Bordes redondeados */
+    color: #fff; /* Color del texto */
+    padding: 20px; /* Espaciado interno */
+    transition: background-color 0.3s, border-color 0.3s; /* Transiciones suaves */
+}
+
+.card:hover {
+    background-color: rgba(145, 145, 189, 0.2); /* Fondo con tinte morado al pasar el ratón */
+    border-color: rgba(145, 145, 189, 0.3); /* Borde con tinte morado al pasar el ratón */
 }
