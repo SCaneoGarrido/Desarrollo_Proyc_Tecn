@@ -2,6 +2,7 @@ import os
 import pandas as pd
 from flask import Flask, request, jsonify, session, render_template
 from flask_cors import CORS
+from Utilidades.manejo_db import db_manage
 
 app = Flask(__name__, template_folder='templates', static_folder='static')
 app.secret_key = 'supersecretkey'  # Necesario para usar sesiones
@@ -110,6 +111,27 @@ def vincular_archivo_curso():
         except Exception as e:
             print(f"Error: {e}")
             return jsonify({"success": False, "error": "ocurrió un error al vincular el archivo"}), 400
+
+
+
+# NUEVAS RUTAS
+@app.route('app/login', mehods=['POST'])
+def handle_login():
+    try:
+        if request.method == 'POST':
+            data = request.get_json()
+            correo = data['correo']
+            contraseña = data['contraseña']
+
+            if not correo or not contraseña:
+                return jsonify({"success": False, "error": "correo o contraseña no proporcionado"}), 400
+            
+            
+        else:
+            return "Bad Request"
+    except Exception as e:
+        print(f"Error: {e}")
+
 
 if __name__ == '__main__':
     app.run(debug=True)

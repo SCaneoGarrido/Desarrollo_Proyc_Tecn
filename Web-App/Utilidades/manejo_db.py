@@ -1,42 +1,36 @@
 import json
-import psycopg2  # type: ignore
+import os
+import mysql.connector
+from dotenv import load_dotenv
 
 
 class db_manage:
     def __init__(self):
+        load_dotenv()
+        self.database = os.environ.get('DATABASE')
+        self.user = os.environ.get('USER')
+        self.password = os.environ.get('PASSWORD')
+        self.host = os.environ.get('HOST')
+        self.port = os.environ.get('PORT')
         pass
 
-    @staticmethod
-    def connect():
 
+    def connect(self):
         try:
-            with open('Backend/Informacion/db_config.json', 'r') as f:
-                credenciales = json.load(f)
-
-            database = credenciales.get('database')
-            user = credenciales.get('user')
-            host = credenciales.get('host')
-            password = credenciales.get('password')
-            port = credenciales.get('port')
-
-            conn = psycopg2.connect(
-                    user=user,
-                    password=password,
-                    host=host,
-                    database=database,
-                    port=port,
-                    )
-
+            conn = mysql.connector.connect(
+                database=self.database,
+                user=self.user,
+                password=self.password,
+                host=self.host,
+                port=self.port
+            
+            )
             if conn:
-                print(f"Conexion exitosa a la base de datos")
                 return conn
-                
-        except psycopg2.Error as e:
-            print(f"Error al conectar a la base de datos: {e}")
-
-
-    @staticmethod
-    def insertUserOnDB(nombre, apellido, correo, hash_clave, salt):
+        except Exception as e:
+            print(f"Error: {e}") 
+    
+    def insertUserOnDB(self ,nombre, apellido, correo, hash_clave, salt):
         try:
             conn = db_manage.connect()
             cursor = conn.cursor()
@@ -51,12 +45,12 @@ class db_manage:
             conn.close()
             return True
 
-        except (Exception, psycopg2.DatabaseError) as error:
+        except mysql.connector.Error as error:
             print(f"Error: {error}")
             return False
 
-    @staticmethod
-    def validate(correo, contraseña):
+    
+    def validate(self ,correo, contraseña):
         #importacion tardia para romper dependencia circular
         from Utilidades.manage_credential import credentialsUser
         try:
@@ -79,8 +73,8 @@ class db_manage:
         except Exception as e:
             print(f"Error: {e}")    
     
-    @staticmethod
-    def get_user_id(correo):
+    
+    def get_user_id(self ,correo):
         try:
             conn = db_manage.connect()
             cursor = conn.cursor()
