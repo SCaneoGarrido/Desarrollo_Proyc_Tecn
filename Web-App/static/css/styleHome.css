@@ -137,3 +137,36 @@ body {
     backdrop-filter: blur(10px); /* Efecto de desenfoque */
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra */
 }
+
+/* Estilos para el footer */
+.footer {
+    background: linear-gradient(135deg, #4f8fc8, #5f4898, #8a76b1); /* Gradiente de color invertido */
+    color: #fff; /* Color del texto blanco */
+    padding: 20px 0; /* Espaciado interno */
+    border-top: 1px solid rgba(255, 255, 255, 0.3); /* Borde superior blanco con transparencia */
+    width: 100%; /* Asegura que el footer ocupe todo el ancho */
+    position: fixed; /* Fija el footer en la parte inferior */
+    bottom: 0; /* Posiciona el footer en la parte inferior */
+}
+
+.footer h5 {
+    font-size: 20px; /* Tamaño de fuente */
+    margin-bottom: 15px; /* Espaciado inferior */
+    color: #fff; /* Color del texto */
+}
+
+.footer p, .footer a {
+    font-size: 16px; /* Tamaño de fuente */
+    color: #fff; /* Color del texto */
+    margin-bottom: 10px; /* Espaciado inferior */
+}
+
+.footer a:hover {
+    color: #d1c4e9; /* Color del texto al pasar el ratón */
+    text-decoration: none; /* Sin subrayado */
+}
+
+.footer .list-unstyled {
+    padding-left: 0; /* Sin sangría */
+    list-style: none; /* Sin viñetas */
+}
