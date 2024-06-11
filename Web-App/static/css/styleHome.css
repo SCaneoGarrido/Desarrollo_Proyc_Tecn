@@ -147,6 +147,8 @@ body {
     width: 100%; /* Asegura que el footer ocupe todo el ancho */
     position: fixed; /* Fija el footer en la parte inferior */
     bottom: 0; /* Posiciona el footer en la parte inferior */
+    overflow: hidden;
+    height: 200px;
 }
 
 .footer h5 {
@@ -169,4 +171,12 @@ body {
 .footer .list-unstyled {
     padding-left: 0; /* Sin sangría */
     list-style: none; /* Sin viñetas */
+}
+
+.footer-logo {
+    width: 250px; /* Ajusta el tamaño de la imagen */
+    height: auto;
+    position: absolute; /* Posiciona la imagen de forma absoluta */
+    bottom: 10px; /* Ajusta la posición vertical */
+    left: 10px; /* Ajusta la posición horizontal */
 }
