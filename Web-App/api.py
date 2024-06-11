@@ -115,7 +115,7 @@ def vincular_archivo_curso():
 
 
 # NUEVAS RUTAS
-@app.route('app/login', mehods=['POST'])
+@app.route('/app/login', methods=['POST'])
 def handle_login():
     try:
         if request.method == 'POST':
