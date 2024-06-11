@@ -14,6 +14,12 @@ body {
     background: url(../iconos/fondo.png) no-repeat center center/cover;
 }
 
+.main-content {
+    min-height: calc(100vh - 200px); /* Altura mínima de la ventana menos la altura del footer */
+    display: flex;
+    flex-direction: column;
+}
+
 .navbar {
     height: 100px;
     padding: 0 20px;
@@ -145,8 +151,6 @@ body {
     padding: 20px 0; /* Espaciado interno */
     border-top: 1px solid rgba(255, 255, 255, 0.3); /* Borde superior blanco con transparencia */
     width: 100%; /* Asegura que el footer ocupe todo el ancho */
-    position: fixed; /* Fija el footer en la parte inferior */
-    bottom: 0; /* Posiciona el footer en la parte inferior */
     overflow: hidden;
     height: 200px;
 }
