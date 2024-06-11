@@ -162,7 +162,10 @@
                                         <input type="file" class="form-control" id="archivoExcel" accept=".xls,.xlsx" required>
                                     </div>
                                 </div>
-                                <button type="submit" class="btn btn-primary btn-lg">Cargar</button>
+                                <div id="button-container" class="d-flex justify-content-between">
+                                    <button type="submit" class="btn btn-primary btn-lg" id="cargar-btn">Cargar</button>
+                                    <!-- El botón "Limpiar y cargar otro archivo" se añadirá aquí dinámicamente -->
+                                </div>
                             </form>
                             <div id="upload-status" class="mt-3"></div>
                         </div>
@@ -172,7 +175,6 @@
                             <h3>Vista Previa del Archivo Excel</h3>
                             <div id="excel-preview" class="mt-3"></div> <!-- Área de visualización del archivo Excel -->
                         </div>
-                        <div id="button-container" class="mt-3"></div> <!-- Contenedor para el botón -->
                     </div>
                 </div>
             </div>
