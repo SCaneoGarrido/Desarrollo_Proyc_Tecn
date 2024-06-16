@@ -11,7 +11,7 @@ body {
     align-items: center;
     justify-content: center;
     height: 100vh;
-    background: url(../iconos/fondo.png) no-repeat center center/cover;
+    background: url(../iconos/fondoweb.jpg) no-repeat center center/cover;
 }
 
 .main-content {
