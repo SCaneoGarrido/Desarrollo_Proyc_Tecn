@@ -157,25 +157,19 @@ body {
 
 /* Estilos para el footer */
 .footer {
-    background: linear-gradient(135deg, #4f8fc8, #5f4898, #8a76b1); /* Gradiente de color invertido */
-    color: #fff; /* Color del texto blanco */
-    padding: 20px 0; /* Espaciado interno */
-    border-top: 1px solid rgba(255, 255, 255, 0.3); /* Borde superior blanco con transparencia */
-    width: 100%; /* Asegura que el footer ocupe todo el ancho */
-    overflow: hidden;
-    height: 200px;
+    background-color: rgba(255, 255, 255, 0.2) !important; /* Fondo blanco con transparencia */
+    backdrop-filter: blur(10px) !important; /* Efecto de desenfoque */
+    border: 1px solid rgba(255, 255, 255, 0.3) !important; /* Borde blanco con transparencia */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1) !important; /* Sombra */
+    color: #fff !important; /* Color del texto blanco */
+    padding: 20px 0 !important; /* Espaciado interno */
+    width: 100% !important; /* Asegura que el footer ocupe todo el ancho */
+    overflow: hidden !important;
+    height: 200px !important;
 }
 
-.footer h5 {
-    font-size: 20px; /* Tamaño de fuente */
-    margin-bottom: 15px; /* Espaciado inferior */
+.footer h5, .footer p, .footer a {
     color: #fff; /* Color del texto */
-}
-
-.footer p, .footer a {
-    font-size: 16px; /* Tamaño de fuente */
-    color: #fff; /* Color del texto */
-    margin-bottom: 10px; /* Espaciado inferior */
 }
 
 .footer a:hover {
