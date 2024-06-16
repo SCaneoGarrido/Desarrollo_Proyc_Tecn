@@ -192,3 +192,22 @@ body {
     bottom: 10px; /* Ajusta la posición vertical */
     left: 10px; /* Ajusta la posición horizontal */
 }
+
+/* Estilos para los textos dentro de todos los modales */
+.modal-content {
+    color: #000 !important; /* Cambia el color del texto a negro con prioridad */
+}
+
+/* Asegúrate de que los elementos específicos dentro de los modales también tengan el color negro */
+.modal-content h2,
+.modal-content h5,
+.modal-content label,
+.modal-content input,
+.modal-content p {
+    color: #000 !important; /* Cambia el color del texto a negro con prioridad */
+}
+
+/* Estilos específicos para el encabezado del modal */
+.modal-header {
+    color: #000 !important; /* Cambia el color del texto del encabezado a negro */
+}
