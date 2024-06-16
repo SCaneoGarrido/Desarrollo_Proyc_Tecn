@@ -4,6 +4,7 @@
     margin: 0;
     box-sizing: border-box;
     font-family: "Montserrat", sans-serif;
+    color: #f1f1f1; /* Cambia el color del texto a blanco off white */
 }
 
 body {
@@ -39,7 +40,7 @@ body {
 }
 
 .nav-link {
-    color: #fff;
+    color: #f1f1f1; /* Cambia el color del texto a blanco off white */
     font-size: 20px;
     transition: color 0.3s;
     margin-right: 10px;
@@ -78,13 +79,13 @@ body {
 #cursos h2 {
     font-size: 45px; /* Aumenta el tamaño de la fuente */
     margin-bottom: 20px;
-    color: #000; /* Cambia el color del texto a negro */
+    color: #f1f1f1; /* Cambia el color del texto a blanco off white */
 }
 
 #cursos h3 {
     font-size: 22px; /* Aumenta el tamaño de la fuente */
     margin-bottom: 10px;
-    color: #000; /* Cambia el color del texto a negro */
+    color: #f1f1f1; /* Cambia el color del texto a blanco off white */
 }
 
 #cursos-lista {
@@ -100,7 +101,7 @@ body {
 
 #cursos-lista p {
     font-size: 20px; /* Aumenta el tamaño de la fuente */
-    color: #000; /* Cambia el color del texto a negro */
+    color: #f1f1f1; /* Cambia el color del texto a blanco off white */
     margin-bottom: 10px;
     padding: 10px;
     border-bottom: 1px solid rgba(255, 255, 255, 0.3); /* Borde blanco con transparencia */
@@ -117,7 +118,7 @@ body {
     border: 1px solid rgba(255, 255, 255, 0.3); /* Borde blanco con transparencia */
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra */
     border-radius: 10px; /* Bordes redondeados */
-    color: #000; /* Color del texto */
+    color: #f1f1f1; /* Cambia el color del texto a blanco off white */
     padding: 20px; /* Espaciado interno */
     transition: background-color 0.3s, border-color 0.3s; /* Transiciones suaves */
 }
@@ -140,7 +141,7 @@ body {
 
 .description {
     font-size: 20px; /* Aumenta el tamaño de la fuente */
-    color: #000; /* Color del texto */
+    color: #f1f1f1; /* Cambia el color del texto a blanco off white */
 }
 
 /* Estilos para la tarjeta de vista previa del Excel */
@@ -161,7 +162,7 @@ body {
     backdrop-filter: blur(10px) !important; /* Efecto de desenfoque */
     border: 1px solid rgba(255, 255, 255, 0.3) !important; /* Borde blanco con transparencia */
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1) !important; /* Sombra */
-    color: #fff !important; /* Color del texto blanco */
+    color: #f1f1f1 !important; /* Cambia el color del texto a blanco off white */
     padding: 20px 0 !important; /* Espaciado interno */
     width: 100% !important; /* Asegura que el footer ocupe todo el ancho */
     overflow: hidden !important;
@@ -169,7 +170,7 @@ body {
 }
 
 .footer h5, .footer p, .footer a {
-    color: #fff; /* Color del texto */
+    color: #f1f1f1; /* Cambia el color del texto a blanco off white */
 }
 
 .footer a:hover {
