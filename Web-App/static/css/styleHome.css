@@ -23,6 +23,14 @@ body {
 .navbar {
     height: 100px;
     padding: 0 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between; /* Distribuye los elementos de manera uniforme */
+    border: 1px solid rgba(255, 255, 255, 0.3); /* Contorno acorde al estilo del sitio */
+    border-radius: 10px; /* Bordes redondeados */
+    background-color: rgba(255, 255, 255, 0.2); /* Fondo blanco con transparencia */
+    backdrop-filter: blur(10px); /* Efecto de desenfoque */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra */
 }
 
 .navbar img {
@@ -35,6 +43,9 @@ body {
     font-size: 20px;
     transition: color 0.3s;
     margin-right: 10px;
+    white-space: nowrap; /* Evita que el texto se rompa en varias líneas */
+    overflow: hidden; /* Oculta el desbordamiento */
+    text-overflow: ellipsis; /* Añade puntos suspensivos si el texto es demasiado largo */
 }
 
 .nav-link:hover {
