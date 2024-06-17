@@ -8,3 +8,14 @@
   - source faEnv/bin/activate (o en windows .\Env\Scripts\activate)
 
 - con el entorno creado y activado continue los siguientes pasos.
+
+- Siga los siguientes comandos para crear el entorno virtual (Windows)
+
+
+  - python -m venv Env
+  - .\Env\Scripts\activate
+
+  En caso de error:
+
+  - Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
+  - .\Env\Scripts\activate
