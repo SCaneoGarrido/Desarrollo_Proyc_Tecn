@@ -45,7 +45,7 @@ document.getElementById('form-inscribir-curso').addEventListener('submit', funct
         'fechaTermino': fechaTermino
     };
     console.log(data_to_send);
-    fetch('/app/register_courses', {
+    fetch(`http://127.0.0.1:5000/app/register_courses${user_id}`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -55,7 +55,7 @@ document.getElementById('form-inscribir-curso').addEventListener('submit', funct
     .then(response => response.json())
     .then(data => {
         console.log(data);
-        // Actualizar la lista de cursos inscritos
+        /*
         const cursosLista = document.getElementById('cursos-lista');
         const nuevoCurso = document.createElement('p');
         nuevoCurso.textContent = `Curso: ${nombreCurso}, Año: ${anioCurso}, Inicio: ${fechaInicio}, Término: ${fechaTermino}`;
@@ -63,6 +63,8 @@ document.getElementById('form-inscribir-curso').addEventListener('submit', funct
         // Actualizar el mensaje de estado
         const estadoCursos = document.getElementById('estado-cursos');
         estadoCursos.textContent = "Los cursos inscritos son:";
+        */
+
     })
     .catch(error => console.error(error));
     // Limpiar el formulario
