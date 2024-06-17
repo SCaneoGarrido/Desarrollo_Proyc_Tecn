@@ -86,7 +86,22 @@ class DatabaseManager:
         pass
         # GENERAR LOGICA DE INSERTAR ARCHIVOS DE CURSOS
 
-    
+    def getRegistered_courses(self, user_id):
+        conn = self.connect()
+        
+        if conn is None:
+            return None
+        
+        try:
+            with conn:
+                with conn.cursor() as cursor:
+                    cursor.execute("SELECT * FROM cursos WHERE id_empleado = %s", (user_id, ))
+                    courses = cursor.fetchall()
+                    cursor.close()
+                    return courses
+        except Exception as e:
+            print(f"Error -> {e}")
+            return None
     def validate(self, correo, contraseña):
         from Util.manage_credential import CredentialsManager
         credentialsManager_instance = CredentialsManager()

@@ -78,27 +78,41 @@ document.getElementById('form-inscribir-curso').addEventListener('submit', funct
     modal.hide();
 });
 
-// Función para cargar los cursos al iniciar
+// Función para obtener los cursos inscritos desde la base de datos
 function cargarCursos() {
-    fetch('/app/get_courses')
+    const user_id = localStorage.getItem('user_id');
+    const div_cursos = document.getElementById('cursos-lista');
+    fetch(`http://127.0.0.1:5000/app/get_courses/${user_id}`)
     .then(response => response.json())
-    .then(courses => {
-        const cursosLista = document.getElementById('cursos-lista');
-        const estadoCursos = document.getElementById('estado-cursos');
-        cursosLista.innerHTML = '';
-        if (courses.length > 0) {
-            estadoCursos.textContent = "Los cursos inscritos son:";
-            courses.forEach(course => {
-                const cursoItem = document.createElement('p');
-                cursoItem.textContent = `Curso: ${course.nombre}, Año: ${course.año}, Inicio: ${course.fechaInicio}, Término: ${course.fechaTermino}`;
-                cursosLista.appendChild(cursoItem);
+    .then(data => {
+        console.log(data);
+        // IMPRIMIR LOS CURSOS INSCRITOS
+        div_cursos.innerHTML = ''; // Limpiar cualquier contenido previo
+
+        if (data.cursos && data.cursos.length > 0) {
+            data.cursos.forEach(course => {
+                const [id, nombre, año, fecha_inicio, fecha_fin, otra_propiedad] = course;
+
+                const courseItem = document.createElement('div');
+                courseItem.className = 'course-item';
+                courseItem.innerHTML = `
+                    <h3>${nombre}</h3>
+                    <p>Año: ${año}</p>
+                    <p>Fecha de inicio: ${new Date(fecha_inicio).toLocaleDateString()}</p>
+                    <p>Fecha de fin: ${new Date(fecha_fin).toLocaleDateString()}</p>
+                `;
+                div_cursos.appendChild(courseItem);
             });
         } else {
-            estadoCursos.textContent = "No hay cursos inscritos aún.";
+            div_cursos.textContent = 'No estás inscrito en ningún curso.';
         }
     })
-    .catch(error => console.error(error));
+    .catch(error => {
+        console.error(error);
+        div_cursos.textContent = 'Error al cargar los cursos.';
+    });
 }
+
 
 // Llamar a la función para cargar los cursos al cargar la página
 document.addEventListener('DOMContentLoaded', cargarCursos);

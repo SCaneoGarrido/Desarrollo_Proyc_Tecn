@@ -27,9 +27,21 @@ def home():
     return render_template('home.html')
 # =========== TERMINO DE RENDERIZADOR ====================== #
 
-@app.route('/app/get_courses', methods=['GET'])
-def get_courses():
-    return jsonify(cursos_registrados), 200
+@app.route('/app/get_courses/<user_id>', methods=['GET'])
+def get_courses(user_id):
+    try:
+        if user_id:
+            DatabaseManager_instance = DatabaseManager()
+
+            cursos = DatabaseManager_instance.getRegistered_courses(user_id)
+            if len(cursos) > 0:
+                return jsonify({"cursos": cursos}), 200
+            else:
+                return jsonify({"error": "no hay cursos registrados"}), 400
+
+    except Exception as e:
+        print(f"Error: {e}")
+        return jsonify({"error": "ocurrio un error al obtener los cursos"}), 400
 
 @app.route('/app/recive_data', methods=['POST'])
 def recive_data():
@@ -75,11 +87,8 @@ def register_courses(user_id):
                 return jsonify({"message": "curso registrado"}), 200
 
         except Exception as e:
-            print(f"Error: {e}")        
-
-        except valueError as ve:
-            print(f"Error: {ve}")
             return jsonify({"error": "ocurrio un error al registrar el curso"}), 400
+            
 
     else:
         return jsonify({'error':'Invalid Method'}), 400
