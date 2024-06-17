@@ -10,4 +10,8 @@
 /Web-App\Util\__pycache__
 /logica.txt
 notas.txt
+/Web-App/Util/__pycache__
+/Web-App/Class/__pycache__
 #### Carpetas de seguridad ###
+
+/Web-App/Util/.env 
