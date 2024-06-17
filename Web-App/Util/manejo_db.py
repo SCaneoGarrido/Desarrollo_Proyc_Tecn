@@ -1,10 +1,9 @@
-import json
 import os
-import mysql.connector
+import psycopg2
 from dotenv import load_dotenv
 
 
-class db_manage:
+class DatabaseManager:
     def __init__(self):
         load_dotenv()
         self.database = os.environ.get('DATABASE')
@@ -12,27 +11,30 @@ class db_manage:
         self.password = os.environ.get('PASSWORD')
         self.host = os.environ.get('HOST')
         self.port = os.environ.get('PORT')
-        pass
 
 
     def connect(self):
         try:
-            conn = mysql.connector.connect(
+            conn = psycopg2.connect(
                 database=self.database,
                 user=self.user,
                 password=self.password,
                 host=self.host,
                 port=self.port
-            
             )
-            if conn:
+
+            if conn is not None:
                 return conn
+            else:
+                print("Error al crear la conexion a la base de datos...")
+                return None
         except Exception as e:
             print(f"Error: {e}") 
+            
     
     def insertUserOnDB(self ,nombre, apellido, correo, hash_clave, salt):
         try:
-            conn = db_manage.connect()
+            conn = DatabaseManager.connect()
             cursor = conn.cursor()
             data = (nombre, apellido, correo, hash_clave, salt)
             cursor.execute("""
@@ -45,16 +47,16 @@ class db_manage:
             conn.close()
             return True
 
-        except mysql.connector.Error as error:
+        except psycopg2.Error as error:
             print(f"Error: {error}")
             return False
 
     
     def validate(self ,correo, contraseña):
         #importacion tardia para romper dependencia circular
-        from Utilidades.manage_credential import credentialsUser
+        from Util.manage_credential import credentialsUser
         try:
-            conn = db_manage.connect()
+            conn = DatabaseManager.connect()
             cursor = conn.cursor()
 
             cursor.execute("SELECT * FROM usuarios WHERE correo = %s", (correo, ))
@@ -76,7 +78,7 @@ class db_manage:
     
     def get_user_id(self ,correo):
         try:
-            conn = db_manage.connect()
+            conn = DatabaseManager.connect()
             cursor = conn.cursor()
             cursor.execute("SELECT id FROM usuarios WHERE correo = %s", (correo, ))
             user_id = cursor.fetchone()
@@ -89,3 +91,15 @@ class db_manage:
                 return None
         except Exception as e:
             print(f"Error: {e}")
+
+
+    def insertCourseOnDB(self ,nombre_curso, course_year, start_date, finish_date):
+        pass
+        # GENERAR LOGICA DE INSERTAR CURSOS
+
+    
+    def UploadFileToBD(self):
+        pass
+        # GENERAR LOGICA DE INSERTAR ARCHIVOS DE CURSOS
+
+    

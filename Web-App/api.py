@@ -2,7 +2,6 @@ import os
 import pandas as pd
 from flask import Flask, request, jsonify, session, render_template
 from flask_cors import CORS
-from Utilidades.manejo_db import db_manage
 
 app = Flask(__name__, template_folder='templates', static_folder='static')
 app.secret_key = 'supersecretkey'  # Necesario para usar sesiones
@@ -73,6 +72,8 @@ def register_courses():
         print(f"Fecha de inicio: {fecha_inicio_curso}")
         print(f"Fecha de termino: {fecha_termino_curso}")
         print("############ FIN DATA RECIBIDA ############")
+
+        # insertar curso en base de datos.
         return jsonify({"success": "curso recibido"}), 200
 
 @app.route('/app/get_courses', methods=['GET'])
