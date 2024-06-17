@@ -47,7 +47,7 @@ document.getElementById('form-inscribir-curso').addEventListener('submit', funct
         'user_id': user_id
     };
     console.log(data_to_send);
-    fetch(`http://127.0.0.1:5000/app/register_courses${user_id}`, {
+    fetch(`http://127.0.0.1:5000/app/register_courses/${user_id}`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
