@@ -53,7 +53,7 @@ def recive_data():
             return jsonify({"error": "ocurrió un error al procesar el archivo"}), 400
 
 @app.route('/app/register_courses/<user_id>', methods=['POST'])
-def register_courses():
+def register_courses(user_id):
     if request.method == 'POST':
         data = request.get_json()
         # obtenemos los datos ingresados del curso
@@ -61,17 +61,7 @@ def register_courses():
         año_curso = data['año']  # Asegúrate de usar 'año' en lugar de 'anio'
         fecha_inicio_curso = data['fechaInicio']
         fecha_termino_curso = data['fechaTermino']
-        # Crear el curso_id combinando el nombre del curso y un sufijo _id
-        curso_id = f"{nombre_curso.replace(' ', '_')}_id"
-        # Agregar el curso a la lista de cursos registrados
-        curso = {
-            "id": curso_id,
-            "nombre": nombre_curso,
-            "año": año_curso,
-            "fechaInicio": fecha_inicio_curso,
-            "fechaTermino": fecha_termino_curso
-        }
-        cursos_registrados.append(curso)
+
         print("############ DATA RECIBIDA ############")
         print(f"Nombre del curso: {nombre_curso}")
         print(f"Año: {año_curso}")
@@ -79,9 +69,21 @@ def register_courses():
         print(f"Fecha de termino: {fecha_termino_curso}")
         print("############ FIN DATA RECIBIDA ############")
         
-        # insertar curso en base de datos.
-        return jsonify({"success": "curso recibido"}), 200
+        try:
+            DatabaseManager_instance = DatabaseManager() # Instancia de clase para uso de metodo de insercion de cursos.
+            if DatabaseManager_instance.insertCourseOnDB(nombre_curso, año_curso, fecha_inicio_curso, fecha_termino_curso, user_id):
+                return jsonify({"message": "curso registrado"}), 200
 
+        except Exception as e:
+            print(f"Error: {e}")        
+
+        except valueError as ve:
+            print(f"Error: {ve}")
+            return jsonify({"error": "ocurrio un error al registrar el curso"}), 400
+
+    else:
+        return jsonify({'error':'Invalid Method'}), 400
+        
 @app.route('/app/vincular_archivo_curso/<user_id>', methods=['POST'])
 def vincular_archivo_curso():
     if request.method == 'POST':

@@ -68,10 +68,19 @@ class DatabaseManager:
             print(f"Error: {e}")
 
 
-    def insertCourseOnDB(self ,nombre_curso, course_year, start_date, finish_date):
-        pass
-        # GENERAR LOGICA DE INSERTAR CURSOS
-
+    def insertCourseOnDB(self ,nombre_curso, course_year, start_date, finish_date, id_empleado):
+        try:
+            conn = self.connect()
+            cursor = conn.cursor()
+            data = (nombre_curso, course_year, start_date, finish_date, id_empleado)
+            cursor.execute("""
+                INSERT INTO cursos (nombre_curso, año, fecha_inicio, fecha_termino, id_empleado)
+                VALUES(%s, %s, %s, %s, %s)""", data)
+            conn.commit()
+            return True
+        
+        except Exception as e:
+            print(f"Error: {e}")
     
     def UploadFileToBD(self):
         pass

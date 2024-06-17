@@ -33,6 +33,7 @@ document.getElementById('form-inscribir-curso').addEventListener('submit', funct
     const anioCurso = document.getElementById('anioCurso').value;
     const fechaInicio = document.getElementById('fechaInicio').value;
     const fechaTermino = document.getElementById('fechaTermino').value;
+    const user_id = localStorage.getItem('user_id');
     // Validar que los campos no esten vacios
     if (nombreCurso.trim() === '' || anioCurso.trim() === '' || fechaInicio.trim() === '' || fechaTermino.trim() === '') {
         alert('Por favor, complete todos los campos.');
@@ -42,7 +43,8 @@ document.getElementById('form-inscribir-curso').addEventListener('submit', funct
         'nombre': nombreCurso,
         'año': anioCurso,
         'fechaInicio': fechaInicio,
-        'fechaTermino': fechaTermino
+        'fechaTermino': fechaTermino,
+        'user_id': user_id
     };
     console.log(data_to_send);
     fetch(`http://127.0.0.1:5000/app/register_courses${user_id}`, {
@@ -64,6 +66,8 @@ document.getElementById('form-inscribir-curso').addEventListener('submit', funct
         const estadoCursos = document.getElementById('estado-cursos');
         estadoCursos.textContent = "Los cursos inscritos son:";
         */
+
+        alert(data.message);
 
     })
     .catch(error => console.error(error));
