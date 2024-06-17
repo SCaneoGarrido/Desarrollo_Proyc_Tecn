@@ -7,13 +7,10 @@
 /flask_session
 
 /dev_branchCommand.txt
-
+/Web-App\Util\__pycache__
 /logica.txt
 notas.txt
 /temp
 #### Carpetas de seguridad ###
-/Web-App/informacion
 
-Web-App\Utilidades\__pycache__
-
-vinculaciones.csv
+/Web-App/Util/.env 
