@@ -103,7 +103,6 @@ document.getElementById('form-cargar-excels').addEventListener('submit', functio
     const archivoExcel = document.getElementById('archivoExcel').files[0];
     const uploadStatus = document.getElementById('upload-status');
     const excelPreview = document.getElementById('excel-preview');
-    const buttonContainer = document.getElementById('button-container');
     uploadStatus.textContent = "Cargando archivo...";
     const formData = new FormData();
     formData.append("file", archivoExcel);
@@ -176,22 +175,28 @@ document.getElementById('form-seleccionar-curso').addEventListener('submit', fun
             modal.hide();
             // Mostrar el archivo cargado en el frontend
             const excelPreview = document.getElementById('excel-preview');
-            const buttonContainer = document.getElementById('button-container');
             excelPreview.innerHTML = data.data; // Asumiendo que `data.data` contiene el HTML del archivo Excel
             alert('Archivo vinculado exitosamente al curso.');
             // Agregar botón para limpiar y cargar otro archivo
             const limpiarBtn = document.createElement('button');
             limpiarBtn.textContent = 'Limpiar y cargar otro archivo';
             limpiarBtn.className = 'btn btn-warning';
+            limpiarBtn.id = 'limpiar-btn'; // Asignar un ID al botón
             limpiarBtn.addEventListener('click', function() {
                 excelPreview.innerHTML = '';
                 document.getElementById('archivoExcel').value = '';
                 const uploadStatus = document.getElementById('upload-status');
                 uploadStatus.textContent = '';
-                buttonContainer.innerHTML = ''; // Limpiar el contenedor del botón
+                // Ocultar el botón "Limpiar y cargar otro archivo"
+                limpiarBtn.style.display = 'none';
+                // Volver a mostrar el botón "Cargar"
+                document.getElementById('cargar-btn').style.display = 'block';
             });
-            buttonContainer.innerHTML = ''; // Limpiar cualquier botón existente
+            // Añadir el botón "Limpiar y cargar otro archivo" al contenedor
+            const buttonContainer = document.getElementById('button-container');
             buttonContainer.appendChild(limpiarBtn);
+            // Ocultar el botón "Cargar"
+            document.getElementById('cargar-btn').style.display = 'none';
         } else {
             alert('Error al vincular el archivo al curso.');
         }

@@ -1,44 +1,40 @@
-import json
-import psycopg2  # type: ignore
+import os
+import psycopg2
+from dotenv import load_dotenv
 
 
-class db_manage:
+class DatabaseManager:
     def __init__(self):
-        pass
+        load_dotenv()
+        self.database = os.environ.get('DATABASE')
+        self.user = os.environ.get('USER')
+        self.password = os.environ.get('PASSWORD')
+        self.host = os.environ.get('HOST')
+        self.port = os.environ.get('PORT')
 
-    @staticmethod
-    def connect():
 
+    def connect(self):
         try:
-            with open('Backend/Informacion/db_config.json', 'r') as f:
-                credenciales = json.load(f)
-
-            database = credenciales.get('database')
-            user = credenciales.get('user')
-            host = credenciales.get('host')
-            password = credenciales.get('password')
-            port = credenciales.get('port')
-
             conn = psycopg2.connect(
-                    user=user,
-                    password=password,
-                    host=host,
-                    database=database,
-                    port=port,
-                    )
+                database=self.database,
+                user=self.user,
+                password=self.password,
+                host=self.host,
+                port=self.port
+            )
 
-            if conn:
-                print(f"Conexion exitosa a la base de datos")
+            if conn is not None:
                 return conn
-                
-        except psycopg2.Error as e:
-            print(f"Error al conectar a la base de datos: {e}")
-
-
-    @staticmethod
-    def insertUserOnDB(nombre, apellido, correo, hash_clave, salt):
+            else:
+                print("Error al crear la conexion a la base de datos...")
+                return None
+        except Exception as e:
+            print(f"Error: {e}") 
+            
+    
+    def insertUserOnDB(self ,nombre, apellido, correo, hash_clave, salt):
         try:
-            conn = db_manage.connect()
+            conn = DatabaseManager.connect()
             cursor = conn.cursor()
             data = (nombre, apellido, correo, hash_clave, salt)
             cursor.execute("""
@@ -51,16 +47,16 @@ class db_manage:
             conn.close()
             return True
 
-        except (Exception, psycopg2.DatabaseError) as error:
+        except psycopg2.Error as error:
             print(f"Error: {error}")
             return False
 
-    @staticmethod
-    def validate(correo, contraseña):
+    
+    def validate(self ,correo, contraseña):
         #importacion tardia para romper dependencia circular
-        from Utilidades.manage_credential import credentialsUser
+        from Util.manage_credential import credentialsUser
         try:
-            conn = db_manage.connect()
+            conn = DatabaseManager.connect()
             cursor = conn.cursor()
 
             cursor.execute("SELECT * FROM usuarios WHERE correo = %s", (correo, ))
@@ -79,10 +75,10 @@ class db_manage:
         except Exception as e:
             print(f"Error: {e}")    
     
-    @staticmethod
-    def get_user_id(correo):
+    
+    def get_user_id(self ,correo):
         try:
-            conn = db_manage.connect()
+            conn = DatabaseManager.connect()
             cursor = conn.cursor()
             cursor.execute("SELECT id FROM usuarios WHERE correo = %s", (correo, ))
             user_id = cursor.fetchone()
@@ -95,3 +91,15 @@ class db_manage:
                 return None
         except Exception as e:
             print(f"Error: {e}")
+
+
+    def insertCourseOnDB(self ,nombre_curso, course_year, start_date, finish_date):
+        pass
+        # GENERAR LOGICA DE INSERTAR CURSOS
+
+    
+    def UploadFileToBD(self):
+        pass
+        # GENERAR LOGICA DE INSERTAR ARCHIVOS DE CURSOS
+
+    

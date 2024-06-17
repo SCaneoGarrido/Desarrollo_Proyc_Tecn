@@ -1,4 +1,4 @@
-pip install psycopg2-binary
+pip install mysql-connector
 pip install flask-cors
 pip install Flask
 pip install flask_sessions
