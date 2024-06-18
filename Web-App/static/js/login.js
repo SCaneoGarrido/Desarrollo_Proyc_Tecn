@@ -51,39 +51,37 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    loginForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const correo = loginForm.querySelector('input[type="email"][placeholder="Email"]').value;
-        const contraseña = loginForm.querySelector('input[type="password"][placeholder="Contraseña"]').value;
+    loginForm.addEventListener('submit', (event) => {
+        event.preventDefault();
 
-        try {
-            const response = await fetch('http://127.0.0.1:5000/app/login', {
+        const user_email = document.getElementById('user_email').value;
+        const user_password = document.getElementById('password').value;
+
+        // comprobar campos que no esten vacios
+
+        if (user_email.trim() === '' || user_password.trim() === '') {
+            alert('Por favor, rellene todos los campos.');
+            return;
+        } else {
+            fetch('http://127.0.0.1:5000/app/login', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ correo: correo, contraseña: contraseña })
-            });
-            const data = await response.json();
-
-            // Verificar si la respuesta contiene datos de sesión válidos
-            if (data && data.user_id && data.correo) {
-                // Almacenar la sesión en el local storage
-                localStorage.setItem('user_id', data.user_id);
-                localStorage.setItem('correo', data.correo);
-                localStorage.setItem('archivos', data.uploaded_files);
-                // También podrías almacenar otros datos de sesión si los necesitas
-                console.log(localStorage.user_id);
-                console.log(localStorage.correo);
-                console.log(localStorage.archivos); 
-                // Redireccionar a la página de inicio después del inicio de sesión
-                window.location.href = "../FrontEnd/home.html";
-            } else {
-                console.error('Respuesta de inicio de sesión incompleta:', data);
-                // Manejar el caso en que la respuesta del servidor no contiene datos de sesión válidos
-            }
-        } catch (error) {
-            console.error('Error al realizar la solicitud:', error);
+                body: JSON.stringify({ correo: user_email, contrasena: user_password })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.url) {
+                    // almacenamos info en localstorage
+                    console.log("Datos de repuesta del servdirvidor -> ",data);
+                    localStorage.setItem('user_id', data.user_id);
+                    window.location.href = data.url; // Redirigir al usuario a la página de inicio
+                }
+            })
+            .catch(error => console.error("Error -> ",error));
         }
-    });
+
+
+    })
 });

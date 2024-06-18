@@ -28,12 +28,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Manejar el formulario de inscripción de cursos
 document.getElementById('form-inscribir-curso').addEventListener('submit', function(e) {
-    e.preventDefault();
+    //e.preventDefault();
     const nombreCurso = document.getElementById('nombreCurso').value;
     const anioCurso = document.getElementById('anioCurso').value;
     const fechaInicio = document.getElementById('fechaInicio').value;
     const fechaTermino = document.getElementById('fechaTermino').value;
-    // Validar que los campos no esten vacios
+    const user_id = localStorage.getItem('user_id');
+    // Validar que los campos no estén vacíos
     if (nombreCurso.trim() === '' || anioCurso.trim() === '' || fechaInicio.trim() === '' || fechaTermino.trim() === '') {
         alert('Por favor, complete todos los campos.');
         return;
@@ -42,60 +43,76 @@ document.getElementById('form-inscribir-curso').addEventListener('submit', funct
         'nombre': nombreCurso,
         'año': anioCurso,
         'fechaInicio': fechaInicio,
-        'fechaTermino': fechaTermino
+        'fechaTermino': fechaTermino,
+        'user_id': user_id
     };
     console.log(data_to_send);
-    fetch('/app/register_courses', {
+    fetch(`http://127.0.0.1:5000/app/register_courses/${user_id}`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify(data_to_send) // Enviando los datos directamente, sin anidar bajo "data"
+        body: JSON.stringify(data_to_send)
     })
-    .then(response => response.json())
-    .then(data => {
-        console.log(data);
-        // Actualizar la lista de cursos inscritos
-        const cursosLista = document.getElementById('cursos-lista');
-        const nuevoCurso = document.createElement('p');
-        nuevoCurso.textContent = `Curso: ${nombreCurso}, Año: ${anioCurso}, Inicio: ${fechaInicio}, Término: ${fechaTermino}`;
-        cursosLista.appendChild(nuevoCurso);
-        // Actualizar el mensaje de estado
-        const estadoCursos = document.getElementById('estado-cursos');
-        estadoCursos.textContent = "Los cursos inscritos son:";
+    .then(response => {
+        console.log(response); 
+        return response.text(); 
     })
-    .catch(error => console.error(error));
+    .then(text => {
+        try {
+            const data = JSON.parse(text); 
+            console.log(data);
+            alert(data.message || data.error); // Mostrar el mensaje o error
+        } catch (error) {
+            console.error("Error al parsear JSON:", error, text);
+            alert("Error al registrar el curso. Por favor, intente nuevamente.");
+        }
+    })
+    .catch(error => console.error("Error en la solicitud:", error));
     // Limpiar el formulario
     this.reset();
     // Cerrar el modal
     const modal = bootstrap.Modal.getInstance(document.getElementById('inscribirCursoModal'));
     modal.hide();
 });
-
-// Función para cargar los cursos al iniciar
+// Función para obtener los cursos inscritos desde la base de datos
 function cargarCursos() {
-    fetch('/app/get_courses')
+    const user_id = localStorage.getItem('user_id');
+    const div_cursos = document.getElementById('cursos-lista');
+    fetch(`http://127.0.0.1:5000/app/get_courses/${user_id}`)
     .then(response => response.json())
-    .then(courses => {
-        const cursosLista = document.getElementById('cursos-lista');
-        const estadoCursos = document.getElementById('estado-cursos');
-        cursosLista.innerHTML = '';
-        if (courses.length > 0) {
-            estadoCursos.textContent = "Los cursos inscritos son:";
-            courses.forEach(course => {
-                const cursoItem = document.createElement('p');
-                cursoItem.textContent = `Curso: ${course.nombre}, Año: ${course.año}, Inicio: ${course.fechaInicio}, Término: ${course.fechaTermino}`;
-                cursosLista.appendChild(cursoItem);
+    .then(data => {
+        console.log(data);
+        // IMPRIMIR LOS CURSOS INSCRITOS
+        div_cursos.innerHTML = ''; // Limpiar cualquier contenido previo
+
+        if (data.cursos && data.cursos.length > 0) {
+            data.cursos.forEach(course => {
+                const [id, nombre, año, fecha_inicio, fecha_fin, otra_propiedad] = course;
+
+                const courseItem = document.createElement('div');
+                courseItem.className = 'course-item';
+                courseItem.innerHTML = `
+                    <h3>${nombre}</h3>
+                    <p>Año: ${año}</p>
+                    <p>Fecha de inicio: ${new Date(fecha_inicio).toLocaleDateString()}</p>
+                    <p>Fecha de fin: ${new Date(fecha_fin).toLocaleDateString()}</p>
+                `;
+                div_cursos.appendChild(courseItem);
             });
         } else {
-            estadoCursos.textContent = "No hay cursos inscritos aún.";
+            div_cursos.textContent = 'No hay cursos inscritos.';
         }
     })
-    .catch(error => console.error(error));
+    .catch(error => {
+        console.error(error);
+        div_cursos.textContent = 'Error al cargar los cursos.';
+    });
 }
 
+
 // Llamar a la función para cargar los cursos al cargar la página
-document.addEventListener('DOMContentLoaded', cargarCursos);
+document.addEventListener('DOMContentLoaded', cargarCursos());
 
 // Manejar el formulario de carga de excels
 document.getElementById('form-cargar-excels').addEventListener('submit', function(e) {

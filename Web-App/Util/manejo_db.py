@@ -11,7 +11,7 @@ class DatabaseManager:
         self.password = os.environ.get('PASSWORD')
         self.host = os.environ.get('HOST')
         self.port = os.environ.get('PORT')
-
+        
 
     def connect(self):
         try:
@@ -34,53 +34,28 @@ class DatabaseManager:
     
     def insertUserOnDB(self ,nombre, apellido, correo, hash_clave, salt):
         try:
-            conn = DatabaseManager.connect()
+            conn = self.connect()
             cursor = conn.cursor()
             data = (nombre, apellido, correo, hash_clave, salt)
             cursor.execute("""
-                INSERT INTO usuarios (Nombre, Apellido, Correo, hash_clave, salt)
+                INSERT INTO empleados (nombre, apellido, mail, hash_contraseña, salt)
                 VALUES(%s, %s, %s, %s, %s)""", data)
-
-
             conn.commit()
-            cursor.close()
-            conn.close()
             return True
 
         except psycopg2.Error as error:
             print(f"Error: {error}")
             return False
 
-    
-    def validate(self ,correo, contraseña):
-        #importacion tardia para romper dependencia circular
-        from Util.manage_credential import credentialsUser
-        try:
-            conn = DatabaseManager.connect()
-            cursor = conn.cursor()
-
-            cursor.execute("SELECT * FROM usuarios WHERE correo = %s", (correo, ))
-            user = cursor.fetchone()
+        finally:
             cursor.close()
-
-            if user:
-                hash_contraseña =user[4]
-                salt = user[5]
-
-                if credentialsUser.validateLogin(contraseña, hash_contraseña, salt):
-                    return True
-                else:
-                    return False
-                
-        except Exception as e:
-            print(f"Error: {e}")    
-    
+            conn.close()
     
     def get_user_id(self ,correo):
         try:
-            conn = DatabaseManager.connect()
+            conn = self.connect()
             cursor = conn.cursor()
-            cursor.execute("SELECT id FROM usuarios WHERE correo = %s", (correo, ))
+            cursor.execute("SELECT id_empleado FROM empleados WHERE mail = %s", (correo, ))
             user_id = cursor.fetchone()
             cursor.close()
 
@@ -93,13 +68,70 @@ class DatabaseManager:
             print(f"Error: {e}")
 
 
-    def insertCourseOnDB(self ,nombre_curso, course_year, start_date, finish_date):
-        pass
-        # GENERAR LOGICA DE INSERTAR CURSOS
-
+    def insertCourseOnDB(self ,nombre_curso, course_year, start_date, finish_date, id_empleado):
+        try:
+            conn = self.connect()
+            cursor = conn.cursor()
+            data = (nombre_curso, course_year, start_date, finish_date, id_empleado)
+            cursor.execute("""
+                INSERT INTO cursos (nombre_curso, año, fecha_inicio, fecha_termino, id_empleado)
+                VALUES(%s, %s, %s, %s, %s)""", data)
+            conn.commit()
+            return True
+        
+        except Exception as e:
+            print(f"Error: {e}")
     
     def UploadFileToBD(self):
         pass
         # GENERAR LOGICA DE INSERTAR ARCHIVOS DE CURSOS
 
-    
+    def getRegistered_courses(self, user_id):
+        conn = self.connect()
+        
+        if conn is None:
+            return None
+        
+        try:
+            with conn:
+                with conn.cursor() as cursor:
+                    cursor.execute("SELECT * FROM cursos WHERE id_empleado = %s", (user_id, ))
+                    courses = cursor.fetchall()
+                    cursor.close()
+                    return courses
+        except Exception as e:
+            print(f"Error -> {e}")
+            return None
+    def validate(self, correo, contraseña):
+        from Util.manage_credential import CredentialsManager
+        credentialsManager_instance = CredentialsManager()
+        conn = self.connect()
+
+        if conn is None:
+            return None
+        
+        try:
+            with conn:
+                with conn.cursor() as cursor:
+                    cursor.execute("SELECT * FROM empleados WHERE mail = %s", (correo, ))
+                    user = cursor.fetchone()
+                    if user:
+                        hash_contraseña =user[4]
+                        salt = user[5]
+
+                        if credentialsManager_instance.validateLogin(contraseña, hash_contraseña, salt):
+                            print("Credenciales Correctas, permitiendo acceso...")
+                            cursor.close()
+                            return True
+                        else:
+                            print("Credenciales incorrectas...")
+                            return False
+                    else:
+                        print("Usuario no encontrado...")
+                        return None
+        except Exception as e:
+            print(f"Error: {e}")
+        
+
+# TESTEO DE CONEXION A BASE DE DATOS
+
