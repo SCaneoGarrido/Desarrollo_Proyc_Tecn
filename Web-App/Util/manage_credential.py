@@ -1,14 +1,15 @@
-from Util.manejo_db import DatabaseManager
 import hashlib
 import secrets
 
 
-class credentialsUser:
+class CredentialsManager:
     def __init__(self):
         pass    
 
      
     def genCredentials(self, nombre, apellido, correo, contraseña):
+        from Util.manejo_db import DatabaseManager
+        DatabaseManager_instance = DatabaseManager()
         try:
             nombre = nombre
             apellido = apellido
@@ -26,7 +27,7 @@ class credentialsUser:
             print(f"contraseña: {contraseña}")
             print(f"Salt: {salt}")
            
-            if (DatabaseManager.insertUserOnDB(nombre, apellido, correo, contraseña, salt)):
+            if (DatabaseManager_instance.insertUserOnDB(nombre, apellido, correo, contraseña, salt)):
                 print('Usuario agregado')
                 return True
 

@@ -1,7 +1,9 @@
 import os
 import pandas as pd
-from flask import Flask, request, jsonify, session, render_template
+from flask import Flask, request, jsonify, session, render_template, url_for
 from flask_cors import CORS
+from Util.manejo_db import DatabaseManager
+from Util.manage_credential import CredentialsManager
 
 app = Flask(__name__, template_folder='templates', static_folder='static')
 app.secret_key = 'supersecretkey'  # Necesario para usar sesiones
@@ -25,6 +27,22 @@ def home():
     return render_template('home.html')
 # =========== TERMINO DE RENDERIZADOR ====================== #
 
+@app.route('/app/get_courses/<user_id>', methods=['GET'])
+def get_courses(user_id):
+    try:
+        if user_id:
+            DatabaseManager_instance = DatabaseManager()
+
+            cursos = DatabaseManager_instance.getRegistered_courses(user_id)
+            if len(cursos) > 0:
+                return jsonify({"cursos": cursos}), 200
+            else:
+                return jsonify({"error": "no hay cursos registrados"}), 400
+
+    except Exception as e:
+        print(f"Error: {e}")
+        return jsonify({"error": "ocurrio un error al obtener los cursos"}), 400
+
 @app.route('/app/recive_data', methods=['POST'])
 def recive_data():
     if request.method == 'POST':
@@ -46,8 +64,8 @@ def recive_data():
             print(f"Error: {e}")
             return jsonify({"error": "ocurrió un error al procesar el archivo"}), 400
 
-@app.route('/app/register_courses', methods=['POST'])
-def register_courses():
+@app.route('/app/register_courses/<user_id>', methods=['POST'])
+def register_courses(user_id):
     if request.method == 'POST':
         data = request.get_json()
         # obtenemos los datos ingresados del curso
@@ -55,32 +73,29 @@ def register_courses():
         año_curso = data['año']  # Asegúrate de usar 'año' en lugar de 'anio'
         fecha_inicio_curso = data['fechaInicio']
         fecha_termino_curso = data['fechaTermino']
-        # Crear el curso_id combinando el nombre del curso y un sufijo _id
-        curso_id = f"{nombre_curso.replace(' ', '_')}_id"
-        # Agregar el curso a la lista de cursos registrados
-        curso = {
-            "id": curso_id,
-            "nombre": nombre_curso,
-            "año": año_curso,
-            "fechaInicio": fecha_inicio_curso,
-            "fechaTermino": fecha_termino_curso
-        }
-        cursos_registrados.append(curso)
+
         print("############ DATA RECIBIDA ############")
         print(f"Nombre del curso: {nombre_curso}")
         print(f"Año: {año_curso}")
         print(f"Fecha de inicio: {fecha_inicio_curso}")
         print(f"Fecha de termino: {fecha_termino_curso}")
         print("############ FIN DATA RECIBIDA ############")
+        
+        try:
+            DatabaseManager_instance = DatabaseManager() # Instancia de clase para uso de metodo de insercion de cursos.
+            if DatabaseManager_instance.insertCourseOnDB(nombre_curso, año_curso, fecha_inicio_curso, fecha_termino_curso, user_id):
+                return jsonify({"message": "curso registrado"}), 200
+            else:
+                return jsonify({"error": "No se pudo registrar el curso"}), 500
 
-        # insertar curso en base de datos.
-        return jsonify({"success": "curso recibido"}), 200
+        except Exception as e:
+            print(f"Error: {e}")
+            return jsonify({"error": "ocurrio un error al registrar el curso"}), 500
 
-@app.route('/app/get_courses', methods=['GET'])
-def get_courses():
-    return jsonify(cursos_registrados), 200
-
-@app.route('/app/vincular_archivo_curso', methods=['POST'])
+    else:
+        return jsonify({'error':'Invalid Method'}), 405
+        
+@app.route('/app/vincular_archivo_curso/<user_id>', methods=['POST'])
 def vincular_archivo_curso():
     if request.method == 'POST':
         data = request.get_json()
@@ -113,26 +128,68 @@ def vincular_archivo_curso():
             print(f"Error: {e}")
             return jsonify({"success": False, "error": "ocurrió un error al vincular el archivo"}), 400
 
-
-
-# NUEVAS RUTAS
+# RUTA PARA MANEJAR EL LOGIN
 @app.route('/app/login', methods=['POST'])
 def handle_login():
-    try:
-        if request.method == 'POST':
+    DatabaseManager_instance = DatabaseManager() # Instancia de clase para uso de metodo de validacion de credenciales.
+    if request.method == 'POST':
+        try:
             data = request.get_json()
-            correo = data['correo']
-            contraseña = data['contraseña']
+
+            if not data: 
+                print("No se proporcionaron datos")
+                return jsonify({"error": "No se proporcionaron datos"}), 400
+            
+            correo = data.get('correo')
+            contraseña = data.get('contrasena')
 
             if not correo or not contraseña:
-                return jsonify({"success": False, "error": "correo o contraseña no proporcionado"}), 400
-            
-            
-        else:
-            return "Bad Request"
-    except Exception as e:
-        print(f"Error: {e}")
+                print("No se proporcionaron correo o contraseña")
+                return jsonify({"error": "No se proporcionaron correo o contraseña"}), 400
+               
+            user = DatabaseManager_instance.validate(correo, contraseña)
+            if user:
+                user_id = DatabaseManager_instance.get_user_id(correo)
+                if user_id:
+                    return jsonify({'url':url_for('home'), "user_id": user_id}), 200
 
+        except ValueError as ve:
+            print(f"Error: {ve}")
+            return jsonify({"error": "ocurrio un error al iniciar sesion"}), 400
+        except Exception as e:
+            print(f"Error: {e}")
+            return jsonify({"error": "ocurrio un error al iniciar sesion"}), 400
+    
+# RUTA PARA CREAR CREDENCIALES
+@app.route('/app/create_user', methods=['POST'])
+def create_user():
+    CredentialsManager_instance = CredentialsManager()
+    if request.method == 'POST':
+        try:
+            data = request.get_json()
+
+            if not data:
+                print(f"No se proporcionardon datos: {data}")
+                return jsonify({"error": "No se proporcionaron datos"}), 400
+            
+            nombre = data.get('nombre')
+            apellido = data.get('apellido')
+            correo = data.get('correo')
+            contraseña = data.get('contraseña')
+
+            if not nombre or not apellido or not correo or not contraseña:
+                print("Datos necesarios para el registro no proporcionados")
+                return jsonify({"error": "Datos necesarios para el registro no proporcionados"}), 400
+            
+            if CredentialsManager_instance.genCredentials(nombre, apellido, correo, contraseña):
+                return jsonify({'message': 'Credenciales generadas correctamente'}), 200
+            else:
+                return jsonify({'message': 'Error al generar credenciales'}), 400
+        except Exception as e:
+            print(f"Error: {e}")
+            return jsonify({"error": "ocurrio un error al crear usuario"}), 400
+    else:
+        return jsonify({'error':'Invalid Method'}), 400
 
 if __name__ == '__main__':
     app.run(debug=True)
