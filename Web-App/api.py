@@ -85,13 +85,15 @@ def register_courses(user_id):
             DatabaseManager_instance = DatabaseManager() # Instancia de clase para uso de metodo de insercion de cursos.
             if DatabaseManager_instance.insertCourseOnDB(nombre_curso, año_curso, fecha_inicio_curso, fecha_termino_curso, user_id):
                 return jsonify({"message": "curso registrado"}), 200
+            else:
+                return jsonify({"error": "No se pudo registrar el curso"}), 500
 
         except Exception as e:
-            return jsonify({"error": "ocurrio un error al registrar el curso"}), 400
-            
+            print(f"Error: {e}")
+            return jsonify({"error": "ocurrio un error al registrar el curso"}), 500
 
     else:
-        return jsonify({'error':'Invalid Method'}), 400
+        return jsonify({'error':'Invalid Method'}), 405
         
 @app.route('/app/vincular_archivo_curso/<user_id>', methods=['POST'])
 def vincular_archivo_curso():
