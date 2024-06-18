@@ -109,7 +109,7 @@ def vincular_archivo_curso():
             df = pd.DataFrame(session['uploaded_data'])
             # Asociar el DataFrame con el curso
             dataframes_cursos[curso_id] = df
-            html_data = df.to_html(classes='table table-bordered table-striped')
+            html_data = df.to_html(classes='table table-bordered table-striped') # no se debe perder
             # Guardar la vinculación en un archivo CSV
             df['curso_id'] = curso_id
             df['nombre_curso'] = next((curso['nombre'] for curso in cursos_registrados if curso['id'] == curso_id), 'Desconocido')
@@ -145,6 +145,7 @@ def handle_login():
 
             if not correo or not contraseña:
                 print("No se proporcionaron correo o contraseña")
+                print()
                 return jsonify({"error": "No se proporcionaron correo o contraseña"}), 400
                
             user = DatabaseManager_instance.validate(correo, contraseña)

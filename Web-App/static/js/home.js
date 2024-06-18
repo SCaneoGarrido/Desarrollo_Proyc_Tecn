@@ -28,7 +28,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Manejar el formulario de inscripción de cursos
 document.getElementById('form-inscribir-curso').addEventListener('submit', function(e) {
-    //e.preventDefault();
+    e.preventDefault();
     const nombreCurso = document.getElementById('nombreCurso').value;
     const anioCurso = document.getElementById('anioCurso').value;
     const fechaInicio = document.getElementById('fechaInicio').value;
