@@ -132,13 +132,13 @@ class DatabaseManager:
         
 
     # FUNCION PARA INSERTAR UN CURSO EN LA TABLA cursos
-    def insertCourseOnDB(self,nombre_curso, fecha_inicio, fecha_fin , colab_id):    
+    def insertCourseOnDB(self,nombre_curso, fecha_inicio, fecha_fin , colab_id, año_curso):    
         try:
             conn = self.connect()
             cursor = conn.cursor()
-            data = (nombre_curso, fecha_inicio, fecha_fin, colab_id)
-            cursor.execute(""" INSERT INTO cursos (nombre_curso, fecha_inicio, fecha_fin, colab_id)
-            VALUES(%s, %s, %s, %s)""", data)
+            data = (nombre_curso, fecha_inicio, fecha_fin, colab_id, año_curso)
+            cursor.execute(""" INSERT INTO cursos (nombre_curso, fecha_inicio, fecha_fin, colab_id, año_curso)
+            VALUES(%s, %s, %s, %s, %s)""", data)
             conn.commit()
             return True
         except psycopg2.Error as error:

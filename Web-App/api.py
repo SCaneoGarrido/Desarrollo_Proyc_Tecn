@@ -67,6 +67,7 @@ def recive_data():
 @app.route('/app/register_courses/<user_id>', methods=['POST'])
 def register_courses(user_id):
     if request.method == 'POST':
+        DatabaseManager_instance = DatabaseManager()
         data = request.get_json()
         # obtenemos los datos ingresados del curso
         nombre_curso = data['nombre']
@@ -101,16 +102,30 @@ def register_courses(user_id):
             print("No se proporcionaron los datos requeridos")
             return jsonify({'error': 'No se proporcionaron los datos requeridos'}), 400
         else:
-            # aqui implementa logica si es que los datos de los cursos llegaron correctamente
-            pass
+            # Aquí puedes implementar la lógica para cargar el curso y establecer la relación con el colaborador que lo cargó
+            try:
+                if DatabaseManager_instance.insertCourseOnDB(nombre_curso, año_curso, fecha_incio_curso, fecha_termino_curso, user_id):
+                    return jsonify({'message': 'Curso cargado exitosamente'}), 200
+                else:
+                    return jsonify({'error': 'Error al cargar curso'}), 400
+            except Exception as e:
+                print(f"Error: {e}")
+                return jsonify({'error': 'Error al cargar curso'}), 400
+            
         # IMPLEMENTAR LOGICA DE CARGA DE ASISTENTES A TABLA "ASISTENTES" + RELACION ASISTENTE -> CURSO
         if len(asistentes) == 0:
             print(f"Asistentes vacio -> {asistentes}")
             return jsonify({'error': 'No se proporcionaron asistentes'}), 400
         else:
             # aqui implementa logica si es que los datos de los asistentes llegaron correctamente
-            pass
-        #####
+            try:
+                if DatabaseManager_instance.CargarAsistentes_cursos(asistentes):
+                    return jsonify({'message': 'Asistentes cargados exitosamente'}), 200
+                else:
+                    return jsonify({'error': 'Error al cargar asistentes'}), 400
+            except Exception as e:
+                print(f"Error: {e}")
+                return jsonify({'error': 'Error al cargar asistentes'}), 400
         
 
         
