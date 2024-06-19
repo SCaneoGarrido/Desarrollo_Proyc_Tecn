@@ -69,29 +69,29 @@ def register_courses(user_id):
     if request.method == 'POST':
         data = request.get_json()
         # obtenemos los datos ingresados del curso
-        nombre_curso = data['nombre']
-        año_curso = data['año']  # Asegúrate de usar 'año' en lugar de 'anio'
-        fecha_inicio_curso = data['fechaInicio']
-        fecha_termino_curso = data['fechaTermino']
+        nombre_curso = data['nombre_curso']
+        año_curso = data['año_curso']  # Asegúrate de usar 'año' en lugar de 'anio'
+        fecha_inicio_curso = data['fecha_inicio_curso']
+        fecha_termino_curso = data['fecha_termino_curso']
+        # AGREGAR ARRAY DE ASISTENTES.
+        array_asistentes = data['array_asistentes'] # ASISTENTES
 
+        
         print("############ DATA RECIBIDA ############")
         print(f"Nombre del curso: {nombre_curso}")
         print(f"Año: {año_curso}")
         print(f"Fecha de inicio: {fecha_inicio_curso}")
         print(f"Fecha de termino: {fecha_termino_curso}")
-        print("############ FIN DATA RECIBIDA ############")
+        for i in array_asistentes:
+            print(f"Asistente -> {i}")
         
-        try:
-            DatabaseManager_instance = DatabaseManager() # Instancia de clase para uso de metodo de insercion de cursos.
-            if DatabaseManager_instance.insertCourseOnDB(nombre_curso, año_curso, fecha_inicio_curso, fecha_termino_curso, user_id):
-                return jsonify({"message": "curso registrado"}), 200
-            else:
-                return jsonify({"error": "No se pudo registrar el curso"}), 500
+        # IMPLEMENTAR LOGICA DE CARGA DE CURSO + RELACION DE COLABORADOR QUE CARGO EL CURSO
+        ######
 
-        except Exception as e:
-            print(f"Error: {e}")
-            return jsonify({"error": "ocurrio un error al registrar el curso"}), 500
+        # IMPLEMENTAR LOGICA DE CARGA DE ASISTENTES A TABLA "ASISTENTES" + RELACION ASISTENTE -> CURSO
+        
 
+        return jsonify({'message':'data de curso recibida'}), 200
     else:
         return jsonify({'error':'Invalid Method'}), 405
         
@@ -147,7 +147,8 @@ def handle_login():
                 print("No se proporcionaron correo o contraseña")
                 print()
                 return jsonify({"error": "No se proporcionaron correo o contraseña"}), 400
-               
+            
+            print("Data de entrada: ", correo, " - ", contraseña)
             user = DatabaseManager_instance.validate(correo, contraseña)
             if user:
                 user_id = DatabaseManager_instance.get_user_id(correo)
@@ -161,7 +162,7 @@ def handle_login():
             print(f"Error: {e}")
             return jsonify({"error": "ocurrio un error al iniciar sesion"}), 400
     
-# RUTA PARA CREAR CREDENCIALES
+# RUTA PARA CREAR CREDENCIALES (AUXILIAR -> ELIMINAR LUEGO DEL PROYECTO)
 @app.route('/app/create_user', methods=['POST'])
 def create_user():
     CredentialsManager_instance = CredentialsManager()
