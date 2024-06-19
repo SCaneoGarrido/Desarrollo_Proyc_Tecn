@@ -211,3 +211,28 @@ body {
 .modal-header {
     color: #000 !important; /* Cambia el color del texto del encabezado a negro */
 }
+
+/* Estilos adicionales para el modal de inscripción */
+.modal-body {
+    max-height: 70vh;
+    overflow-y: auto;
+  }
+  
+  .accordion-item {
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin-bottom: 10px;
+  }
+  
+  .accordion-button {
+    background-color: #f8f9fa;
+  }
+  
+  .accordion-button:not(.collapsed) {
+    color: #0d6efd;
+    background-color: #e9ecef;
+  }
+  
+  .accordion-body {
+    padding: 10px;
+  }
