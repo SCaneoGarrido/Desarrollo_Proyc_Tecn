@@ -2,7 +2,6 @@ import os
 import psycopg2
 from dotenv import load_dotenv
 
-
 class DatabaseManager:
     def __init__(self):
         load_dotenv()
@@ -11,7 +10,6 @@ class DatabaseManager:
         self.password = os.environ.get('PASSWORD')
         self.host = os.environ.get('HOST')
         self.port = os.environ.get('PORT')
-        
 
     def connect(self):
         try:
@@ -22,59 +20,60 @@ class DatabaseManager:
                 host=self.host,
                 port=self.port
             )
-
-            if conn is not None:
-                return conn
-            else:
-                print("Error al crear la conexion a la base de datos...")
-                return None
+            return conn
         except Exception as e:
-            print(f"Error: {e}") 
-            
-    # INGRESAR UN USUAURIO EN LA BASE DE DATOS (TEMPORAL ELIMINAR LUEGO DE DESARROLLO)
-    def insertUserOnDB(self ,nombre, apellido, correo, hash_clave, salt):
+            print(f"Error: {e}")
+            return None
+
+    def insertUserOnDB(self, nombre, apellido, correo, hash_clave, salt):
         try:
             conn = self.connect()
             cursor = conn.cursor()
             data = (correo, nombre, apellido, hash_clave, salt)
             cursor.execute("""
                 INSERT INTO muni_colab (correo, nombre, apellido, hash, salt)
-                VALUES(%s, %s, %s, %s, %s)""", data)
+                VALUES (%s, %s, %s, %s, %s)
+            """, data)
             conn.commit()
             return True
-
         except psycopg2.Error as error:
             print(f"Error: {error}")
             return False
-
         finally:
             cursor.close()
             conn.close()
-    
-    # OBTENER EL ID DEL USUARIO
-    def get_user_id(self ,correo):
+
+    def get_user_id(self, correo):
         try:
             conn = self.connect()
             cursor = conn.cursor()
-            cursor.execute("SELECT id FROM muni_colab WHERE correo = %s", (correo, ))
+            cursor.execute("SELECT id FROM muni_colab WHERE correo = %s", (correo,))
             user_id = cursor.fetchone()
             cursor.close()
-
             if user_id:
-                return user_id
+                return user_id[0]  # devolver solo el id
             else:
                 print("Error al obtener id del usuario...")
                 return None
         except Exception as e:
             print(f"Error: {e}")
+            return None
 
-
-
-    # OBTENER LOS CURSOS REGISTRADOS
     def getRegistered_courses(self, user_id):
-        pass
-        
-    # VALIDAR CREDENCIALES
+        try:
+            conn = self.connect()
+            cursor = conn.cursor()
+            cursor.execute("SELECT * FROM Cursos WHERE Colab_id = %s", (user_id,))
+            cursos = cursor.fetchall()
+            cursor.close()
+            if cursos:
+                return cursos
+            else:
+                return []
+        except Exception as e:
+            print(f"Error: {e}")
+            return []
+
     def validate(self, correo, contraseña):
         from Util.manage_credential import CredentialsManager
         credentialsManager_instance = CredentialsManager()
@@ -83,70 +82,54 @@ class DatabaseManager:
         try:
             with conn:
                 with conn.cursor() as cursor:
-                    cursor.execute("SELECT * FROM muni_colab WHERE correo = %s", (correo, ))
+                    cursor.execute("SELECT * FROM muni_colab WHERE correo = %s", (correo,))
                     user = cursor.fetchone()
-
                     if user:
                         print("Usuario encontrado")
-                        hash_  = user[4]
+                        hash_ = user[4]
                         salt_ = user[5]
-
                         if credentialsManager_instance.validateLogin(contraseña, hash_, salt_):
-                            cursor.close()
                             return True
                         else:
                             return False
-
                     else:
                         print(f"Usuario no encontrado,\n data -> {user}")
                         return None
-
         except Exception as e:
             print(f"Error: {e}")
+            return None
 
-    
-    # FUNCION PARA CARGAR LOS ASISTENTES EN LA TABLA asistentes
-    def CargarAsistentes_cursos(self, curso_id ,array):
+    def CargarAsistentes_cursos(self, asistentes):
         try:
             conn = self.connect()
             cursor = conn.cursor()
-            
-            for asistente in array:
-                data = (asistente['nombre'], asistente['edad'], asistente['apellido'], asistente['direccion'], asistente['estadoCivil'], asistente['genero'], asistente['rut'], curso_id)
+            for asistente in asistentes:
+                data = (asistente['nombre'], asistente['edad'], asistente['apellido'],
+                        asistente['direccion'], asistente['estadoCivil'], asistente['genero'],
+                        asistente['rut'], asistente['curso_id'])
                 cursor.execute("""
-                    INSERT INTO asistentes (nombre, edad, apellido, direccion, estadoCivil, genero, rut, curso_id)
-                    VALUES(%s, %s, %s, %s, %s, %s, %s, %s)""", data)
-
+                    INSERT INTO Asistentes (Nombre, Edad, Apellido, Direccion, EstadoCivil, Genero, Rut, Curso_id)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+                """, data)
             conn.commit()
             return True
-    
         except psycopg2.Error as error:
             print(f"Error: {error}")
             return False
-
         finally:
             cursor.close()
             conn.close()
 
-
-        
-
-    # FUNCION PARA INSERTAR UN CURSO EN LA TABLA cursos
-    def insertCourseOnDB(self,nombre_curso, fecha_inicio, fecha_fin , colab_id, año_curso):    
+    def insertCourseOnDB(self, nombre_curso, año_curso, fecha_inicio, fecha_fin, colab_id):
         try:
             conn = self.connect()
             cursor = conn.cursor()
-            data = (nombre_curso, fecha_inicio, fecha_fin, colab_id, año_curso)
-            cursor.execute(""" INSERT INTO cursos (nombre_curso, fecha_inicio, fecha_fin, colab_id, año_curso)
-            VALUES(%s, %s, %s, %s, %s)""", data)
+            data = (nombre_curso, año_curso, fecha_inicio, fecha_fin, colab_id)
+            cursor.execute("""
+                INSERT INTO Cursos (Nombre_curso, año_curso, Fecha_Inicio, Fecha_Fin, Colab_id)
+                VALUES (%s, %s, %s, %s, %s) RETURNING CursoID
+            """, data)
             curso_id = cursor.fetchone()[0]
-            if curso_id:
-                print(f"Curso agregado -> ID CURSO {curso_id}")
-            else:
-                print("Error al registrar el curso...")
-                print(curso_id)
-            
-            
             conn.commit()
             return curso_id
         except psycopg2.Error as error:
@@ -155,5 +138,3 @@ class DatabaseManager:
         finally:
             cursor.close()
             conn.close()
-
-
