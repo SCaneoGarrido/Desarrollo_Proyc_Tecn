@@ -13,6 +13,22 @@ function showSection(sectionId) {
     document.getElementById(sectionId).style.display = 'block';
 }
 
+// Función para ocultar elementos de la sección "perfil" al cargar la página
+function hideProfileElements() {
+    const profileElements = document.querySelectorAll('#perfil *');
+    profileElements.forEach(element => {
+        element.style.display = 'none';
+    });
+}
+
+// Función para mostrar elementos de la sección "perfil" cuando se selecciona la sección "perfil"
+function showProfileElements() {
+    const profileElements = document.querySelectorAll('#perfil *');
+    profileElements.forEach(element => {
+        element.style.display = 'block';
+    });
+}
+
 // Eventos de clic para los enlaces de la barra de navegación
 document.addEventListener('DOMContentLoaded', function() {
     document.querySelectorAll('.nav-link').forEach(item => {
@@ -20,10 +36,17 @@ document.addEventListener('DOMContentLoaded', function() {
             e.preventDefault(); // Previene el comportamiento por defecto de los enlaces
             const sectionId = this.getAttribute('href').substring(1); // Obtiene el ID de la sección desde el href del enlace
             showSection(sectionId);
+            if (sectionId === 'perfil') {
+                showProfileElements();
+            } else {
+                hideProfileElements();
+            }
         });
     });
+
     // Mostrar la sección de landing page por defecto al cargar la página
     showSection('inicio');
+    hideProfileElements(); // Asegúrate de ocultar los elementos de "perfil" al cargar la página
 });
 
 // Evento de clic para agregar un asistente
@@ -73,7 +96,8 @@ document.getElementById('add-asistente').addEventListener('click', function() {
     newAsistente.querySelector('.remove-asistente').addEventListener('click', function() {
       newAsistente.remove();
     });
-  });
+});
+
 
   // Evento de clic para registrar el curso
   document.getElementById('form-inscribir-curso').addEventListener('submit', function(e) {
