@@ -93,32 +93,26 @@ def register_courses(user_id):
         if not nombre_curso or not año_curso or not fecha_incio_curso or not fecha_termino_curso:
             print("No se proporcionaron los datos requeridos")
             return jsonify({'error': 'No se proporcionaron los datos requeridos'}), 400
-        else:
-            # Aquí puedes implementar la lógica para cargar el curso y establecer la relación con el colaborador que lo cargó
-            try:
-                if DatabaseManager_instance.insertCourseOnDB(nombre_curso, año_curso, fecha_incio_curso, fecha_termino_curso, user_id):
-                    return jsonify({'message': 'Curso cargado exitosamente'}), 200
-                else:
-                    return jsonify({'error': 'Error al cargar curso'}), 400
-            except Exception as e:
-                print(f"Error: {e}")
-                return jsonify({'error': 'Error al cargar curso'}), 400
-            
-        # IMPLEMENTAR LOGICA DE CARGA DE ASISTENTES A TABLA "ASISTENTES" + RELACION ASISTENTE -> CURSO
-        if len(asistentes) == 0:
-            print(f"Asistentes vacio -> {asistentes}")
-            return jsonify({'error': 'No se proporcionaron asistentes'}), 400
-        else:
-            # aqui implementa logica si es que los datos de los asistentes llegaron correctamente
-            try:
-                if DatabaseManager_instance.CargarAsistentes_cursos(asistentes):
-                    return jsonify({'message': 'Asistentes cargados exitosamente'}), 200
-                else:
-                    return jsonify({'error': 'Error al cargar asistentes'}), 400
-            except Exception as e:
-                print(f"Error: {e}")
-                return jsonify({'error': 'Error al cargar asistentes'}), 400
+        
+        try:
+            curso_id = DatabaseManager_instance.insertCourseOnDB(nombre_curso, año_curso, fecha_incio_curso, fecha_termino_curso, user_id,)
 
+            if curso_id:
+                if len(asistentes) > 0:
+                    for asistente in asistentes:
+                        asistente['curso_id'] = curso_id
+
+                    if DatabaseManager_instance.CargarAsistentes_cursos(asistentes):
+                        return jsonify({'message':'Curso y asistentes registrados correctamente'}), 200
+                    else:
+                        return jsonify({'Error': 'ocurrio un error al cargar asistentes'}), 400
+                else:
+                    return jsonify({'message':'Curso registrado correctamente, no se proporcionaron asistentes'}), 200
+            else:
+                return jsonify({"error": "ocurrio un error al registrar el curso"}), 400
+        except Exception as e:
+            print(f"Error: {e}")
+            return jsonify({"error": "ocurrio un error al registrar el curso"}), 400
     else:
         return jsonify({'error':'Invalid Method'}), 405
         

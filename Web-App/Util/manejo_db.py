@@ -63,7 +63,7 @@ class DatabaseManager:
         try:
             conn = self.connect()
             cursor = conn.cursor()
-            cursor.execute("SELECT * FROM Cursos WHERE Colab_id = %s", (user_id,))
+            cursor.execute("SELECT * FROM Cursos WHERE colab_id = %s", (user_id,))
             cursos = cursor.fetchall()
             cursor.close()
             if cursos:
@@ -104,11 +104,19 @@ class DatabaseManager:
             conn = self.connect()
             cursor = conn.cursor()
             for asistente in asistentes:
-                data = (asistente['nombre'], asistente['edad'], asistente['apellido'],
-                        asistente['direccion'], asistente['estadoCivil'], asistente['genero'],
-                        asistente['rut'], asistente['curso_id'])
+                data = (asistente['nombre'], 
+                        asistente['edad'], 
+                        asistente['apellido'],
+                        asistente['direccion'], 
+                        asistente['estadoCivil'], 
+                        asistente['genero'],
+                        asistente['rut'], 
+                        asistente['curso_id']
+                    )
+                
+                print(f"Mensaje 'CargarAsistentes_cursos' data de asistentes -> \n {data}")
                 cursor.execute("""
-                    INSERT INTO Asistentes (Nombre, Edad, Apellido, Direccion, EstadoCivil, Genero, Rut, Curso_id)
+                    INSERT INTO asistentes (Nombre, Edad, Apellido, Direccion, EstadoCivil, Genero, Rut, Curso_id)
                     VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
                 """, data)
             conn.commit()
@@ -126,15 +134,16 @@ class DatabaseManager:
             cursor = conn.cursor()
             data = (nombre_curso, año_curso, fecha_inicio, fecha_fin, colab_id)
             cursor.execute("""
-                INSERT INTO Cursos (Nombre_curso, año_curso, Fecha_Inicio, Fecha_Fin, Colab_id)
+                INSERT INTO cursos (Nombre_curso, año_curso, Fecha_Inicio, Fecha_Fin, Colab_id)
                 VALUES (%s, %s, %s, %s, %s) RETURNING CursoID
             """, data)
-            curso_id = cursor.fetchone()[0]
+            curso_id = cursor.fetchone()[0] 
             conn.commit()
+
             return curso_id
         except psycopg2.Error as error:
             print(f"Error: {error}")
-            return False
+            return None
         finally:
             cursor.close()
             conn.close()

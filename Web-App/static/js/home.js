@@ -140,20 +140,23 @@ function cargarCursos() {
     .then(response => response.json())
     .then(data => {
         console.log(data);
-        // IMPRIMIR LOS CURSOS INSCRITOS
-        div_cursos.innerHTML = ''; // Limpiar cualquier contenido previo
+        // Limpiar cualquier contenido previo
+        div_cursos.innerHTML = '';
 
         if (data.cursos && data.cursos.length > 0) {
             data.cursos.forEach(course => {
-                const [id, nombre, año, fecha_inicio, fecha_fin, otra_propiedad] = course;
+                const [id, nombre, fecha_inicio, fecha_fin, user_id, año] = course;
 
                 const courseItem = document.createElement('div');
-                courseItem.className = 'course-item';
+                courseItem.className = 'course-item card mb-3';
                 courseItem.innerHTML = `
-                    <h3>${nombre}</h3>
-                    <p>Año: ${año}</p>
-                    <p>Fecha de inicio: ${new Date(fecha_inicio).toLocaleDateString()}</p>
-                    <p>Fecha de fin: ${new Date(fecha_fin).toLocaleDateString()}</p>
+                    <div class="card-body">
+                        <h3 class="card-title">${nombre}</h3>
+                        <p class="card-text"><strong>UID del curso:</strong> ${id}</p>
+                        <p class="card-text"><strong>Año:</strong> ${año}</p>
+                        <p class="card-text"><strong>Fecha de inicio:</strong> ${new Date(fecha_inicio).toLocaleDateString()}</p>
+                        <p class="card-text"><strong>Fecha de fin:</strong> ${new Date(fecha_fin).toLocaleDateString()}</p>
+                    </div>
                 `;
                 div_cursos.appendChild(courseItem);
             });
@@ -166,7 +169,6 @@ function cargarCursos() {
         div_cursos.textContent = 'Error al cargar los cursos.';
     });
 }
-
 
 // Llamar a la función para cargar los cursos al cargar la página
 document.addEventListener('DOMContentLoaded', cargarCursos());
