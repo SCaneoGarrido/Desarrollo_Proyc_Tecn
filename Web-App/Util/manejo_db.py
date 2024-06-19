@@ -107,9 +107,46 @@ class DatabaseManager:
     
     # FUNCION PARA CARGAR LOS ASISTENTES EN LA TABLA asistentes
     def CargarAsistentes_cursos(self, array):
-        pass
+    try:
+        conn = self.connect()
+        cursor = conn.cursor()
+
+        for asistente in array:
+            data = (asistente['nombre'], asistente['apellido'], asistente['correo'], asistente['curso_id'])
+            cursor.execute("""
+                INSERT INTO asistentes (nombre, apellido, correo, curso_id)
+                VALUES(%s, %s, %s, %s)""", data)
+
+        conn.commit()
+        return True
+    
+    except psycopg2.Error as error:
+        print(f"Error: {error}")
+        return False
+
+    finally:
+        cursor.close()
+        conn.close()
+
+
+        
 
     # FUNCION PARA INSERTAR UN CURSO EN LA TABLA cursos
     def insertCourseOnDB(self, user_id):    
-        pass
+    try:
+        conn = self.connect()
+        cursor = conn.cursor()
+        data = (user_id,)
+        cursor.execute("""
+            INSERT INTO cursos (user_id)
+            VALUES(%s)""", data)
+        conn.commit()
+        return True
+    except psycopg2.Error as error:
+        print(f"Error: {error}")
+        return False
+    finally:
+        cursor.close()
+        conn.close()
+
 
