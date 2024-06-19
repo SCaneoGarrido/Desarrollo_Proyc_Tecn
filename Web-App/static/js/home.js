@@ -106,6 +106,8 @@ document.getElementById('add-asistente').addEventListener('click', function() {
       user_id: user_id,
       asistentes: asistentes
     };
+
+    console.log('Data para api -> ', data_to_send);
   
     fetch(`http://127.0.0.1:5000/app/register_courses/${user_id}`, {
       method: 'POST',

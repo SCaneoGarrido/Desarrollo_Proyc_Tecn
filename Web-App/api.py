@@ -69,29 +69,51 @@ def register_courses(user_id):
     if request.method == 'POST':
         data = request.get_json()
         # obtenemos los datos ingresados del curso
-        nombre_curso = data['nombre_curso']
-        año_curso = data['año_curso']  # Asegúrate de usar 'año' en lugar de 'anio'
-        fecha_inicio_curso = data['fecha_inicio_curso']
-        fecha_termino_curso = data['fecha_termino_curso']
-        # AGREGAR ARRAY DE ASISTENTES.
-        array_asistentes = data['array_asistentes'] # ASISTENTES
+        nombre_curso = data['nombre']
+        año_curso = data['año']
+        fecha_incio_curso = data['fechaInicio']
+        fecha_termino_curso = data['fechaTermino']
+        asistentes = data.get('asistentes', [])
 
+
+        print("DATA DE ENTRADA. \n", nombre_curso, "\n", año_curso, "\n", fecha_incio_curso, "\n", fecha_termino_curso, "\n", asistentes)
         
-        print("############ DATA RECIBIDA ############")
-        print(f"Nombre del curso: {nombre_curso}")
-        print(f"Año: {año_curso}")
-        print(f"Fecha de inicio: {fecha_inicio_curso}")
-        print(f"Fecha de termino: {fecha_termino_curso}")
-        for i in array_asistentes:
-            print(f"Asistente -> {i}")
-        
+
+        response = {
+            "message": "Curso creado exitosamente",
+            "data": {
+                "nombre_curso": nombre_curso,
+                "año_curso": año_curso,
+                "fecha_inicio_curso": fecha_incio_curso,
+                "fecha_termino_curso": fecha_termino_curso,
+                "user_id": user_id,
+                "asistentes": asistentes
+            }
+        }
+     
+        print(f"Data de ingreso a registro -> {response}")
+
+    
+    
         # IMPLEMENTAR LOGICA DE CARGA DE CURSO + RELACION DE COLABORADOR QUE CARGO EL CURSO
         ######
-
+        if not nombre_curso or not año_curso or not fecha_incio_curso or not fecha_termino_curso:
+            print("No se proporcionaron los datos requeridos")
+            return jsonify({'error': 'No se proporcionaron los datos requeridos'}), 400
+        else:
+            # aqui implementa logica si es que los datos de los cursos llegaron correctamente
+            pass
         # IMPLEMENTAR LOGICA DE CARGA DE ASISTENTES A TABLA "ASISTENTES" + RELACION ASISTENTE -> CURSO
+        if len(asistentes) == 0:
+            print(f"Asistentes vacio -> {asistentes}")
+            return jsonify({'error': 'No se proporcionaron asistentes'}), 400
+        else:
+            # aqui implementa logica si es que los datos de los asistentes llegaron correctamente
+            pass
+        #####
         
 
-        return jsonify({'message':'data de curso recibida'}), 200
+        
     else:
         return jsonify({'error':'Invalid Method'}), 405
         
