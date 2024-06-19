@@ -36,7 +36,7 @@ class DatabaseManager:
         try:
             conn = self.connect()
             cursor = conn.cursor()
-            data = (nombre, apellido, correo, hash_clave, salt)
+            data = (correo, nombre, apellido, hash_clave, salt)
             cursor.execute("""
                 INSERT INTO muni_colab (correo, nombre, apellido, hash, salt)
                 VALUES(%s, %s, %s, %s, %s)""", data)
@@ -69,7 +69,7 @@ class DatabaseManager:
             print(f"Error: {e}")
 
     # INSERTAR UN CURSO EN LA BASE DE DATOS
-    def insertCourseOnDB(self):    
+    def insertCourseOnDB(self, user_id):    
         pass
 
     # OBTENER LOS CURSOS REGISTRADOS
@@ -81,6 +81,30 @@ class DatabaseManager:
         from Util.manage_credential import CredentialsManager
         credentialsManager_instance = CredentialsManager()
         conn = self.connect()
-        
+
+        try:
+            with conn:
+                with conn.cursor() as cursor:
+                    cursor.execute("SELECT * FROM muni_colab WHERE correo = %s", (correo, ))
+                    user = cursor.fetchone()
+
+                    if user:
+                        print("Usuario encontrado")
+                        hash_  = user[4]
+                        salt_ = user[5]
+
+                        if credentialsManager_instance.validateLogin(contraseña, hash_, salt_):
+                            cursor.close()
+                            return True
+                        else:
+                            return False
+
+                    else:
+                        print(f"Usuario no encontrado,\n data -> {user}")
+                        return None
+
+        except Exception as e:
+            print(f"Error: {e}")
+
         
 

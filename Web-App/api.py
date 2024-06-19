@@ -138,6 +138,7 @@ def handle_login():
                 print()
                 return jsonify({"error": "No se proporcionaron correo o contraseña"}), 400
             
+            print("Data de entrada: ", correo, " - ", contraseña)
             user = DatabaseManager_instance.validate(correo, contraseña)
             if user:
                 user_id = DatabaseManager_instance.get_user_id(correo)
