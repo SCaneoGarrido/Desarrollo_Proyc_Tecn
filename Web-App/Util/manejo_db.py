@@ -68,9 +68,7 @@ class DatabaseManager:
         except Exception as e:
             print(f"Error: {e}")
 
-    # INSERTAR UN CURSO EN LA BASE DE DATOS
-    def insertCourseOnDB(self, user_id):    
-        pass
+
 
     # OBTENER LOS CURSOS REGISTRADOS
     def getRegistered_courses(self, user_id):
@@ -106,5 +104,12 @@ class DatabaseManager:
         except Exception as e:
             print(f"Error: {e}")
 
-        
+    
+    # FUNCION PARA CARGAR LOS ASISTENTES EN LA TABLA asistentes
+    def CargarAsistentes_cursos(self, array):
+        pass
+
+    # FUNCION PARA INSERTAR UN CURSO EN LA TABLA cursos
+    def insertCourseOnDB(self, user_id):    
+        pass
 
