@@ -179,6 +179,7 @@ document.getElementById('form-cargar-excels').addEventListener('submit', functio
     const archivoExcel = document.getElementById('archivoExcel').files[0];
     const uploadStatus = document.getElementById('upload-status');
     const excelPreview = document.getElementById('excel-preview');
+    const userID = localStorage.getItem('user_id');
     uploadStatus.textContent = "Cargando archivo...";
     const formData = new FormData();
     formData.append("file", archivoExcel);
@@ -195,9 +196,10 @@ document.getElementById('form-cargar-excels').addEventListener('submit', functio
             const seleccionarCursoModal = new bootstrap.Modal(document.getElementById('seleccionarCursoModal'));
             seleccionarCursoModal.show();
             // Llenar las opciones del select con los cursos disponibles
-            fetch('/app/get_courses')
+            fetch(`/app/get_courses/${userID}`)
             .then(response => response.json())
             .then(courses => {
+                console.log(courses);
                 const cursoSeleccionado = document.getElementById('cursoSeleccionado');
                 cursoSeleccionado.innerHTML = '';
                 if (courses.length > 0) {
