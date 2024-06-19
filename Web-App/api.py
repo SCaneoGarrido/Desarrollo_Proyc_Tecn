@@ -73,25 +73,15 @@ def register_courses(user_id):
         año_curso = data['año']  # Asegúrate de usar 'año' en lugar de 'anio'
         fecha_inicio_curso = data['fechaInicio']
         fecha_termino_curso = data['fechaTermino']
+        # AGREGAR ARRAY DE ASISTENTES.
+        array_asistentes = [] # ASISTENTES
 
+        
         print("############ DATA RECIBIDA ############")
         print(f"Nombre del curso: {nombre_curso}")
         print(f"Año: {año_curso}")
         print(f"Fecha de inicio: {fecha_inicio_curso}")
         print(f"Fecha de termino: {fecha_termino_curso}")
-        print("############ FIN DATA RECIBIDA ############")
-        
-        try:
-            DatabaseManager_instance = DatabaseManager() # Instancia de clase para uso de metodo de insercion de cursos.
-            if DatabaseManager_instance.insertCourseOnDB(nombre_curso, año_curso, fecha_inicio_curso, fecha_termino_curso, user_id):
-                return jsonify({"message": "curso registrado"}), 200
-            else:
-                return jsonify({"error": "No se pudo registrar el curso"}), 500
-
-        except Exception as e:
-            print(f"Error: {e}")
-            return jsonify({"error": "ocurrio un error al registrar el curso"}), 500
-
     else:
         return jsonify({'error':'Invalid Method'}), 405
         
@@ -147,7 +137,7 @@ def handle_login():
                 print("No se proporcionaron correo o contraseña")
                 print()
                 return jsonify({"error": "No se proporcionaron correo o contraseña"}), 400
-               
+            
             user = DatabaseManager_instance.validate(correo, contraseña)
             if user:
                 user_id = DatabaseManager_instance.get_user_id(correo)
@@ -161,7 +151,7 @@ def handle_login():
             print(f"Error: {e}")
             return jsonify({"error": "ocurrio un error al iniciar sesion"}), 400
     
-# RUTA PARA CREAR CREDENCIALES
+# RUTA PARA CREAR CREDENCIALES (AUXILIAR -> ELIMINAR LUEGO DEL PROYECTO)
 @app.route('/app/create_user', methods=['POST'])
 def create_user():
     CredentialsManager_instance = CredentialsManager()
