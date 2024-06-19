@@ -211,7 +211,7 @@ function cargarCursos_modal() {
           data.cursos.forEach(curso => {
             const [id, nombre] = curso;
             const option = document.createElement('option');
-  
+            option.style = 'color: black;';
             option.value = id;
             option.textContent = nombre;
             option.textContent = `${nombre} UID -> (${id})`;

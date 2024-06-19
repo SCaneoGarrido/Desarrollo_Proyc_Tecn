@@ -116,7 +116,7 @@ def register_courses(user_id):
     else:
         return jsonify({'error':'Invalid Method'}), 405
         
-@app.route('/app/vincular_archivo_curso/<user_id>', methods=['POST'])
+@app.route('/app/vincular_archivo_curso', methods=['POST'])
 def vincular_archivo_curso():
     if request.method == 'POST':
         data = request.get_json()
@@ -144,6 +144,7 @@ def vincular_archivo_curso():
             # Agregar print para ver la vinculación en la terminal
             print(f"Curso ID: {curso_id} vinculado con el siguiente DataFrame:")
             print(df)
+            
             return jsonify({"success": True, "data": html_data}), 200
         except Exception as e:
             print(f"Error: {e}")
@@ -227,5 +228,7 @@ def getInfo_muniColab(user_id):
         except Exception as e:
             print(f"Error: {e}")
             return jsonify({"error": "ocurrio un error al obtener la información del usuario"}), 400
+
+
 if __name__ == '__main__':
     app.run(debug=True)

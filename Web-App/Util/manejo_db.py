@@ -169,4 +169,5 @@ class DatabaseManager:
             cursor.close()
             conn.close()
 
-    
+    def CargarAsitentencia(self, curso_id, dataframe_csv):
+        pass
