@@ -69,68 +69,33 @@ def register_courses(user_id):
     if request.method == 'POST':
         DatabaseManager_instance = DatabaseManager()
         data = request.get_json()
-        # obtenemos los datos ingresados del curso
-        nombre_curso = data['nombre']
-        año_curso = data['año']
-        fecha_incio_curso = data['fechaInicio']
-        fecha_termino_curso = data['fechaTermino']
+        
+        # Obtener los datos del curso
+        nombre_curso = data.get('nombre')
+        año_curso = data.get('año')
+        fecha_inicio_curso = data.get('fechaInicio')
+        fecha_termino_curso = data.get('fechaTermino')
         asistentes = data.get('asistentes', [])
 
+        # Verificar si todos los datos requeridos están presentes
+        if not nombre_curso or not año_curso or not fecha_inicio_curso or not fecha_termino_curso:
+            return jsonify({'error': 'No se proporcionaron todos los datos requeridos'}), 400
 
-        print("DATA DE ENTRADA. \n", nombre_curso, "\n", año_curso, "\n", fecha_incio_curso, "\n", fecha_termino_curso, "\n", asistentes)
-        
-
-        response = {
-            "message": "Curso creado exitosamente",
-            "data": {
-                "nombre_curso": nombre_curso,
-                "año_curso": año_curso,
-                "fecha_inicio_curso": fecha_incio_curso,
-                "fecha_termino_curso": fecha_termino_curso,
-                "user_id": user_id,
-                "asistentes": asistentes
-            }
-        }
-     
-        print(f"Data de ingreso a registro -> {response}")
-
-    
-    
-        # IMPLEMENTAR LOGICA DE CARGA DE CURSO + RELACION DE COLABORADOR QUE CARGO EL CURSO
-        ######
-        if not nombre_curso or not año_curso or not fecha_incio_curso or not fecha_termino_curso:
-            print("No se proporcionaron los datos requeridos")
-            return jsonify({'error': 'No se proporcionaron los datos requeridos'}), 400
-        else:
-            # Aquí puedes implementar la lógica para cargar el curso y establecer la relación con el colaborador que lo cargó
-            try:
-                if DatabaseManager_instance.insertCourseOnDB(nombre_curso, año_curso, fecha_incio_curso, fecha_termino_curso, user_id):
-                    return jsonify({'message': 'Curso cargado exitosamente'}), 200
-                else:
-                    return jsonify({'error': 'Error al cargar curso'}), 400
-            except Exception as e:
-                print(f"Error: {e}")
-                return jsonify({'error': 'Error al cargar curso'}), 400
-            
-        # IMPLEMENTAR LOGICA DE CARGA DE ASISTENTES A TABLA "ASISTENTES" + RELACION ASISTENTE -> CURSO
-        if len(asistentes) == 0:
-            print(f"Asistentes vacio -> {asistentes}")
-            return jsonify({'error': 'No se proporcionaron asistentes'}), 400
-        else:
-            # aqui implementa logica si es que los datos de los asistentes llegaron correctamente
-            try:
+        # Intentar insertar el curso en la base de datos
+        try:
+            if DatabaseManager_instance.insertCourseOnDB(nombre_curso, fecha_inicio_curso, fecha_termino_curso, user_id, año_curso):
+                # El curso se ha insertado correctamente, ahora intentar cargar los asistentes
                 if DatabaseManager_instance.CargarAsistentes_cursos(asistentes):
-                    return jsonify({'message': 'Asistentes cargados exitosamente'}), 200
+                    return jsonify({'message': 'Curso y asistentes cargados exitosamente'}), 200
                 else:
                     return jsonify({'error': 'Error al cargar asistentes'}), 400
-            except Exception as e:
-                print(f"Error: {e}")
-                return jsonify({'error': 'Error al cargar asistentes'}), 400
-        
+            else:
+                return jsonify({'error': 'Error al cargar curso'}), 400
 
-        
-    else:
-        return jsonify({'error':'Invalid Method'}), 405
+        except Exception as e:
+            print(f"Error: {e}")
+            return jsonify({'error': 'Error interno del servidor'}), 500
+
         
 @app.route('/app/vincular_archivo_curso/<user_id>', methods=['POST'])
 def vincular_archivo_curso():

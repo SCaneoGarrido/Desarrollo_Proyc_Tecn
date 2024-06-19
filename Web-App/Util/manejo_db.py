@@ -106,16 +106,16 @@ class DatabaseManager:
 
     
     # FUNCION PARA CARGAR LOS ASISTENTES EN LA TABLA asistentes
-    def CargarAsistentes_cursos(self, array):
+    def CargarAsistentes_cursos(self, curso_id ,array):
         try:
             conn = self.connect()
             cursor = conn.cursor()
-
+            
             for asistente in array:
-                data = (asistente['nombre'], asistente['edad'], asistente['apellido'], asistente['direccion'], asistente['estadoCivil'], asistente['genero'], asistente['rut'])
+                data = (asistente['nombre'], asistente['edad'], asistente['apellido'], asistente['direccion'], asistente['estadoCivil'], asistente['genero'], asistente['rut'], curso_id)
                 cursor.execute("""
-                    INSERT INTO asistentes (nombre, edad, apellido, direccion, estadoCivil, genero, rut)
-                    VALUES(%s, %s, %s, %s, %s, %s, %s)""", data)
+                    INSERT INTO asistentes (nombre, edad, apellido, direccion, estadoCivil, genero, rut, curso_id)
+                    VALUES(%s, %s, %s, %s, %s, %s, %s, %s)""", data)
 
             conn.commit()
             return True
@@ -139,8 +139,16 @@ class DatabaseManager:
             data = (nombre_curso, fecha_inicio, fecha_fin, colab_id, año_curso)
             cursor.execute(""" INSERT INTO cursos (nombre_curso, fecha_inicio, fecha_fin, colab_id, año_curso)
             VALUES(%s, %s, %s, %s, %s)""", data)
+            curso_id = cursor.fetchone()[0]
+            if curso_id:
+                print(f"Curso agregado -> ID CURSO {curso_id}")
+            else:
+                print("Error al registrar el curso...")
+                print(curso_id)
+            
+            
             conn.commit()
-            return True
+            return curso_id
         except psycopg2.Error as error:
             print(f"Error: {error}")
             return False
