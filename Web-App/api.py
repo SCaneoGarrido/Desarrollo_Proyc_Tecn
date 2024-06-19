@@ -214,5 +214,18 @@ def create_user():
     else:
         return jsonify({'error':'Invalid Method'}), 400
 
+
+@app.route('/app/get_info_User/<user_id>', methods=['GET'])
+def getInfo_muniColab(user_id):
+    if request.method == 'GET':
+        try:
+            DatabaseManager_instance = DatabaseManager()
+            if user_id:
+                info = DatabaseManager_instance.getMuni_colabInfo(user_id)
+                if info:
+                    return jsonify({"info": info}), 200
+        except Exception as e:
+            print(f"Error: {e}")
+            return jsonify({"error": "ocurrio un error al obtener la información del usuario"}), 400
 if __name__ == '__main__':
     app.run(debug=True)

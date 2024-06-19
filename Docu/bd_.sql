@@ -12,7 +12,13 @@ CREATE TABLE muni_colab (
 CREATE TABLE Asistentes (
     AsistenteID SERIAL PRIMARY KEY,
     Nombre VARCHAR(255) NOT NULL,
-    Edad INT NOT NULL
+    Edad INT NOT NULL,
+    apellido VARCHAR(255),
+    direccion VARCHAR(255),
+    estadoCivil VARCHAR(255),
+    genero VARCHAR(50),
+    rut VARCHAR(255) NOT NULL UNIQUE
+    FOREIGN KEY curso_id REFERENCES Cursos(CursoID);
 );
 
 -- Crear tabla Cursos
@@ -23,15 +29,6 @@ CREATE TABLE Cursos (
     Fecha_Fin DATE NOT NULL,
     Colab_id INT,
     FOREIGN KEY (Colab_id) REFERENCES muni_colab(id)
-);
-
--- Crear tabla de relación CursoAsistente
-CREATE TABLE CursoAsistente (
-    CursoID INT,
-    AsistenteID INT,
-    PRIMARY KEY (CursoID, AsistenteID),
-    FOREIGN KEY (CursoID) REFERENCES Cursos(CursoID),
-    FOREIGN KEY (AsistenteID) REFERENCES Asistentes(AsistenteID)
 );
 
 -- Crear tabla Asistencia

@@ -289,3 +289,43 @@ document.getElementById('irAInscribirCurso').addEventListener('click', function(
     modal.hide();
     showSection('cursos');
 });
+
+
+
+/**
+ * MENSAJE PARA PANA BENJA EL FRONT END MAESTRO
+ * puedes revisar este evento que carga los datos del usuario
+ * bug:
+ * cuando te logeas entras a la web y el cuadro o seccion del usuario
+ * se ve en cada seccion. No de manera permantente pero es como si caminara 
+ * entre secciones. 
+ * 
+ * INICIA LA APP LOGUEA Y VERAS EL BUG
+ */
+
+/// Manejar carga de datos de usuarios en seccion de usuarios
+document.addEventListener('DOMContentLoaded', function() {
+    // verificar un user_id en localstorage
+    const userId = localStorage.getItem('user_id');
+
+    if (userId) {
+        // si este existe hacemos una peticion a la API
+        fetch(`http://127.0.0.1:5000/app/get_info_User/${userId}`)
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);
+
+                // Verificar si data.info existe y no está vacío
+                if (data.info) {
+                    const userInfo = data.info;
+                    document.getElementById('nombreUsuario').textContent = userInfo[1];
+                    document.getElementById('apellidoUsuario').textContent = userInfo[2];
+                    document.getElementById('emailUsuario').textContent = userInfo[0];
+                    document.getElementById('perfil').style.display = 'block'; // Mostrar la sección de perfil
+                } else {
+                    console.error('No se encontró información del usuario.');
+                }
+            })
+            .catch(error => console.error('Error al obtener la información del usuario:', error));
+    }
+});

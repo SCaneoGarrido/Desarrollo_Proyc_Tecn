@@ -147,3 +147,26 @@ class DatabaseManager:
         finally:
             cursor.close()
             conn.close()
+
+    def getMuni_colabInfo(self, user_id):
+        try:
+            conn = self.connect()
+            with conn:
+                with conn.cursor() as cursor:
+                    cursor.execute("SELECT correo, nombre, apellido FROM muni_colab WHERE id = %s", (user_id,))
+                    info = cursor.fetchone()
+
+                    if info:
+                        print(f"Informacion del usuario encontrada -> \n {info}")
+                        return info
+                    else:
+                        print(f"Usuario no encontrado,\n data -> {info}")
+                        return None
+        except Exception as e:
+            print(f"Ocurrio un error al obtener la informacion del usuario de la base de datos \n Error -> {e}")
+
+        finally:
+            cursor.close()
+            conn.close()
+
+    
