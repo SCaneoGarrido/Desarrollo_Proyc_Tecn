@@ -197,6 +197,34 @@ function cargarCursos() {
 // Llamar a la función para cargar los cursos al cargar la página
 document.addEventListener('DOMContentLoaded', cargarCursos());
 
+function cargarCursos_modal() {
+    const userID = localStorage.getItem('user_id');
+  
+    if (userID) {
+      fetch(`/app/get_courses/${userID}`)
+      .then(response => response.json())
+      .then(data => {
+        cursoSeleccionado = document.getElementById('cursoSeleccionado');
+        cursoSeleccionado.innerHTML = '';
+  
+        if (data.cursos && data.cursos.length > 0) {
+          data.cursos.forEach(curso => {
+            const [id, nombre] = curso;
+            const option = document.createElement('option');
+  
+            option.value = id;
+            option.textContent = nombre;
+            option.textContent = `${nombre} UID -> (${id})`;
+            cursoSeleccionado.appendChild(option);
+          })
+        }
+      })
+      .catch(error => console.error(error));
+    }
+  }
+  
+  
+
 // Manejar el formulario de carga de excels
 document.getElementById('form-cargar-excels').addEventListener('submit', function(e) {
     e.preventDefault();
@@ -220,23 +248,7 @@ document.getElementById('form-cargar-excels').addEventListener('submit', functio
             const seleccionarCursoModal = new bootstrap.Modal(document.getElementById('seleccionarCursoModal'));
             seleccionarCursoModal.show();
             // Llenar las opciones del select con los cursos disponibles
-            fetch(`/app/get_courses/${userID}`)
-            .then(response => response.json())
-            .then(courses => {
-                console.log(courses);
-                const cursoSeleccionado = document.getElementById('cursoSeleccionado');
-                cursoSeleccionado.innerHTML = '';
-                if (courses.length > 0) {
-                    courses.forEach(course => {
-                        const option = document.createElement('option');
-                        option.value = course.id;
-                        option.textContent = `${course.nombre} (${course.año})`;
-                        cursoSeleccionado.appendChild(option);
-                    });
-                } else {
-                    cursoSeleccionado.innerHTML = '';
-                }
-            });
+            cargarCursos_modal();
         } else {
             uploadStatus.textContent = "Error al cargar el archivo.";
             uploadStatus.style.color = "#dc3545";
