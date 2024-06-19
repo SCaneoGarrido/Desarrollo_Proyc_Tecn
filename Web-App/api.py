@@ -67,33 +67,35 @@ def recive_data():
 @app.route('/app/register_courses/<user_id>', methods=['POST'])
 def register_courses(user_id):
     if request.method == 'POST':
+        DatabaseManager_instance = DatabaseManager()
         data = request.get_json()
-        # obtenemos los datos ingresados del curso
-        nombre_curso = data['nombre']
-        año_curso = data['año']  # Asegúrate de usar 'año' en lugar de 'anio'
-        fecha_inicio_curso = data['fechaInicio']
-        fecha_termino_curso = data['fechaTermino']
-
-        print("############ DATA RECIBIDA ############")
-        print(f"Nombre del curso: {nombre_curso}")
-        print(f"Año: {año_curso}")
-        print(f"Fecha de inicio: {fecha_inicio_curso}")
-        print(f"Fecha de termino: {fecha_termino_curso}")
-        print("############ FIN DATA RECIBIDA ############")
         
+        # Obtener los datos del curso
+        nombre_curso = data.get('nombre')
+        año_curso = data.get('año')
+        fecha_inicio_curso = data.get('fechaInicio')
+        fecha_termino_curso = data.get('fechaTermino')
+        asistentes = data.get('asistentes', [])
+
+        # Verificar si todos los datos requeridos están presentes
+        if not nombre_curso or not año_curso or not fecha_inicio_curso or not fecha_termino_curso:
+            return jsonify({'error': 'No se proporcionaron todos los datos requeridos'}), 400
+
+        # Intentar insertar el curso en la base de datos
         try:
-            DatabaseManager_instance = DatabaseManager() # Instancia de clase para uso de metodo de insercion de cursos.
-            if DatabaseManager_instance.insertCourseOnDB(nombre_curso, año_curso, fecha_inicio_curso, fecha_termino_curso, user_id):
-                return jsonify({"message": "curso registrado"}), 200
+            if DatabaseManager_instance.insertCourseOnDB(nombre_curso, fecha_inicio_curso, fecha_termino_curso, user_id, año_curso):
+                # El curso se ha insertado correctamente, ahora intentar cargar los asistentes
+                if DatabaseManager_instance.CargarAsistentes_cursos(asistentes):
+                    return jsonify({'message': 'Curso y asistentes cargados exitosamente'}), 200
+                else:
+                    return jsonify({'error': 'Error al cargar asistentes'}), 400
             else:
-                return jsonify({"error": "No se pudo registrar el curso"}), 500
+                return jsonify({'error': 'Error al cargar curso'}), 400
 
         except Exception as e:
             print(f"Error: {e}")
-            return jsonify({"error": "ocurrio un error al registrar el curso"}), 500
+            return jsonify({'error': 'Error interno del servidor'}), 500
 
-    else:
-        return jsonify({'error':'Invalid Method'}), 405
         
 @app.route('/app/vincular_archivo_curso/<user_id>', methods=['POST'])
 def vincular_archivo_curso():
@@ -109,7 +111,7 @@ def vincular_archivo_curso():
             df = pd.DataFrame(session['uploaded_data'])
             # Asociar el DataFrame con el curso
             dataframes_cursos[curso_id] = df
-            html_data = df.to_html(classes='table table-bordered table-striped')
+            html_data = df.to_html(classes='table table-bordered table-striped') # no se debe perder
             # Guardar la vinculación en un archivo CSV
             df['curso_id'] = curso_id
             df['nombre_curso'] = next((curso['nombre'] for curso in cursos_registrados if curso['id'] == curso_id), 'Desconocido')
@@ -145,8 +147,10 @@ def handle_login():
 
             if not correo or not contraseña:
                 print("No se proporcionaron correo o contraseña")
+                print()
                 return jsonify({"error": "No se proporcionaron correo o contraseña"}), 400
-               
+            
+            print("Data de entrada: ", correo, " - ", contraseña)
             user = DatabaseManager_instance.validate(correo, contraseña)
             if user:
                 user_id = DatabaseManager_instance.get_user_id(correo)
@@ -160,7 +164,7 @@ def handle_login():
             print(f"Error: {e}")
             return jsonify({"error": "ocurrio un error al iniciar sesion"}), 400
     
-# RUTA PARA CREAR CREDENCIALES
+# RUTA PARA CREAR CREDENCIALES (AUXILIAR -> ELIMINAR LUEGO DEL PROYECTO)
 @app.route('/app/create_user', methods=['POST'])
 def create_user():
     CredentialsManager_instance = CredentialsManager()

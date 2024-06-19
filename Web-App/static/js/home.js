@@ -26,55 +26,112 @@ document.addEventListener('DOMContentLoaded', function() {
     showSection('inicio');
 });
 
-// Manejar el formulario de inscripción de cursos
-document.getElementById('form-inscribir-curso').addEventListener('submit', function(e) {
-    //e.preventDefault();
+// Evento de clic para agregar un asistente
+document.getElementById('add-asistente').addEventListener('click', function() {
+    const asistentesContainer = document.getElementById('accordionAsistentes');
+    const newAsistenteId = `asistente-${Date.now()}`;
+    const newAsistente = document.createElement('div');
+    newAsistente.classList.add('accordion-item');
+    newAsistente.innerHTML = `
+      <h2 class="accordion-header" id="heading-${newAsistenteId}">
+        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-${newAsistenteId}" aria-expanded="false" aria-controls="collapse-${newAsistenteId}">
+          Asistente
+        </button>
+      </h2>
+      <div id="collapse-${newAsistenteId}" class="accordion-collapse collapse" aria-labelledby="heading-${newAsistenteId}" data-bs-parent="#accordionAsistentes">
+        <div class="accordion-body">
+          <label for="rut" class="form-label">RUT</label>
+          <input type="text" class="form-control" name="rut" required>
+          <label for="edad" class="form-label">Edad</label>
+          <input type="number" class="form-control" name="edad" required>
+          <label for="genero" class="form-label">Género</label>
+          <select class="form-control" name="genero" required>
+            <option value="Masculino">Masculino</option>
+            <option value="Femenino">Femenino</option>
+            <option value="Otro">Otro</option>
+          </select>
+          <label for="nombre" class="form-label">Nombre</label>
+          <input type="text" class="form-control" name="nombre" required>
+          <label for="apellido" class="form-label">Apellido</label>
+          <input type="text" class="form-control" name="apellido" required>
+          <label for="direccion" class="form-label">Dirección</label>
+          <input type="text" class="form-control" name="direccion" required>
+          <label for="estadoCivil" class="form-label">Estado Civil</label>
+          <select class="form-control" name="estadoCivil" required>
+            <option value="Soltero">Soltero</option>
+            <option value="Casado">Casado</option>
+            <option value="Divorciado">Divorciado</option>
+            <option value="Viudo">Viudo</option>
+          </select>
+          <button type="button" class="btn btn-danger remove-asistente mt-2">Eliminar</button>
+        </div>
+      </div>
+    `;
+    asistentesContainer.appendChild(newAsistente);
+  
+    // Añadir evento para eliminar asistente
+    newAsistente.querySelector('.remove-asistente').addEventListener('click', function() {
+      newAsistente.remove();
+    });
+  });
+
+  // Evento de clic para registrar el curso
+  document.getElementById('form-inscribir-curso').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
     const nombreCurso = document.getElementById('nombreCurso').value;
     const anioCurso = document.getElementById('anioCurso').value;
     const fechaInicio = document.getElementById('fechaInicio').value;
     const fechaTermino = document.getElementById('fechaTermino').value;
     const user_id = localStorage.getItem('user_id');
-    // Validar que los campos no estén vacíos
-    if (nombreCurso.trim() === '' || anioCurso.trim() === '' || fechaInicio.trim() === '' || fechaTermino.trim() === '') {
-        alert('Por favor, complete todos los campos.');
-        return;
-    }
-    let data_to_send = {
-        'nombre': nombreCurso,
-        'año': anioCurso,
-        'fechaInicio': fechaInicio,
-        'fechaTermino': fechaTermino,
-        'user_id': user_id
+  
+    const asistentes = [];
+    document.querySelectorAll('.accordion-item').forEach(asistente => {
+      const rut = asistente.querySelector('input[name="rut"]').value;
+      const edad = asistente.querySelector('input[name="edad"]').value;
+      const genero = asistente.querySelector('select[name="genero"]').value;
+      const nombre = asistente.querySelector('input[name="nombre"]').value;
+      const apellido = asistente.querySelector('input[name="apellido"]').value;
+      const direccion = asistente.querySelector('input[name="direccion"]').value;
+      const estadoCivil = asistente.querySelector('select[name="estadoCivil"]').value;
+  
+      asistentes.push({ rut, edad, genero, nombre, apellido, direccion, estadoCivil });
+    });
+  
+    const data_to_send = {
+      nombre: nombreCurso,
+      año: anioCurso,
+      fechaInicio: fechaInicio,
+      fechaTermino: fechaTermino,
+      user_id: user_id,
+      asistentes: asistentes
     };
-    console.log(data_to_send);
+
+    console.log('Data para api -> ', data_to_send);
+  
     fetch(`http://127.0.0.1:5000/app/register_courses/${user_id}`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(data_to_send)
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(data_to_send)
     })
-    .then(response => {
-        console.log(response); 
-        return response.text(); 
+    .then(response => response.json())
+    .then(data => {
+      alert(data.message || data.error);
     })
-    .then(text => {
-        try {
-            const data = JSON.parse(text); 
-            console.log(data);
-            alert(data.message || data.error); // Mostrar el mensaje o error
-        } catch (error) {
-            console.error("Error al parsear JSON:", error, text);
-            alert("Error al registrar el curso. Por favor, intente nuevamente.");
-        }
-    })
-    .catch(error => console.error("Error en la solicitud:", error));
+    .catch(error => {
+      console.error("Error en la solicitud:", error);
+      alert("Error al registrar el curso. Por favor, intente nuevamente.");
+    });
+  
     // Limpiar el formulario
     this.reset();
     // Cerrar el modal
     const modal = bootstrap.Modal.getInstance(document.getElementById('inscribirCursoModal'));
     modal.hide();
-});
+  });
+
 // Función para obtener los cursos inscritos desde la base de datos
 function cargarCursos() {
     const user_id = localStorage.getItem('user_id');

@@ -31,14 +31,14 @@ class DatabaseManager:
         except Exception as e:
             print(f"Error: {e}") 
             
-    
+    # INGRESAR UN USUAURIO EN LA BASE DE DATOS (TEMPORAL ELIMINAR LUEGO DE DESARROLLO)
     def insertUserOnDB(self ,nombre, apellido, correo, hash_clave, salt):
         try:
             conn = self.connect()
             cursor = conn.cursor()
-            data = (nombre, apellido, correo, hash_clave, salt)
+            data = (correo, nombre, apellido, hash_clave, salt)
             cursor.execute("""
-                INSERT INTO empleados (nombre, apellido, mail, hash_contraseña, salt)
+                INSERT INTO muni_colab (correo, nombre, apellido, hash, salt)
                 VALUES(%s, %s, %s, %s, %s)""", data)
             conn.commit()
             return True
@@ -51,11 +51,12 @@ class DatabaseManager:
             cursor.close()
             conn.close()
     
+    # OBTENER EL ID DEL USUARIO
     def get_user_id(self ,correo):
         try:
             conn = self.connect()
             cursor = conn.cursor()
-            cursor.execute("SELECT id_empleado FROM empleados WHERE mail = %s", (correo, ))
+            cursor.execute("SELECT id FROM muni_colab WHERE correo = %s", (correo, ))
             user_id = cursor.fetchone()
             cursor.close()
 
@@ -68,70 +69,91 @@ class DatabaseManager:
             print(f"Error: {e}")
 
 
-    def insertCourseOnDB(self ,nombre_curso, course_year, start_date, finish_date, id_empleado):
-        try:
-            conn = self.connect()
-            cursor = conn.cursor()
-            data = (nombre_curso, course_year, start_date, finish_date, id_empleado)
-            cursor.execute("""
-                INSERT INTO cursos (nombre_curso, año, fecha_inicio, fecha_termino, id_empleado)
-                VALUES(%s, %s, %s, %s, %s)""", data)
-            conn.commit()
-            return True
-        
-        except Exception as e:
-            print(f"Error: {e}")
-    
-    def UploadFileToBD(self):
-        pass
-        # GENERAR LOGICA DE INSERTAR ARCHIVOS DE CURSOS
 
+    # OBTENER LOS CURSOS REGISTRADOS
     def getRegistered_courses(self, user_id):
-        conn = self.connect()
+        pass
         
-        if conn is None:
-            return None
-        
-        try:
-            with conn:
-                with conn.cursor() as cursor:
-                    cursor.execute("SELECT * FROM cursos WHERE id_empleado = %s", (user_id, ))
-                    courses = cursor.fetchall()
-                    cursor.close()
-                    return courses
-        except Exception as e:
-            print(f"Error -> {e}")
-            return None
+    # VALIDAR CREDENCIALES
     def validate(self, correo, contraseña):
         from Util.manage_credential import CredentialsManager
         credentialsManager_instance = CredentialsManager()
         conn = self.connect()
 
-        if conn is None:
-            return None
-        
         try:
             with conn:
                 with conn.cursor() as cursor:
-                    cursor.execute("SELECT * FROM empleados WHERE mail = %s", (correo, ))
+                    cursor.execute("SELECT * FROM muni_colab WHERE correo = %s", (correo, ))
                     user = cursor.fetchone()
-                    if user:
-                        hash_contraseña =user[4]
-                        salt = user[5]
 
-                        if credentialsManager_instance.validateLogin(contraseña, hash_contraseña, salt):
-                            print("Credenciales Correctas, permitiendo acceso...")
+                    if user:
+                        print("Usuario encontrado")
+                        hash_  = user[4]
+                        salt_ = user[5]
+
+                        if credentialsManager_instance.validateLogin(contraseña, hash_, salt_):
                             cursor.close()
                             return True
                         else:
-                            print("Credenciales incorrectas...")
                             return False
+
                     else:
-                        print("Usuario no encontrado...")
+                        print(f"Usuario no encontrado,\n data -> {user}")
                         return None
+
         except Exception as e:
             print(f"Error: {e}")
+
+    
+    # FUNCION PARA CARGAR LOS ASISTENTES EN LA TABLA asistentes
+    def CargarAsistentes_cursos(self, curso_id ,array):
+        try:
+            conn = self.connect()
+            cursor = conn.cursor()
+            
+            for asistente in array:
+                data = (asistente['nombre'], asistente['edad'], asistente['apellido'], asistente['direccion'], asistente['estadoCivil'], asistente['genero'], asistente['rut'], curso_id)
+                cursor.execute("""
+                    INSERT INTO asistentes (nombre, edad, apellido, direccion, estadoCivil, genero, rut, curso_id)
+                    VALUES(%s, %s, %s, %s, %s, %s, %s, %s)""", data)
+
+            conn.commit()
+            return True
+    
+        except psycopg2.Error as error:
+            print(f"Error: {error}")
+            return False
+
+        finally:
+            cursor.close()
+            conn.close()
+
+
         
 
-# TESTEO DE CONEXION A BASE DE DATOS
+    # FUNCION PARA INSERTAR UN CURSO EN LA TABLA cursos
+    def insertCourseOnDB(self,nombre_curso, fecha_inicio, fecha_fin , colab_id, año_curso):    
+        try:
+            conn = self.connect()
+            cursor = conn.cursor()
+            data = (nombre_curso, fecha_inicio, fecha_fin, colab_id, año_curso)
+            cursor.execute(""" INSERT INTO cursos (nombre_curso, fecha_inicio, fecha_fin, colab_id, año_curso)
+            VALUES(%s, %s, %s, %s, %s)""", data)
+            curso_id = cursor.fetchone()[0]
+            if curso_id:
+                print(f"Curso agregado -> ID CURSO {curso_id}")
+            else:
+                print("Error al registrar el curso...")
+                print(curso_id)
+            
+            
+            conn.commit()
+            return curso_id
+        except psycopg2.Error as error:
+            print(f"Error: {error}")
+            return False
+        finally:
+            cursor.close()
+            conn.close()
+
 
