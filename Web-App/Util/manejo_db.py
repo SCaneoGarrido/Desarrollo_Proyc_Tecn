@@ -104,45 +104,50 @@ class DatabaseManager:
             conn = self.connect()
             cursor = conn.cursor()
             for asistente in asistentes:
-                data = (asistente['nombre'], 
-                        asistente['edad'], 
-                        asistente['apellido'],
-                        asistente['direccion'], 
-                        asistente['estadoCivil'], 
-                        asistente['genero'],
-                        asistente['rut'], 
-                        asistente['curso_id']
-                    )
+                data = (
+                    asistente['rut_noDV'],
+                    asistente['rut_DV'],
+                    asistente['nombre_completo'],
+                    asistente['telefono'],
+                    asistente['email'],
+                    asistente['genero'],
+                    asistente['edad'],
+                    asistente['nacionalidad'],
+                    asistente['comuna'],
+                    asistente['barrio'],
+                    asistente['curso_id'],  # Asegúrate de tener este campo en la tupla data
+                )
                 
                 print(f"Mensaje 'CargarAsistentes_cursos' data de asistentes -> \n {data}")
                 cursor.execute("""
-                    INSERT INTO asistentes (Nombre, Edad, Apellido, Direccion, EstadoCivil, Genero, Rut, Curso_id)
-                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+                    INSERT INTO asistentes (rut, digito_v, nombre, telefono, correo, genero, edad, nacionalidad, comuna, barrio, cursoid)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
                 """, data)
+            
             conn.commit()
             return True
         except psycopg2.Error as error:
-            print(f"Error: {error}")
+            print(f"Error error raro en CargarAsistentes_cursos -> {error}")
             return False
         finally:
             cursor.close()
             conn.close()
 
-    def insertCourseOnDB(self, nombre_curso, año_curso, fecha_inicio, fecha_fin, colab_id):
+    def insertCourseOnDB(self, nombre_curso,  fecha_inicio, fecha_fin, mes_curso, escuela, actividad_servicio, institucion, colab_id):
         try:
             conn = self.connect()
             cursor = conn.cursor()
-            data = (nombre_curso, año_curso, fecha_inicio, fecha_fin, colab_id)
+            data = (nombre_curso, fecha_inicio, fecha_fin, colab_id, escuela, actividad_servicio, institucion, mes_curso)
             cursor.execute("""
-                INSERT INTO cursos (Nombre_curso, año_curso, Fecha_Inicio, Fecha_Fin, Colab_id)
-                VALUES (%s, %s, %s, %s, %s) RETURNING CursoID
+                INSERT INTO cursos (nombre_curso, fecha_inicio, fecha_fin, colab_id, escuela, actividad_servicio, institucion, mes)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s) RETURNING CursoID
             """, data)
             curso_id = cursor.fetchone()[0] 
             conn.commit()
 
             return curso_id
         except psycopg2.Error as error:
-            print(f"Error: {error}")
+            print(f"Error raro en insertCourseOnDB -> {error}")
             return None
         finally:
             cursor.close()
@@ -171,3 +176,16 @@ class DatabaseManager:
 
     def CargarAsitentencia(self, curso_id, dataframe_csv):
         pass
+
+
+# TEST DE CONEXION
+#try:
+#    databaseManager_instance = DatabaseManager()
+#    conn = databaseManager_instance.connect()
+
+#    if conn:
+#        print("Conexión exitosa")
+#    else:
+#        print("Conexión fallida")
+#except Exception as e:
+#    print(f"Error: {e}")

@@ -65,56 +65,68 @@ def recive_data():
 @app.route('/app/register_courses/<user_id>', methods=['POST'])
 def register_courses(user_id):
     if request.method == 'POST':
-        DatabaseManager_instance = DatabaseManager()
         data = request.get_json()
-        # obtenemos los datos ingresados del curso
-        nombre_curso = data['nombre']
-        año_curso = int(data['año'])  # Convertir año_curso a entero
-        fecha_incio_curso = data['fechaInicio']
-        fecha_termino_curso = data['fechaTermino']
+
+        DatabaseManager_instance = DatabaseManager()
+
+        # OBTENER DATOS PARA EL REGISTRO DEL CURSO
+        nombre_curso = data.get('nombre')
+        fecha_inicio = data.get('fechaInicio')
+        fecha_termino = data.get('fechaTermino')
+        mes_curso = data.get('mes_curso')
+        escuela = data.get('escuela')
+        actividad_servicio = data.get('actividad_servicio')
+        institucion = data.get('institucion')
+        user_id = data.get('user_id')  # ESTO ES PARA VINCULAR AL COLABORADOR DE MUNICIPALIDAD CON EL CURSO QUE REGISTRÓ.
+
+        # OBTENER DATOS DE ASISTENTES
         asistentes = data.get('asistentes', [])
 
-        print("DATA DE ENTRADA. \n", nombre_curso, "\n", año_curso, "\n", fecha_incio_curso, "\n", fecha_termino_curso, "\n", asistentes)
+        # COMPROBAR DATOS DE CURSOS
+        if not nombre_curso or not fecha_inicio or not fecha_termino or not escuela or not actividad_servicio or not institucion or not mes_curso:
+            return jsonify({"error": "faltan datos del curso"}), 400
+        if not user_id:
+            return jsonify({"error": "faltan datos del colaborador"}), 400
+
+        # COMPROBAR DATOS DE ASISTENTES
+        if len(asistentes) == 0:
+            print("No hay asistentes, lista vacia \n lista -> {} \n".format(asistentes))
+            return jsonify({"error": "No se ingresaron asistentes"}), 400
         
-        response = {
-            "message": "Curso creado exitosamente",
-            "data": {
-                "nombre_curso": nombre_curso,
-                "año_curso": año_curso,
-                "fecha_inicio_curso": fecha_incio_curso,
-                "fecha_termino_curso": fecha_termino_curso,
-                "user_id": user_id,
-                "asistentes": asistentes
-            }
+        # MOSTREMOS LOS DATOS
+        datos_curso = {
+            'nombre': nombre_curso,
+            'fechaInicio': fecha_inicio,
+            'fechaTermino': fecha_termino,
+            'mes_curso': mes_curso,
+            'escuela': escuela,
+            'actividad_servicio': actividad_servicio,
+            'institucion': institucion,
         }
 
-        print(f"Data de ingreso a registro -> {response}")
-
-        if not nombre_curso or not año_curso or not fecha_incio_curso or not fecha_termino_curso:
-            print("No se proporcionaron los datos requeridos")
-            return jsonify({'error': 'No se proporcionaron los datos requeridos'}), 400
+        print("Los datos del curso son: \n {} \n".format(datos_curso))
+        print("Los datos de los asistentes son: \n {} \n".format(asistentes))
         
+        # INSERTAR DATOS EN BD
         try:
-            curso_id = DatabaseManager_instance.insertCourseOnDB(nombre_curso, año_curso, fecha_incio_curso, fecha_termino_curso, user_id,)
-
+            curso_id = DatabaseManager_instance.insertCourseOnDB(nombre_curso, fecha_inicio, fecha_termino, mes_curso, escuela, actividad_servicio, institucion, user_id,)
             if curso_id:
                 if len(asistentes) > 0:
                     for asistente in asistentes:
-                        asistente['curso_id'] = curso_id
-
+                        asistente['curso_id'] = curso_id  # aquí agrego una nueva clave 'curso_id' al diccionario 'asistente'
                     if DatabaseManager_instance.CargarAsistentes_cursos(asistentes):
-                        return jsonify({'message':'Curso y asistentes registrados correctamente'}), 200
+                        return jsonify({"message":"Curso y asistentes registrados"}), 200
                     else:
-                        return jsonify({'Error': 'ocurrio un error al cargar asistentes'}), 400
+                        return jsonify({"message":"Ocurrio un error al registrar asistentes"}), 400
                 else:
-                    return jsonify({'message':'Curso registrado correctamente, no se proporcionaron asistentes'}), 200
+                    return jsonify({"message":"Curso cargado correctamente pero no se proporcionaron asistentes"}), 200
             else:
-                return jsonify({"error": "ocurrio un error al registrar el curso"}), 400
+                return jsonify({"message":"Ocurrio un error al registrar el curso"}), 400
         except Exception as e:
             print(f"Error: {e}")
-            return jsonify({"error": "ocurrio un error al registrar el curso"}), 400
+            return jsonify({"error": str(e)}), 500  # Devuelve el error como respuesta HTTP 500
     else:
-        return jsonify({'error':'Invalid Method'}), 405
+        return jsonify({"error": "Invalid Method"}), 400
         
 @app.route('/app/vincular_archivo_curso', methods=['POST'])
 def vincular_archivo_curso():

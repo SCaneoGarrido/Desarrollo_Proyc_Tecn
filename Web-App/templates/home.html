@@ -99,10 +99,6 @@
                       <label for="nombreCurso" class="form-label">Nombre del Curso</label>
                       <input type="text" class="form-control" id="nombreCurso" required>
                     </div>
-                    <div class="mb-3"> 
-                      <label for="anioCurso" class="form-label">Año del Curso</label>
-                      <input type="number" class="form-control" id="anioCurso" required>
-                    </div>
                     <div class="mb-3">
                       <label for="fechaInicio" class="form-label">Fecha de Inicio</label>
                       <input type="date" class="form-control" id="fechaInicio" required>
@@ -111,11 +107,48 @@
                       <label for="fechaTermino" class="form-label">Fecha de Término</label>
                       <input type="date" class="form-control" id="fechaTermino" required>
                     </div>
+
+                    <div class="mb-3">
+                        <label for="escuela" class="form-label">Mes</label>
+                        <select name="mes" id="selectorMES" style="color: black;">
+                            <option value="Enero"       style="color: black;">Enero</option>
+                            <option value="Febrero"     style="color: black;">Febrero</option>
+                            <option value="Marzo"       style="color: black;">Marzo</option>
+                            <option value="Abril"       style="color: black;">Abril</option>
+                            <option value="Mayo"        style="color: black;">Mayo</option>
+                            <option value="Junio"       style="color: black;">Junio</option>
+                            <option value="Julio"       style="color: black;">Julio</option>
+                            <option value="Agosto"      style="color: black;">Agosto</option>
+                            <option value="Septiembre"  style="color: black;">Septiembre</option>
+                            <option value="Octubre"     style="color: black;">Octubre</option>
+                            <option value="Noviembre"   style="color: black;">Noviembre</option>
+                            <option value="Diciembre"   style="color: black;">Diciembre</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="escuela" class="form-label">Escuela</label>
+                        <input type="text" class="form-control" id="escuela" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="actividad_sevicio" class="form-label">Actividad o servicio</label>
+                        <select name="actividad_sevicio" id="selectorAS" style="color: black;">
+                            <option value="Actividad" style="color: black;">Actividad</option>
+                            <option value="Servicio"  style="color: black;">Servicio</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="institucion" class="form-label">Institucion</label>
+                        <input type="text" class="form-control" id="institucion" required>
+                    </div>
                     <div id="asistentes-container">
                       <h5>Asistentes</h5>
                       <div class="accordion" id="accordionAsistentes">
                         <!-- Aquí se añadirán los asistentes dinámicamente -->
                       </div>
+                      
                     </div>
                     <button type="button" class="btn btn-secondary" id="add-asistente">Añadir Asistente</button>
                     <button type="submit" class="btn btn-primary">Registrar</button>
