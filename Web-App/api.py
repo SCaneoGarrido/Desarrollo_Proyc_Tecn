@@ -70,14 +70,14 @@ def register_courses(user_id):
         DatabaseManager_instance = DatabaseManager()
 
         # OBTENER DATOS PARA EL REGISTRO DEL CURSO
-        nombre_curso = data.get('nombre')
-        fecha_inicio = data.get('fechaInicio')
-        fecha_termino = data.get('fechaTermino')
-        mes_curso = data.get('mes_curso')
-        escuela = data.get('escuela')
-        actividad_servicio = data.get('actividad_servicio')
-        institucion = data.get('institucion')
-        user_id = data.get('user_id')  # ESTO ES PARA VINCULAR AL COLABORADOR DE MUNICIPALIDAD CON EL CURSO QUE REGISTRÓ.
+        nombre_curso        = data.get('nombre')
+        fecha_inicio        = data.get('fechaInicio')
+        fecha_termino       = data.get('fechaTermino')
+        mes_curso           = data.get('mes_curso')
+        escuela             = data.get('escuela')
+        actividad_servicio  = data.get('actividad_servicio')
+        institucion         = data.get('institucion')
+        user_id             = data.get('user_id')  # ESTO ES PARA VINCULAR AL COLABORADOR DE MUNICIPALIDAD CON EL CURSO QUE REGISTRÓ.
 
         # OBTENER DATOS DE ASISTENTES
         asistentes = data.get('asistentes', [])
@@ -95,13 +95,13 @@ def register_courses(user_id):
         
         # MOSTREMOS LOS DATOS
         datos_curso = {
-            'nombre': nombre_curso,
-            'fechaInicio': fecha_inicio,
-            'fechaTermino': fecha_termino,
-            'mes_curso': mes_curso,
-            'escuela': escuela,
-            'actividad_servicio': actividad_servicio,
-            'institucion': institucion,
+            'nombre':               nombre_curso,
+            'fechaInicio':          fecha_inicio,
+            'fechaTermino':         fecha_termino,
+            'mes_curso':            mes_curso,
+            'escuela':              escuela,
+            'actividad_servicio':   actividad_servicio,
+            'institucion':          institucion,
         }
 
         print("Los datos del curso son: \n {} \n".format(datos_curso))
