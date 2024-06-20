@@ -41,16 +41,36 @@ def get_courses(user_id):
         print(f"Error: {e}")
         return jsonify({"error": "ocurrió un error al obtener los cursos"}), 400
 
-@app.route('/app/recive_data', methods=['POST'])
-def recive_data():
+# ruta que crea una pre-visualizacion del archivo cargado
+@app.route('/app/recive_data/<user_id>', methods=['POST'])
+def recive_data(user_id):
     if request.method == 'POST':
         try:
+            # Obtener los datos del formulario
+            curso_id = request.form.get('cursoId')
+            file = request.files['file']
+        
+            # Asegurarse de que ambos datos están presentes
+            if not curso_id or not file:
+                return jsonify({"success": False, "message": "Falta el archivo o el cursoId"}), 400
+
+            # Procesar el archivo y el curso_id según sea necesario
+            # Aquí puedes añadir tu lógica para manejar el archivo y el curso_id
+            print("Curso ID: ", curso_id)
+            print("Archivo recibido: ", file.filename)
+            print("User ID: ", user_id)
+
+
             if 'file' not in request.files:
                 return jsonify({"error": "no se ha proporcionado ningún archivo"}), 400
             file = request.files['file']
             if file.filename == '':
                 return jsonify({"error": "no se ha seleccionado ningún archivo"}), 400
             if file:
+                # mostrar info 
+                print(f"archivo -> {file.filename}")
+                print(f"user_id -> {user_id}")
+                print(f"curso_id -> {curso_id}")
                 # Leer el archivo directamente en un DataFrame
                 data = pd.read_excel(file)
                 # Convertir el DataFrame a HTML
@@ -128,40 +148,6 @@ def register_courses(user_id):
     else:
         return jsonify({"error": "Invalid Method"}), 400
         
-@app.route('/app/vincular_archivo_curso', methods=['POST'])
-def vincular_archivo_curso():
-    if request.method == 'POST':
-        data = request.get_json()
-        curso_id = data.get('cursoId')
-        if not curso_id:
-            return jsonify({"success": False, "error": "cursoId no proporcionado"}), 400
-        try:
-            # Obtener el DataFrame de la variable de sesión o memoria
-            if 'uploaded_data' not in session:
-                return jsonify({"success": False, "error": "No hay datos cargados"}), 400
-            df = pd.DataFrame(session['uploaded_data'])
-            # Asociar el DataFrame con el curso
-            dataframes_cursos[curso_id] = df
-            html_data = df.to_html(classes='table table-bordered table-striped') # no se debe perder
-            # Guardar la vinculación en un archivo CSV
-            df['curso_id'] = curso_id
-            df['nombre_curso'] = next((curso['nombre'] for curso in cursos_registrados if curso['id'] == curso_id), 'Desconocido')
-            if os.path.exists(CSV_FILE_PATH):
-                # Agregar una línea de separación antes de concatenar los nuevos datos
-                with open(CSV_FILE_PATH, 'a') as f:
-                    f.write('\n' + '-'*50 + '\n')
-                df.to_csv(CSV_FILE_PATH, mode='a', header=False, index=False)
-            else:
-                df.to_csv(CSV_FILE_PATH, mode='w', header=True, index=False)
-            # Agregar print para ver la vinculación en la terminal
-            print(f"Curso ID: {curso_id} vinculado con el siguiente DataFrame:")
-            print(df)
-            
-            return jsonify({"success": True, "data": html_data}), 200
-        except Exception as e:
-            print(f"Error: {e}")
-            return jsonify({"success": False, "error": "ocurrió un error al vincular el archivo"}), 400
-
 # RUTA PARA MANEJAR EL LOGIN
 @app.route('/app/login', methods=['POST'])
 def handle_login():

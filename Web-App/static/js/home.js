@@ -267,58 +267,56 @@ function cargarCursos_modal() {
     }
   }
   
-  
+let archivoExcelGlobal = null; // Variable global para almacenar el archivo Excel
 
-// Manejar el formulario de carga de excels
+  // Manejar el formulario de carga de excels
 document.getElementById('form-cargar-excels').addEventListener('submit', function(e) {
     e.preventDefault();
     const archivoExcel = document.getElementById('archivoExcel').files[0];
     const uploadStatus = document.getElementById('upload-status');
-    const excelPreview = document.getElementById('excel-preview');
-    const userID = localStorage.getItem('user_id');
-    uploadStatus.textContent = "Cargando archivo...";
-    const formData = new FormData();
-    formData.append("file", archivoExcel);
-    fetch('/app/recive_data', {
-        method: 'POST',
-        body: formData
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            uploadStatus.textContent = "Archivo cargado exitosamente.";
-            uploadStatus.style.color = "#28a745";
-            // Mostrar el modal para seleccionar curso
-            const seleccionarCursoModal = new bootstrap.Modal(document.getElementById('seleccionarCursoModal'));
-            seleccionarCursoModal.show();
-            // Llenar las opciones del select con los cursos disponibles
-            cargarCursos_modal();
-        } else {
-            uploadStatus.textContent = "Error al cargar el archivo.";
-            uploadStatus.style.color = "#dc3545";
-        }
-    })
-    .catch(error => {
-        console.error(error);
-        uploadStatus.textContent = "Error al cargar el archivo.";
+    
+  
+    if (!archivoExcel) {
+        uploadStatus.textContent = "Por favor, selecciona un archivo.";
         uploadStatus.style.color = "#dc3545";
-    });
+        return;
+    }
+  
+    uploadStatus.textContent = "Archivo cargado y listo para vincular.";
+    uploadStatus.style.color = "#28a745";
+    archivoExcelGlobal = archivoExcel; // Guardar el archivo en la variable global
+  
+    // Mostrar el modal para seleccionar curso
+    const seleccionarCursoModal = new bootstrap.Modal(document.getElementById('seleccionarCursoModal'));
+    seleccionarCursoModal.show();
+    // Llenar las opciones del select con los cursos disponibles
+    cargarCursos_modal();
 });
-
-// Manejar el formulario de selección de curso
+  
+  // Manejar el formulario de selección de curso
 document.getElementById('form-seleccionar-curso').addEventListener('submit', function(e) {
     e.preventDefault();
     const cursoSeleccionado = document.getElementById('cursoSeleccionado').value;
+    const uploadStatus = document.getElementById('upload-status');
+    const userID = localStorage.getItem('user_id');
+  
     if (cursoSeleccionado === '') {
         alert('Por favor, seleccione un curso.');
         return;
     }
-    fetch('/app/vincular_archivo_curso', {
+  
+    if (!archivoExcelGlobal) {
+        alert('Por favor, cargue un archivo antes de seleccionar un curso.');
+        return;
+    }
+  
+    const formData = new FormData();
+    formData.append("file", archivoExcelGlobal);
+    formData.append("cursoId", cursoSeleccionado);
+  
+    fetch(`/app/recive_data/${userID}`, {
         method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ cursoId: cursoSeleccionado })
+        body: formData
     })
     .then(response => {
         if (!response.ok) {
@@ -343,8 +341,8 @@ document.getElementById('form-seleccionar-curso').addEventListener('submit', fun
             limpiarBtn.addEventListener('click', function() {
                 excelPreview.innerHTML = '';
                 document.getElementById('archivoExcel').value = '';
-                const uploadStatus = document.getElementById('upload-status');
                 uploadStatus.textContent = '';
+                archivoExcelGlobal = null; // Limpiar la variable global
                 // Ocultar el botón "Limpiar y cargar otro archivo"
                 limpiarBtn.style.display = 'none';
                 // Volver a mostrar el botón "Cargar"
@@ -363,7 +361,8 @@ document.getElementById('form-seleccionar-curso').addEventListener('submit', fun
         console.error(error);
         alert('Error al vincular el archivo al curso.');
     });
-});
+}); 
+
 
 // Redirigir a la sección de inscripción de cursos
 document.getElementById('irAInscribirCurso').addEventListener('click', function() {

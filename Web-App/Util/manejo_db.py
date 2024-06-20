@@ -1,4 +1,5 @@
 import os
+import datetime
 import psycopg2
 from dotenv import load_dotenv
 
@@ -174,8 +175,68 @@ class DatabaseManager:
             cursor.close()
             conn.close()
 
-    def CargarAsitentencia(self, curso_id, dataframe_csv):
-        pass
+
+    #### FUNCIONES RELACIONADAS A LA INSERCION DEL ARCHIVO DE ASISTENCIAS #### 
+
+
+    # ESTA FUNCION DEVUELVE EL ARCHIVO CARGADO EN LA BASE DE DATOS
+    def get_existing_file(self, curso_id):
+        try:
+            conn = self.connect()
+            with conn:
+                with conn.cursor() as cursor:
+                    cursor.execute("SELECT archivoasistencia FROM asistencia WHERE cursoid = %s", (curso_id,))
+                    result = cursor.fetchone()
+
+                    if result:
+                        print(f"resultados encontrados -> \n {result} \n retornando resultado ...")
+                        return result
+                    else:
+                        print(f"no se han encontrado resultados, respuesta de Base de datos \n {result}")
+                        return None
+        except Exception as e:
+            print(f"Error raro en get_existing_file -> {e}")
+        
+        finally:
+            cursor.close()
+            conn.close()
+
+    # ESTA FUNCION ACTUALIZA EL ARCHIVO CARGADO EN LA BASE DE DATOS
+    def update_file(self, curso_id, file_data):
+        try:
+            conn = self.connect()
+            with conn:
+                with conn.cursor() as cursor:
+                    cursor.execute("""
+                        UPDATE asistencia 
+                        SET archivoasistencia = %s, fecha_subida = %s,
+                        WHERE cursoid = %s
+                    """, (file_data, datetime.now(), curso_id))
+                    conn.commit()
+        except Exception as e:
+            print(f"Error raro en update_file -> {e}")
+
+        finally:
+            cursor.close()
+            conn.close()
+
+    # ESTA FUNCION INSERTA EL ARCHIVO CARGADO EN LA BASE DE DATOS
+    def insert_file(self, user_id, cursoid, file_data):
+        try:
+            conn = self.connect()
+            with conn:
+                with conn.cursor() as cursor:
+                    cursor.execute("INSERT INTO asistencia (curso_id, archivoasistencia, colab_id, fecha_subida) VALUES (%s, %s, %s, %s)", (cursoid, file_data, user_id, datetime.now()))
+                conn.commit()
+
+        except Exception as e:
+            print(f"Error raro en insert_file -> {e}")
+        
+        finally:
+            cursor.close()
+            conn.close()
+    
+    ################ FIN FUNCIONES PARA CARGAR ARCHIVOS ##################
 
 
 # TEST DE CONEXION

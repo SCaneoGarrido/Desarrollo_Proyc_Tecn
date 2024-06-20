@@ -45,9 +45,10 @@ CREATE TABLE Cursos (
 CREATE TABLE AsistenciaDF (
     AsistenciaID SERIAL PRIMARY KEY,
     CursoID INT,
-    AsistenteID INT,
     Fecha DATE NOT NULL,
     ArchivoAsistencia BYTEA,
+    colab_id INT,
+    FOREIGN KEY (colab_id) REFERENCES muni_colab(id),
     FOREIGN KEY (CursoID) REFERENCES Cursos(CursoID),
     FOREIGN KEY (AsistenteID) REFERENCES Asistentes(AsistenteID)
 );
