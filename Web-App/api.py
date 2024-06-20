@@ -77,12 +77,15 @@ def recive_data(user_id):
                     print(f"curso_id -> {curso_id}")
 
                     # guardamos el df en temp
+                    if not os.path.exists('temp'):
+                        os.makedirs('temp')
                     ruta_archivo = os.path.join('temp', file.filename)
                     file.save(ruta_archivo)
 
+                    print("ruta_archivo: ", ruta_archivo)
                     # Leer el archivo directamente en un DataFrame
                     data = pd.read_excel(ruta_archivo)
-                    os.remove(ruta_archivo)
+                    
                     
                     # Convertir el DataFrame a HTML
                     html_data = data.to_html(classes='table table-bordered table-striped')
@@ -104,7 +107,7 @@ def recive_data(user_id):
                     if existing_data is not None:
                         data.columns = existing_data.columns
                         # concatenamos
-                        merged_data = pd.concat([existing_data, data]).drop_duplicates(subset=['Nombres'])
+                        merged_data = pd.concat([existing_data, data]).drop_duplicates(subset=['NOMBRES Y APELLIDOS'])
                     else:
                         merged_data = data
 
@@ -123,7 +126,7 @@ def recive_data(user_id):
                     else:
                         DatabaseManager_instance.insert_file(user_id ,curso_id, file_data)
                     
-
+                    os.remove(ruta_archivo)
                     return jsonify({"success": "archivo guardado", "data": html_data}), 200
             except Exception as e:
                 print("Error al previsualizar archivo: ", e)

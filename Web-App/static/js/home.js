@@ -77,8 +77,6 @@ document.getElementById('add-asistente').addEventListener('click', function() {
           <input type="text" class="form-control" name="nombre" required>
           <label for="apellido" class="form-label">Apellido</label>
           <input type="text" class="form-control" name="apellido" required>
-          <label for="direccion" class="form-label">Dirección</label>
-          <input type="text" class="form-control" name="direccion" required>
           <label for="Telefono" class="form-label">Telefono</label>
           <input type="text" class="form-control" name="telefono" required>
           <label for="email" class="form-label">Email</label>
@@ -123,7 +121,6 @@ document.getElementById('add-asistente').addEventListener('click', function() {
       const genero       = asistente.querySelector('select[name="genero"]').value;
       const nombre       = asistente.querySelector('input[name="nombre"]').value;
       const apellido     = asistente.querySelector('input[name="apellido"]').value;
-      const direccion    = asistente.querySelector('input[name="direccion"]').value;
       const telefono     = asistente.querySelector('input[name="telefono"]').value;
       const email        = asistente.querySelector('input[name="email"]').value;
       const nacionalidad = asistente.querySelector('input[name="nacionalidad"]').value;
@@ -148,8 +145,7 @@ document.getElementById('add-asistente').addEventListener('click', function() {
         rut_DV, 
         edad, 
         genero, 
-        nombre_completo, 
-        direccion, 
+        nombre_completo,  
         telefono, 
         email, 
         nacionalidad, 
