@@ -1,0 +1,56 @@
+@app.route('/app/vincular_archivo_curso/<user_id>/<curso_id>', methods=['POST'])
+def vincular_archivo_curso(user_id, curso_id):
+    if request.method == 'POST':
+        try:
+            DatabaseManager_instance = DatabaseManager()
+            # Obtener el archivo subido desde la solicitud
+            file = request.files['file']
+
+            # Guardar temporalmente el archivo subido
+            file_path = os.path.join('/mnt/data', file.filename)
+            file.save(file_path)
+
+            # Leer el archivo subido en un DataFrame de pandas
+            new_df = pd.read_excel(file_path)
+
+            # Comprobar si ya existe un archivo para ese curso
+            existing_file = DatabaseManager_instance.fetch_existing_file(curso_id)
+
+            if existing_file:
+                # Si existe, concatenar los DataFrames
+                existing_file_path = os.path.join('/mnt/data', 'existing_file.xlsx')
+                with open(existing_file_path, 'wb') as f:
+                    f.write(existing_file[0])
+                existing_df = pd.read_excel(existing_file_path)
+
+                # Concatenar los DataFrames
+                concatenated_df = pd.concat([existing_df, new_df]).drop_duplicates().reset_index(drop=True)
+
+                # Guardar el DataFrame concatenado en un archivo
+                concatenated_file_path = os.path.join('/mnt/data', 'concatenated_file.xlsx')
+                concatenated_df.to_excel(concatenated_file_path, index=False)
+
+                # Leer el archivo concatenado y guardarlo en la base de datos
+                with open(concatenated_file_path, 'rb') as f:
+                    concatenated_file_data = f.read()
+
+                DatabaseManager_instance.update_file(curso_id, concatenated_file_data)
+            else:
+                # Si no existe, guardar el nuevo archivo directamente
+                with open(file_path, 'rb') as f:
+                    new_file_data = f.read()
+
+                DatabaseManager_instance.insert_file(user_id, curso_id, new_file_data)
+
+            # Eliminar archivos temporales
+            os.remove(file_path)
+            if existing_file:
+                os.remove(existing_file_path)
+                os.remove(concatenated_file_path)
+
+            html_data = concatenated_df.to_html(classes='table table-bordered table-striped') if existing_file else new_df.to_html(classes='table table-bordered table-striped')
+
+            return jsonify({"success": True, "data": html_data}), 200
+        except Exception as e:
+            print(f"Error: {e}")
+            return jsonify({"success": False, "error": "ocurrió un error al vincular el archivo"}), 400

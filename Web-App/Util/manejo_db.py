@@ -1,7 +1,9 @@
 import os
-import datetime
+from datetime import datetime
 import psycopg2
+import pandas as pd
 from dotenv import load_dotenv
+from io import BytesIO
 
 class DatabaseManager:
     def __init__(self):
@@ -189,19 +191,25 @@ class DatabaseManager:
                     result = cursor.fetchone()
 
                     if result:
-                        print(f"resultados encontrados -> \n {result} \n retornando resultado ...")
-                        return result
+                        file_data = result[0]
+                        # Si el archivo está guardado como bytes en la base de datos
+                        # Puedes cargarlo utilizando BytesIO para leerlo con pandas
+                        df = pd.read_excel(BytesIO(file_data))
+                        
+                        print(f"Resultados encontrados -> \n{df}\nRetornando resultado ...")
+                        return df  # Retornamos el DataFrame cargado desde el archivo
                     else:
-                        print(f"no se han encontrado resultados, respuesta de Base de datos \n {result}")
+                        print(f"No se han encontrado resultados para curso_id {curso_id}")
                         return None
         except Exception as e:
             print(f"Error raro en get_existing_file -> {e}")
-        
+            return None
         finally:
             cursor.close()
             conn.close()
 
     # ESTA FUNCION ACTUALIZA EL ARCHIVO CARGADO EN LA BASE DE DATOS
+
     def update_file(self, curso_id, file_data):
         try:
             conn = self.connect()
@@ -209,16 +217,16 @@ class DatabaseManager:
                 with conn.cursor() as cursor:
                     cursor.execute("""
                         UPDATE asistencia 
-                        SET archivoasistencia = %s, fecha_subida = %s,
+                        SET archivoasistencia = %s, fecha_subida = %s
                         WHERE cursoid = %s
                     """, (file_data, datetime.now(), curso_id))
                     conn.commit()
         except Exception as e:
             print(f"Error raro en update_file -> {e}")
-
         finally:
             cursor.close()
             conn.close()
+
 
     # ESTA FUNCION INSERTA EL ARCHIVO CARGADO EN LA BASE DE DATOS
     def insert_file(self, user_id, cursoid, file_data):
@@ -226,7 +234,7 @@ class DatabaseManager:
             conn = self.connect()
             with conn:
                 with conn.cursor() as cursor:
-                    cursor.execute("INSERT INTO asistencia (curso_id, archivoasistencia, colab_id, fecha_subida) VALUES (%s, %s, %s, %s)", (cursoid, file_data, user_id, datetime.now()))
+                    cursor.execute("INSERT INTO asistencia (cursoid, archivoasistencia, colab_id, fecha_subida) VALUES (%s, %s, %s, %s)", (cursoid, file_data, user_id, datetime.now()))
                 conn.commit()
 
         except Exception as e:
