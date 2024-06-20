@@ -2,6 +2,7 @@ import os
 import pandas as pd
 from flask import Flask, request, jsonify, session, render_template, url_for
 from flask_cors import CORS
+from io import BytesIO
 from Util.manejo_db import DatabaseManager
 from Util.manage_credential import CredentialsManager
 
@@ -55,84 +56,78 @@ def recive_data(user_id):
                 return jsonify({"success": False, "message": "Falta el archivo o el cursoId"}), 400
 
             # Procesar el archivo y el curso_id según sea necesario
+            # Aquí puedes añadir tu lógica para manejar el archivo y el curso_id
             print("Curso ID: ", curso_id)
             print("Archivo recibido: ", file.filename)
             print("User ID: ", user_id)
 
+
             if 'file' not in request.files:
                 return jsonify({"error": "no se ha proporcionado ningún archivo"}), 400
+            file = request.files['file']
             if file.filename == '':
                 return jsonify({"error": "no se ha seleccionado ningún archivo"}), 400
             
-            try:
+            try: 
                 if file:
+                    DatabaseManager_instance = DatabaseManager()
                     # mostrar info 
                     print(f"archivo -> {file.filename}")
                     print(f"user_id -> {user_id}")
                     print(f"curso_id -> {curso_id}")
 
-                    # Guardar el archivo subido temporalmente en una ruta accesible
-                    upload_folder = os.path.join(os.getcwd(), 'uploaded_files')
-                    if not os.path.exists(upload_folder):
-                        os.makedirs(upload_folder)
-                    file_path = os.path.join(upload_folder, file.filename)
-                    file.save(file_path)
+                    # guardamos el df en temp
+                    ruta_archivo = os.path.join('temp', file.filename)
+                    file.save(ruta_archivo)
 
                     # Leer el archivo directamente en un DataFrame
-                    data = pd.read_excel(file_path)
+                    data = pd.read_excel(ruta_archivo)
+                    os.remove(ruta_archivo)
+                    
                     # Convertir el DataFrame a HTML
                     html_data = data.to_html(classes='table table-bordered table-striped')
-                    # Guardar el DataFrame en una variable de sesión o en memoria
-                    session['uploaded_data'] = data.to_dict()
+                    # Guardar el DataFrame en base de datos
+                    # si ya existe un dataframe asociado concatenar el nuevo df 
+                    # con el existente para crear un nuevo df concatenarlos mediante la primera columna
+                    # actualizar la base de datos subiendo el nuevo archivo concatenado
 
-                    # Aquí se inicia la lógica de base de datos
-                    try:
-                        DatabaseManager_instance = DatabaseManager()
-                        existing_file = DatabaseManager_instance.get_existing_file(curso_id)
+                    existing_data = DatabaseManager_instance.get_existing_file(curso_id)
+                    
+                    if existing_data is not None:
+                        print(" ############### Existe un archivo existente ############### ")
+                        print(existing_data)
+                    
+                    # Mostrar archivo a cargar
+                    print(" ############### Archivo a cargar ############### ")
+                    print(data)
 
-                        if existing_file:
-                            existing_file_path = os.path.join(upload_folder, 'existing_file.xlsx')
+                    if existing_data is not None:
+                        data.columns = existing_data.columns
+                        # concatenamos
+                        merged_data = pd.concat([existing_data, data]).drop_duplicates(subset=['Nombres'])
+                    else:
+                        merged_data = data
 
-                            with open(existing_file_path, 'wb') as f:
-                                f.write(existing_file[0])
+                    
+                    
+                    print(" ############### Archivo concatenado ############### ")
+                    print(merged_data)
 
-                            existing_df = pd.read_excel(existing_file_path)
+                    bytes_io = BytesIO()
+                    merged_data.to_excel(bytes_io, index=False)
+                    file_data = bytes_io.getvalue()
 
-                            # Concatenar los DataFrames
-                            concatenated_df = pd.concat([existing_df, data]).drop_duplicates().reset_index(drop=True)
-
-                            # Guardar el DataFrame concatenado en un archivo
-                            concatenated_file_path = os.path.join(upload_folder, 'concatenated_file.xlsx')
-                            concatenated_df.to_excel(concatenated_file_path, index=False)
-
-                            # Leer el archivo concatenado y guardarlo en la base de datos
-                            with open(concatenated_file_path, 'rb') as f:
-                                concatenated_file_data = f.read()
-
-                            DatabaseManager_instance.update_file(curso_id, concatenated_file_data)
-
-                            # Eliminar archivo temporal existente
-                            os.remove(existing_file_path)
-                            os.remove(concatenated_file_path)
-                        else:
-                            # Si no existe, guardar el nuevo archivo directamente
-                            with open(file_path, 'rb') as f:
-                                new_file_data = f.read()
-
-                            DatabaseManager_instance.insert_file(user_id, curso_id, new_file_data)
-
-                        # Eliminar archivo temporal subido
-                        os.remove(file_path)
-
-                    except Exception as e:
-                        print(f"Error al cargar archivo a la base de datos: {e}")
-                        return jsonify({"error": "Ocurrió un error al cargar el archivo"}), 400
+                    # actualizar o insertar en la base de datos
+                    if existing_data is not None:
+                        DatabaseManager_instance.update_file(curso_id, file_data)
+                    else:
+                        DatabaseManager_instance.insert_file(user_id ,curso_id, file_data)
+                    
 
                     return jsonify({"success": "archivo guardado", "data": html_data}), 200
-
             except Exception as e:
                 print("Error al previsualizar archivo: ", e)
-                return jsonify({"error": "ocurrió un error al previsualizar el archivo"}), 400
+                return jsonify({"error": "ocurrio un error al previsualizar el archivo"}), 400
 
         except Exception as e:
             print(f"Error: {e}")

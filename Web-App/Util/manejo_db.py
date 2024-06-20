@@ -195,8 +195,6 @@ class DatabaseManager:
                         # Si el archivo está guardado como bytes en la base de datos
                         # Puedes cargarlo utilizando BytesIO para leerlo con pandas
                         df = pd.read_excel(BytesIO(file_data))
-                        
-                        print(f"Resultados encontrados -> \n{df}\nRetornando resultado ...")
                         return df  # Retornamos el DataFrame cargado desde el archivo
                     else:
                         print(f"No se han encontrado resultados para curso_id {curso_id}")
@@ -236,7 +234,7 @@ class DatabaseManager:
                 with conn.cursor() as cursor:
                     cursor.execute("INSERT INTO asistencia (cursoid, archivoasistencia, colab_id, fecha_subida) VALUES (%s, %s, %s, %s)", (cursoid, file_data, user_id, datetime.now()))
                 conn.commit()
-
+                return True
         except Exception as e:
             print(f"Error raro en insert_file -> {e}")
         
