@@ -180,7 +180,6 @@ class DatabaseManager:
 
     #### FUNCIONES RELACIONADAS A LA INSERCION DEL ARCHIVO DE ASISTENCIAS #### 
 
-
     # ESTA FUNCION DEVUELVE EL ARCHIVO CARGADO EN LA BASE DE DATOS
     def get_existing_file(self, curso_id):
         try:
@@ -244,14 +243,26 @@ class DatabaseManager:
     
     ################ FIN FUNCIONES PARA CARGAR ARCHIVOS ##################
 
+    def obtenerLista_asistentes(self, cursoid):
+        try:
 
-# TEST DE CONEXION
-try:
-    databaseManager_instance = DatabaseManager()
-    conn = databaseManager_instance.connect()
-    if conn:
-       print("Conexión exitosa")
-    else:
-        print("Conexión fallida")
-except Exception as e:
-    print(f"Error: {e}")
+            conn = self.connect()
+            if conn is None:
+                return None
+            
+            with conn:
+                with conn.cursor() as cursor:
+                    cursor.execute("SELECT * FROM asistentes WHERE cursoid = %s", (cursoid))
+                    lista_asistentes = cursor.fetchall()
+
+                    for i in lista_asistentes:
+                        print(f"Asistente --> {i}")
+
+                    return lista_asistentes
+
+        except Exception as e:
+            print(f"Error en 'obtenerLista_asistentes - DatabaseManager' \nError -> {e}" )
+            return None
+        finally:
+            cursor.close()
+            conn.close()

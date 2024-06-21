@@ -42,7 +42,7 @@ def get_courses(user_id):
         print(f"Error: {e}")
         return jsonify({"error": "ocurrió un error al obtener los cursos"}), 400
 
-# ruta que crea una pre-visualizacion del archivo cargado
+# ruta que crea una pre-visualizacion, carga y vinculacion del archivo cargado
 @app.route('/app/recive_data/<user_id>', methods=['POST'])
 def recive_data(user_id):
     if request.method == 'POST':
@@ -282,5 +282,52 @@ def getInfo_muniColab(user_id):
             return jsonify({"error": "ocurrio un error al obtener la información del usuario"}), 400
 
 
+#### RUTA DE MOTOR ANALITICO ####
+@app.route('/app/analytical_engine/<user_id>', methods=['GET'])
+def analytical_engine(user_id):
+    
+    if request.method == 'GET':
+        data = request.get_json()
+        cursoID = data.get('userID')
+        DatabaseManager_instance = DatabaseManager() # instancia de DatabaseManager
+
+        # 1.- Recibimos tanto el User_ID como el Curso_ID.
+        if cursoID and user_id:
+            print(f"Data recibida para motor de analitca \nUID de usuario -> {user_id} \nUID del curso -> {cursoID} ")
+            
+            
+            # 2.- Comprobamos con el User_ID que exista un curso registrado que coinicida con el Curso_ID.
+
+            historial_cursos = DatabaseManager_instance.getRegistered_courses(user_id)
+
+            # LA VARIABLE historial_cursos Es una lista por lo que podemos recorrerla
+            # para buscar el curso asociado pero no es muy efectivo cuando 
+            # se tengan muchos cursos registrados 
+            # (APLICAR QUERY DE BUSQUEDA - En otro momento por ahora sirve recorrer la lista)
+
+            if historial_cursos:
+                print(f"Cursos asociados al userID -> {user_id}")
+                print(historial_cursos)
+
+
+            # 3.- Si existe el curso comprobamos si este posee un archivo de asistencia asociado (USAR METODO get_existing_file() de la clase DatabaseManager).
+            # 4.- Si el paso anterior se cumple se retorna:
+            #       - La lista de asistentes registrados al curso (Usar metodo obtenerLista_asistentes() de la clase DatabaseManager)
+            #       - El archivo de asistencia vinculado al curso (Con el retorno de get_existing_file() Hacemos print para mostrar)
+            # 5.- Si no existe retornamos un mensaje de "Este curso no posee archivo de assitencia asociado".            
+
+
+            # LUEGO DE COMPLETAR LO ANTERIOR SE DEBE REALIZAR UN PRINT DE:
+            # 1.- La lista de asistentes de la tabla "asistentes" relacionada al curso
+            # 2.- Un print del archivo de asistencia
+            return jsonify({'message' : f'Data\n User UID: {user_id}\n Curso UID: {cursoID}\n\n Cursos: {historial_cursos}'}), 200    
+                  
+
+        else:
+            print("Faltan Datos")
+            return jsonify({'error':f'falttan datos,\nid curso = {cursoID} \n User id = {user_id}'}), 400
+
+    else:
+        return jsonify({'error':'Metodo invalido'}), 500
 if __name__ == '__main__':
     app.run(debug=True)
