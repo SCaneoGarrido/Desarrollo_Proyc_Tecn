@@ -9,7 +9,7 @@ class DatabaseManager:
     def __init__(self):
         load_dotenv()
         self.database = os.environ.get('DATABASE')
-        self.user = os.environ.get('USER')
+        self.user = os.environ.get('USER_BD') # CAMBIEN ESTA LINEA EN SUS .ENV
         self.password = os.environ.get('PASSWORD')
         self.host = os.environ.get('HOST')
         self.port = os.environ.get('PORT')
@@ -246,13 +246,12 @@ class DatabaseManager:
 
 
 # TEST DE CONEXION
-#try:
-#    databaseManager_instance = DatabaseManager()
-#    conn = databaseManager_instance.connect()
-
-#    if conn:
-#        print("Conexión exitosa")
-#    else:
-#        print("Conexión fallida")
-#except Exception as e:
-#    print(f"Error: {e}")
+try:
+    databaseManager_instance = DatabaseManager()
+    conn = databaseManager_instance.connect()
+    if conn:
+       print("Conexión exitosa")
+    else:
+        print("Conexión fallida")
+except Exception as e:
+    print(f"Error: {e}")
