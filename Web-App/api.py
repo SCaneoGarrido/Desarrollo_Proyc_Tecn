@@ -288,46 +288,56 @@ def analytical_engine(user_id):
     
     if request.method == 'GET':
         data = request.get_json()
-        cursoID = data.get('userID')
-        DatabaseManager_instance = DatabaseManager() # instancia de DatabaseManager
+        cursoID = data.get('userID')  # Mantener la variable original 'userID'
+        DatabaseManager_instance = DatabaseManager()  # Instancia de DatabaseManager
 
         # 1.- Recibimos tanto el User_ID como el Curso_ID.
         if cursoID and user_id:
             print(f"Data recibida para motor de analitca \nUID de usuario -> {user_id} \nUID del curso -> {cursoID} ")
             
-            
-            # 2.- Comprobamos con el User_ID que exista un curso registrado que coinicida con el Curso_ID.
-
+            # 2.- Comprobamos con el User_ID que exista un curso registrado que coincida con el Curso_ID.
             historial_cursos = DatabaseManager_instance.getRegistered_courses(user_id)
 
-            # LA VARIABLE historial_cursos Es una lista por lo que podemos recorrerla
-            # para buscar el curso asociado pero no es muy efectivo cuando 
-            # se tengan muchos cursos registrados 
-            # (APLICAR QUERY DE BUSQUEDA - En otro momento por ahora sirve recorrer la lista)
-
-            if historial_cursos:
-                print(f"Cursos asociados al userID -> {user_id}")
-                print(historial_cursos)
-
+            # Verificar si el curso está en el historial de cursos del usuario
+            curso_encontrado = any(curso['curso_id'] == cursoID for curso in historial_cursos)
+            
+            if not curso_encontrado:
+                return jsonify({"error": "Curso no encontrado en el historial del usuario"}), 404
 
             # 3.- Si existe el curso comprobamos si este posee un archivo de asistencia asociado (USAR METODO get_existing_file() de la clase DatabaseManager).
+            existing_file = DatabaseManager_instance.get_existing_file(cursoID)
+
+            if existing_file is None:
+                return jsonify({"error": "Este curso no posee archivo de asistencia asociado"}), 404
+
             # 4.- Si el paso anterior se cumple se retorna:
             #       - La lista de asistentes registrados al curso (Usar metodo obtenerLista_asistentes() de la clase DatabaseManager)
             #       - El archivo de asistencia vinculado al curso (Con el retorno de get_existing_file() Hacemos print para mostrar)
-            # 5.- Si no existe retornamos un mensaje de "Este curso no posee archivo de assitencia asociado".            
 
+            lista_asistentes = DatabaseManager_instance.obtenerLista_asistentes(cursoID)
 
-            # LUEGO DE COMPLETAR LO ANTERIOR SE DEBE REALIZAR UN PRINT DE:
-            # 1.- La lista de asistentes de la tabla "asistentes" relacionada al curso
-            # 2.- Un print del archivo de asistencia
-            return jsonify({'message' : f'Data\n User UID: {user_id}\n Curso UID: {cursoID}\n\n Cursos: {historial_cursos}'}), 200    
-                  
+            if not lista_asistentes:
+                return jsonify({"error": "No se encontraron asistentes para el curso"}), 404
+
+            # Mostrar archivo de asistencia
+            print("############### Archivo de asistencia ###############")
+            print(existing_file)
+
+            # Mostrar lista de asistentes
+            print("############### Lista de asistentes ###############")
+            print(lista_asistentes)
+
+            return jsonify({
+                "asistentes": lista_asistentes,
+                "archivo_asistencia": existing_file
+            }), 200
 
         else:
             print("Faltan Datos")
-            return jsonify({'error':f'falttan datos,\nid curso = {cursoID} \n User id = {user_id}'}), 400
+            return jsonify({'error': 'Faltan datos, id curso = {} \n User id = {}'.format(cursoID, user_id)}), 400
 
     else:
-        return jsonify({'error':'Metodo invalido'}), 500
+        return jsonify({'error': 'Método inválido'}), 500
+
 if __name__ == '__main__':
     app.run(debug=True)
