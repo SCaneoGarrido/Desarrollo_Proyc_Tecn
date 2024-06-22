@@ -245,24 +245,44 @@ class DatabaseManager:
 
     def obtenerLista_asistentes(self, cursoid):
         try:
-
             conn = self.connect()
+            if conn is None:
+                return [], []  # Devuelve listas vacías en caso de error
+            
+            with conn:
+                with conn.cursor() as cursor:
+                    cursor.execute("SELECT * FROM asistentes WHERE cursoid = %s", (cursoid,))
+                    lista_asistentes = cursor.fetchall()
+
+                    column_names = [description[0] for description in cursor.description]
+                    return lista_asistentes if lista_asistentes else [], column_names
+
+        except Exception as e:
+            print(f"Error en 'obtenerLista_asistentes - DatabaseManager' \nError -> {e}")
+            return [], []  # Devuelve listas vacías en caso de excepción
+        finally:
+            if conn:
+                conn.close()
+
+    def obtenerCursoBy_userID_CursoID(self, user_id, cursoid):
+        try:
+            conn = self.connect()
+
             if conn is None:
                 return None
             
             with conn:
                 with conn.cursor() as cursor:
-                    cursor.execute("SELECT * FROM asistentes WHERE cursoid = %s", (cursoid))
-                    lista_asistentes = cursor.fetchall()
+                    cursor.execute("SELECT * FROM cursos WHERE cursoid=%s AND colab_id=%s", (cursoid, user_id))
+                    curso = cursor.fetchone()
 
-                    for i in lista_asistentes:
-                        print(f"Asistente --> {i}")
-
-                    return lista_asistentes
-
+                    if curso:
+                        return curso
+                    else:
+                        return None
         except Exception as e:
-            print(f"Error en 'obtenerLista_asistentes - DatabaseManager' \nError -> {e}" )
-            return None
+            print(f"Error en 'obtenerCursoBy_userID_CursoID()\n Error: {e}")
+
         finally:
             cursor.close()
             conn.close()

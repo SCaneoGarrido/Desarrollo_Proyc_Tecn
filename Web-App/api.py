@@ -288,49 +288,45 @@ def analytical_engine(user_id):
     
     if request.method == 'GET':
         data = request.get_json()
-        cursoID = data.get('userID')  # Mantener la variable original 'userID'
+        cursoID = data.get('cursoID')  # Mantener la variable original 'userID'
         DatabaseManager_instance = DatabaseManager()  # Instancia de DatabaseManager
-
+        
+        # transformar el CURSO ID A INT
+        cursoID = int(cursoID)
         # 1.- Recibimos tanto el User_ID como el Curso_ID.
         if cursoID and user_id:
-            print(f"Data recibida para motor de analitca \nUID de usuario -> {user_id} \nUID del curso -> {cursoID} ")
+            print(f"Data recibida para motor de analitca \nUID de usuario -> {user_id} \nUID del curso -> {cursoID}\n Tipo de datos del UID Curso: {type(cursoID)} ")
             
             # 2.- Comprobamos con el User_ID que exista un curso registrado que coincida con el Curso_ID.
-            historial_cursos = DatabaseManager_instance.getRegistered_courses(user_id)
+            cursoSolicitado = DatabaseManager_instance.obtenerCursoBy_userID_CursoID(user_id, cursoID)
 
-            # Verificar si el curso está en el historial de cursos del usuario
-            curso_encontrado = any(curso['curso_id'] == cursoID for curso in historial_cursos)
-            
-            if not curso_encontrado:
-                return jsonify({"error": "Curso no encontrado en el historial del usuario"}), 404
+            if cursoSolicitado:
+                print(f"Curso solicitado encontrado: {cursoSolicitado}")
+                print(f"Respuesta de curso solicitado typedata: {type(cursoSolicitado)}")
 
-            # 3.- Si existe el curso comprobamos si este posee un archivo de asistencia asociado (USAR METODO get_existing_file() de la clase DatabaseManager).
-            existing_file = DatabaseManager_instance.get_existing_file(cursoID)
+                # comprobamos si existe un archivo asociado al curso
+                existing_file = DatabaseManager_instance.get_existing_file(cursoID)
 
-            if existing_file is None:
-                return jsonify({"error": "Este curso no posee archivo de asistencia asociado"}), 404
+                if existing_file is not None:
+                    print(f"Archivo de asistencia encontrado \n{existing_file}")
+                else:
+                    print("No se encontro archivo asociado al curso")
+                    return  jsonify({"error":"No existe un archivo de asistencia asociado al curso"})
 
-            # 4.- Si el paso anterior se cumple se retorna:
-            #       - La lista de asistentes registrados al curso (Usar metodo obtenerLista_asistentes() de la clase DatabaseManager)
-            #       - El archivo de asistencia vinculado al curso (Con el retorno de get_existing_file() Hacemos print para mostrar)
+                # obtener lista de asistentes
 
-            lista_asistentes = DatabaseManager_instance.obtenerLista_asistentes(cursoID)
+                lista_asistentes, column_names = DatabaseManager_instance.obtenerLista_asistentes(cursoID)
+    
+                print(f"""
+                    Se ha encontrado la siguiente lista de asistentes para el curso: {cursoSolicitado[1]}\n
+                    lista de asistentes: {lista_asistentes}
+                """)
+                print(f"ripo de datos lista asistentes.\n {type(lista_asistentes)}")
 
-            if not lista_asistentes:
-                return jsonify({"error": "No se encontraron asistentes para el curso"}), 404
-
-            # Mostrar archivo de asistencia
-            print("############### Archivo de asistencia ###############")
-            print(existing_file)
-
-            # Mostrar lista de asistentes
-            print("############### Lista de asistentes ###############")
-            print(lista_asistentes)
-
-            return jsonify({
-                "asistentes": lista_asistentes,
-                "archivo_asistencia": existing_file
-            }), 200
+                return jsonify({'success': 'Ok'})
+            else:
+                print("No se encontro el curso solicitado asociado al usuario")
+                return jsonify({"error":"No se encontro el curso solicitado o no se encontro en la base de datos"}), 404
 
         else:
             print("Faltan Datos")
