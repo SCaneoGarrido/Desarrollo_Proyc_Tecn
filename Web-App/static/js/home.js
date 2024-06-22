@@ -138,6 +138,7 @@ document.getElementById('add-asistente').addEventListener('click', function() {
        * nombre_completo: contiene el nombre completo del asistente
        * 
        * SE QUITA ESTADO CIVIL, NO ES NECESARIO YA QUE EL FORMATO DE ASISTENCIA NO LO CONTIENE
+       * SE QUITA DIRECCION YA QUE NO ESTA EN EL FORMATO DE ASISTENCIA
        */
     
       asistentes.push({ 
