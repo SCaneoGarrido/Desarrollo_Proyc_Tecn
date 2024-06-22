@@ -9,11 +9,22 @@ CREATE TABLE muni_colab (
 );
 
 -- Crear tabla Asistentes
-CREATE TABLE Asistentes (
-    AsistenteID SERIAL PRIMARY KEY,
-    Nombre VARCHAR(255) NOT NULL,
-    Edad INT NOT NULL
+CREATE TABLE asistentes (
+    asistenteid SERIAL PRIMARY KEY,
+    rut INT NOT NULL UNIQUE,
+    digito_v CHAR(1) NOT NULL CHECK (digito_v ~ '^[0-9Kk]$'),
+    nombre VARCHAR(255),
+    telefono VARCHAR(14),
+    correo VARCHAR(255) UNIQUE,
+    genero VARCHAR(10) CHECK (genero IN ('Masculino', 'Femenino', 'Otro')),
+    edad INT CHECK (edad >= 0),
+    nacionalidad VARCHAR(100),
+    comuna VARCHAR(100),
+    barrio VARCHAR(100),
+    cursoID INT,
+    FOREIGN KEY (cursoID) REFERENCES Cursos(CursoID)
 );
+
 
 -- Crear tabla Cursos
 CREATE TABLE Cursos (
@@ -22,28 +33,26 @@ CREATE TABLE Cursos (
     Fecha_Inicio DATE NOT NULL,
     Fecha_Fin DATE NOT NULL,
     Colab_id INT,
+    escuela VARCHAR(255) NOT NULL,
+    actividad_servicio VARCHAR(255) NOT NULL,
+    insititucion VARCHAR(255) NOT NULL,
+    mes VARCHAR(255) NOT NULL,
     FOREIGN KEY (Colab_id) REFERENCES muni_colab(id)
 );
 
--- Crear tabla de relación CursoAsistente
-CREATE TABLE CursoAsistente (
+
+-- Crear tabla Asistencia
+CREATE TABLE AsistenciaDF (
+    AsistenciaID SERIAL PRIMARY KEY,
     CursoID INT,
-    AsistenteID INT,
-    PRIMARY KEY (CursoID, AsistenteID),
+    Fecha DATE NOT NULL,
+    ArchivoAsistencia BYTEA,
+    colab_id INT,
+    FOREIGN KEY (colab_id) REFERENCES muni_colab(id),
     FOREIGN KEY (CursoID) REFERENCES Cursos(CursoID),
     FOREIGN KEY (AsistenteID) REFERENCES Asistentes(AsistenteID)
 );
 
--- Crear tabla Asistencia
-CREATE TABLE Asistencia (
-    AsistenciaID SERIAL PRIMARY KEY,
-    CursoID INT,
-    AsistenteID INT,
-    Fecha DATE NOT NULL,
-    Estado VARCHAR(50) NOT NULL,
-    FOREIGN KEY (CursoID) REFERENCES Cursos(CursoID),
-    FOREIGN KEY (AsistenteID) REFERENCES Asistentes(AsistenteID)
-);
 
 -- Crear tabla Certificados
 CREATE TABLE Certificados (
@@ -52,5 +61,5 @@ CREATE TABLE Certificados (
     AsistenteID INT,
     ArchivoCertificado BYTEA,
     FOREIGN KEY (CursoID) REFERENCES Cursos(CursoID),
-    FOREIGN KEY (AsistenteID) REFERENCES Asistentes(AsistenteID)
+    FOREIGN KEY (AsistenteID) REFERENCES asistentes(asistenteid)
 );

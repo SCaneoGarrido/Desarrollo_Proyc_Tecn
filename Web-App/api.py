@@ -2,6 +2,7 @@ import os
 import pandas as pd
 from flask import Flask, request, jsonify, session, render_template, url_for
 from flask_cors import CORS
+from io import BytesIO
 from Util.manejo_db import DatabaseManager
 from Util.manage_credential import CredentialsManager
 
@@ -32,34 +33,105 @@ def get_courses(user_id):
     try:
         if user_id:
             DatabaseManager_instance = DatabaseManager()
-
             cursos = DatabaseManager_instance.getRegistered_courses(user_id)
-            if len(cursos) > 0:
+            if cursos:
                 return jsonify({"cursos": cursos}), 200
             else:
                 return jsonify({"error": "no hay cursos registrados"}), 400
-
     except Exception as e:
         print(f"Error: {e}")
-        return jsonify({"error": "ocurrio un error al obtener los cursos"}), 400
+        return jsonify({"error": "ocurrió un error al obtener los cursos"}), 400
 
-@app.route('/app/recive_data', methods=['POST'])
-def recive_data():
+# ruta que crea una pre-visualizacion, carga y vinculacion del archivo cargado
+@app.route('/app/recive_data/<user_id>', methods=['POST'])
+def recive_data(user_id):
     if request.method == 'POST':
         try:
+            # Obtener los datos del formulario
+            curso_id = request.form.get('cursoId')
+            file = request.files['file']
+        
+            # Asegurarse de que ambos datos están presentes
+            if not curso_id or not file:
+                return jsonify({"success": False, "message": "Falta el archivo o el cursoId"}), 400
+
+            # Procesar el archivo y el curso_id según sea necesario
+            # Aquí puedes añadir tu lógica para manejar el archivo y el curso_id
+            print("Curso ID: ", curso_id)
+            print("Archivo recibido: ", file.filename)
+            print("User ID: ", user_id)
+
+
             if 'file' not in request.files:
                 return jsonify({"error": "no se ha proporcionado ningún archivo"}), 400
             file = request.files['file']
             if file.filename == '':
                 return jsonify({"error": "no se ha seleccionado ningún archivo"}), 400
-            if file:
-                # Leer el archivo directamente en un DataFrame
-                data = pd.read_excel(file)
-                # Convertir el DataFrame a HTML
-                html_data = data.to_html(classes='table table-bordered table-striped')
-                # Guardar el DataFrame en una variable de sesión o en memoria
-                session['uploaded_data'] = data.to_dict()
-                return jsonify({"success": "archivo guardado", "data": html_data}), 200
+            
+            try: 
+                if file:
+                    DatabaseManager_instance = DatabaseManager()
+                    # mostrar info 
+                    print(f"archivo -> {file.filename}")
+                    print(f"user_id -> {user_id}")
+                    print(f"curso_id -> {curso_id}")
+
+                    # guardamos el df en temp
+                    if not os.path.exists('temp'):
+                        os.makedirs('temp')
+                    ruta_archivo = os.path.join('temp', file.filename)
+                    file.save(ruta_archivo)
+
+                    print("ruta_archivo: ", ruta_archivo)
+                    # Leer el archivo directamente en un DataFrame
+                    data = pd.read_excel(ruta_archivo)
+                    
+                    
+                    # Convertir el DataFrame a HTML
+                    html_data = data.to_html(classes='table table-bordered table-striped')
+                    # Guardar el DataFrame en base de datos
+                    # si ya existe un dataframe asociado concatenar el nuevo df 
+                    # con el existente para crear un nuevo df concatenarlos mediante la primera columna
+                    # actualizar la base de datos subiendo el nuevo archivo concatenado
+
+                    existing_data = DatabaseManager_instance.get_existing_file(curso_id)
+                    
+                    if existing_data is not None:
+                        print(" ############### Existe un archivo existente ############### ")
+                        print(existing_data)
+                    
+                    # Mostrar archivo a cargar
+                    print(" ############### Archivo a cargar ############### ")
+                    print(data)
+
+                    if existing_data is not None:
+                        data.columns = existing_data.columns
+                        # concatenamos
+                        merged_data = pd.concat([existing_data, data]).drop_duplicates(subset=['NOMBRES Y APELLIDOS'])
+                    else:
+                        merged_data = data
+
+                    
+                    
+                    print(" ############### Archivo concatenado ############### ")
+                    print(merged_data)
+
+                    bytes_io = BytesIO()
+                    merged_data.to_excel(bytes_io, index=False)
+                    file_data = bytes_io.getvalue()
+
+                    # actualizar o insertar en la base de datos
+                    if existing_data is not None:
+                        DatabaseManager_instance.update_file(curso_id, file_data)
+                    else:
+                        DatabaseManager_instance.insert_file(user_id ,curso_id, file_data)
+                    
+                    os.remove(ruta_archivo)
+                    return jsonify({"success": "archivo guardado", "data": html_data}), 200
+            except Exception as e:
+                print("Error al previsualizar archivo: ", e)
+                return jsonify({"error": "ocurrio un error al previsualizar el archivo"}), 400
+
         except Exception as e:
             print(f"Error: {e}")
             return jsonify({"error": "ocurrió un error al procesar el archivo"}), 400
@@ -67,69 +139,69 @@ def recive_data():
 @app.route('/app/register_courses/<user_id>', methods=['POST'])
 def register_courses(user_id):
     if request.method == 'POST':
-        DatabaseManager_instance = DatabaseManager()
         data = request.get_json()
-        
-        # Obtener los datos del curso
-        nombre_curso = data.get('nombre')
-        año_curso = data.get('año')
-        fecha_inicio_curso = data.get('fechaInicio')
-        fecha_termino_curso = data.get('fechaTermino')
+
+        DatabaseManager_instance = DatabaseManager()
+
+        # OBTENER DATOS PARA EL REGISTRO DEL CURSO
+        nombre_curso        = data.get('nombre')
+        fecha_inicio        = data.get('fechaInicio')
+        fecha_termino       = data.get('fechaTermino')
+        mes_curso           = data.get('mes_curso')
+        escuela             = data.get('escuela')
+        actividad_servicio  = data.get('actividad_servicio')
+        institucion         = data.get('institucion')
+        user_id             = data.get('user_id')  # ESTO ES PARA VINCULAR AL COLABORADOR DE MUNICIPALIDAD CON EL CURSO QUE REGISTRÓ.
+
+        # OBTENER DATOS DE ASISTENTES
         asistentes = data.get('asistentes', [])
 
-        # Verificar si todos los datos requeridos están presentes
-        if not nombre_curso or not año_curso or not fecha_inicio_curso or not fecha_termino_curso:
-            return jsonify({'error': 'No se proporcionaron todos los datos requeridos'}), 400
+        # COMPROBAR DATOS DE CURSOS
+        if not nombre_curso or not fecha_inicio or not fecha_termino or not escuela or not actividad_servicio or not institucion or not mes_curso:
+            return jsonify({"error": "faltan datos del curso"}), 400
+        if not user_id:
+            return jsonify({"error": "faltan datos del colaborador"}), 400
 
-        # Intentar insertar el curso en la base de datos
-        try:
-            if DatabaseManager_instance.insertCourseOnDB(nombre_curso, fecha_inicio_curso, fecha_termino_curso, user_id, año_curso):
-                # El curso se ha insertado correctamente, ahora intentar cargar los asistentes
-                if DatabaseManager_instance.CargarAsistentes_cursos(asistentes):
-                    return jsonify({'message': 'Curso y asistentes cargados exitosamente'}), 200
-                else:
-                    return jsonify({'error': 'Error al cargar asistentes'}), 400
-            else:
-                return jsonify({'error': 'Error al cargar curso'}), 400
-
-        except Exception as e:
-            print(f"Error: {e}")
-            return jsonify({'error': 'Error interno del servidor'}), 500
-
+        # COMPROBAR DATOS DE ASISTENTES
+        if len(asistentes) == 0:
+            print("No hay asistentes, lista vacia \n lista -> {} \n".format(asistentes))
+            return jsonify({"error": "No se ingresaron asistentes"}), 400
         
-@app.route('/app/vincular_archivo_curso/<user_id>', methods=['POST'])
-def vincular_archivo_curso():
-    if request.method == 'POST':
-        data = request.get_json()
-        curso_id = data.get('cursoId')
-        if not curso_id:
-            return jsonify({"success": False, "error": "cursoId no proporcionado"}), 400
+        # MOSTREMOS LOS DATOS
+        datos_curso = {
+            'nombre':               nombre_curso,
+            'fechaInicio':          fecha_inicio,
+            'fechaTermino':         fecha_termino,
+            'mes_curso':            mes_curso,
+            'escuela':              escuela,
+            'actividad_servicio':   actividad_servicio,
+            'institucion':          institucion,
+        }
+
+        print("Los datos del curso son: \n {} \n".format(datos_curso))
+        print("Los datos de los asistentes son: \n {} \n".format(asistentes))
+        
+        # INSERTAR DATOS EN BD
         try:
-            # Obtener el DataFrame de la variable de sesión o memoria
-            if 'uploaded_data' not in session:
-                return jsonify({"success": False, "error": "No hay datos cargados"}), 400
-            df = pd.DataFrame(session['uploaded_data'])
-            # Asociar el DataFrame con el curso
-            dataframes_cursos[curso_id] = df
-            html_data = df.to_html(classes='table table-bordered table-striped') # no se debe perder
-            # Guardar la vinculación en un archivo CSV
-            df['curso_id'] = curso_id
-            df['nombre_curso'] = next((curso['nombre'] for curso in cursos_registrados if curso['id'] == curso_id), 'Desconocido')
-            if os.path.exists(CSV_FILE_PATH):
-                # Agregar una línea de separación antes de concatenar los nuevos datos
-                with open(CSV_FILE_PATH, 'a') as f:
-                    f.write('\n' + '-'*50 + '\n')
-                df.to_csv(CSV_FILE_PATH, mode='a', header=False, index=False)
+            curso_id = DatabaseManager_instance.insertCourseOnDB(nombre_curso, fecha_inicio, fecha_termino, mes_curso, escuela, actividad_servicio, institucion, user_id,)
+            if curso_id:
+                if len(asistentes) > 0:
+                    for asistente in asistentes:
+                        asistente['curso_id'] = curso_id  # aquí agrego una nueva clave 'curso_id' al diccionario 'asistente'
+                    if DatabaseManager_instance.CargarAsistentes_cursos(asistentes):
+                        return jsonify({"message":"Curso y asistentes registrados"}), 200
+                    else:
+                        return jsonify({"message":"Ocurrio un error al registrar asistentes"}), 400
+                else:
+                    return jsonify({"message":"Curso cargado correctamente pero no se proporcionaron asistentes"}), 200
             else:
-                df.to_csv(CSV_FILE_PATH, mode='w', header=True, index=False)
-            # Agregar print para ver la vinculación en la terminal
-            print(f"Curso ID: {curso_id} vinculado con el siguiente DataFrame:")
-            print(df)
-            return jsonify({"success": True, "data": html_data}), 200
+                return jsonify({"message":"Ocurrio un error al registrar el curso"}), 400
         except Exception as e:
             print(f"Error: {e}")
-            return jsonify({"success": False, "error": "ocurrió un error al vincular el archivo"}), 400
-
+            return jsonify({"error": str(e)}), 500  # Devuelve el error como respuesta HTTP 500
+    else:
+        return jsonify({"error": "Invalid Method"}), 400
+        
 # RUTA PARA MANEJAR EL LOGIN
 @app.route('/app/login', methods=['POST'])
 def handle_login():
@@ -194,6 +266,74 @@ def create_user():
             return jsonify({"error": "ocurrio un error al crear usuario"}), 400
     else:
         return jsonify({'error':'Invalid Method'}), 400
+
+
+@app.route('/app/get_info_User/<user_id>', methods=['GET'])
+def getInfo_muniColab(user_id):
+    if request.method == 'GET':
+        try:
+            DatabaseManager_instance = DatabaseManager()
+            if user_id:
+                info = DatabaseManager_instance.getMuni_colabInfo(user_id)
+                if info:
+                    return jsonify({"info": info}), 200
+        except Exception as e:
+            print(f"Error: {e}")
+            return jsonify({"error": "ocurrio un error al obtener la información del usuario"}), 400
+
+
+#### RUTA DE MOTOR ANALITICO ####
+@app.route('/app/analytical_engine/<user_id>', methods=['GET'])
+def analytical_engine(user_id):
+    
+    if request.method == 'GET':
+        data = request.get_json()
+        cursoID = data.get('cursoID')  # Mantener la variable original 'userID'
+        DatabaseManager_instance = DatabaseManager()  # Instancia de DatabaseManager
+        
+        # transformar el CURSO ID A INT
+        cursoID = int(cursoID)
+        # 1.- Recibimos tanto el User_ID como el Curso_ID.
+        if cursoID and user_id:
+            print(f"Data recibida para motor de analitca \nUID de usuario -> {user_id} \nUID del curso -> {cursoID}\n Tipo de datos del UID Curso: {type(cursoID)} ")
+            
+            # 2.- Comprobamos con el User_ID que exista un curso registrado que coincida con el Curso_ID.
+            cursoSolicitado = DatabaseManager_instance.obtenerCursoBy_userID_CursoID(user_id, cursoID)
+
+            if cursoSolicitado:
+                print(f"Curso solicitado encontrado: {cursoSolicitado}")
+                print(f"Respuesta de curso solicitado typedata: {type(cursoSolicitado)}")
+
+                # comprobamos si existe un archivo asociado al curso
+                existing_file = DatabaseManager_instance.get_existing_file(cursoID)
+
+                if existing_file is not None:
+                    print(f"Archivo de asistencia encontrado \n{existing_file}")
+                else:
+                    print("No se encontro archivo asociado al curso")
+                    return  jsonify({"error":"No existe un archivo de asistencia asociado al curso"})
+
+                # obtener lista de asistentes
+
+                lista_asistentes, column_names = DatabaseManager_instance.obtenerLista_asistentes(cursoID)
+    
+                print(f"""
+                    Se ha encontrado la siguiente lista de asistentes para el curso: {cursoSolicitado[1]}\n
+                    lista de asistentes: {lista_asistentes}
+                """)
+                print(f"ripo de datos lista asistentes.\n {type(lista_asistentes)}")
+
+                return jsonify({'success': 'Ok'})
+            else:
+                print("No se encontro el curso solicitado asociado al usuario")
+                return jsonify({"error":"No se encontro el curso solicitado o no se encontro en la base de datos"}), 404
+
+        else:
+            print("Faltan Datos")
+            return jsonify({'error': 'Faltan datos, id curso = {} \n User id = {}'.format(cursoID, user_id)}), 400
+
+    else:
+        return jsonify({'error': 'Método inválido'}), 500
 
 if __name__ == '__main__':
     app.run(debug=True)

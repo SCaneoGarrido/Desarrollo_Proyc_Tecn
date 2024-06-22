@@ -11,6 +11,8 @@
 /logica.txt
 notas.txt
 /temp
+vinculaciones.csv
+token.txt
 #### Carpetas de seguridad ###
 
 /Web-App/Util/.env 
