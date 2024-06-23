@@ -407,3 +407,33 @@ document.addEventListener('DOMContentLoaded', function() {
             .catch(error => console.error('Error al obtener la información del usuario:', error));
     }
 });
+
+document.addEventListener('DOMContentLoaded', function() {
+  // Función para clonar la lista de cursos
+  function cloneCourseList() {
+      const cursosLista = document.getElementById('cursos-lista');
+      const analisisCursosLista = document.getElementById('analisis-cursos-lista');
+
+      // Elimina el contenido previo en la lista de análisis de cursos
+      analisisCursosLista.innerHTML = '';
+
+      // Clona el contenido de la lista de cursos
+      const clonedContent = cursosLista.cloneNode(true);
+      clonedContent.id = ''; // Elimina el ID para evitar duplicados
+
+      // Agrega el contenido clonado a la lista de análisis de cursos
+      analisisCursosLista.appendChild(clonedContent);
+  }
+
+  // Llama a la función para clonar la lista de cursos cuando sea necesario
+  // Por ejemplo, al mostrar la sección de análisis de cursos
+  document.querySelectorAll('.nav-link').forEach(item => {
+      item.addEventListener('click', function(e) {
+          e.preventDefault();
+          const sectionId = this.getAttribute('href').substring(1);
+          if (sectionId === 'analisis-cursos') {
+              cloneCourseList();
+          }
+      });
+  });
+});
