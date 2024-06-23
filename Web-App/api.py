@@ -285,10 +285,8 @@ def getInfo_muniColab(user_id):
 #### RUTA DE MOTOR ANALITICO ####
 @app.route('/app/analytical_engine/<user_id>', methods=['GET'])
 def analytical_engine(user_id):
-    
     if request.method == 'GET':
-        data = request.get_json()
-        cursoID = data.get('cursoID')  # Mantener la variable original 'userID'
+        cursoID = request.args.get('cursoID')  # Obtener el cursoID de los parámetros de la solicitud
         DatabaseManager_instance = DatabaseManager()  # Instancia de DatabaseManager
         
         # transformar el CURSO ID A INT
@@ -311,10 +309,9 @@ def analytical_engine(user_id):
                     print(f"Archivo de asistencia encontrado \n{existing_file}")
                 else:
                     print("No se encontro archivo asociado al curso")
-                    return  jsonify({"error":"No existe un archivo de asistencia asociado al curso"})
+                    return jsonify({"error":"No existe un archivo de asistencia asociado al curso"})
 
                 # obtener lista de asistentes
-
                 lista_asistentes, column_names = DatabaseManager_instance.obtenerLista_asistentes(cursoID)
     
                 print(f"""
@@ -334,6 +331,5 @@ def analytical_engine(user_id):
 
     else:
         return jsonify({'error': 'Método inválido'}), 500
-
 if __name__ == '__main__':
     app.run(debug=True)
