@@ -221,10 +221,33 @@
         <section id="analisis-cursos" class="section" style="display:none;">
             <div class="container">
                 <h2>Análisis Cursos</h2>
-                <p>Esta sección está vacía por ahora.</p>
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#courseModal">
+                    Ver Cursos
+                </button>
+                <p>Selecciona un curso para ver el análisis.</p>
             </div>
         </section>
 
+        <!-- Modal para Seleccionar Curso -->
+        <div class="modal fade" id="courseModal" tabindex="-1" aria-labelledby="courseModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="courseModalLabel">Seleccionar Curso</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <ul id="courseList" class="list-group">
+                            <!-- Aquí se llenará la lista de cursos -->
+                        </ul>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
         <!-- Sección de Perfil -->
         <section id="perfil" class="section" style="display:none;">
             <div class="container">

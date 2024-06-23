@@ -407,3 +407,42 @@ document.addEventListener('DOMContentLoaded', function() {
           .catch(error => console.error('Error al obtener la información del usuario:', error));
   }
 });
+
+document.addEventListener('DOMContentLoaded', function() {
+  // Función para obtener los cursos desde la base de datos
+  function fetchCourses() {
+      const user_id = localStorage.getItem('user_id');
+      fetch(`/app/get_courses/${user_id}`, {
+          method: 'GET',
+          headers: {
+              'Content-Type': 'application/json'
+          }
+      })
+      .then(response => response.json())
+      .then(data => {
+          if (data.cursos) {
+              const courseList = document.getElementById('courseList');
+              courseList.innerHTML = ''; // Limpiar la lista antes de llenarla
+              data.cursos.forEach(course => {
+                  const listItem = document.createElement('li');
+                  listItem.classList.add('list-group-item');
+                  listItem.textContent = course[1]; // Asumiendo que el nombre del curso está en la segunda posición
+                  listItem.dataset.courseId = course[0]; // Asignar el curso_id al elemento
+                  listItem.addEventListener('click', function() {
+                      const selectedCourseId = this.dataset.courseId;
+                      console.log('Curso seleccionado ID:', selectedCourseId);
+                      // Aquí puedes manejar el curso_id seleccionado, por ejemplo, almacenarlo en una variable global o enviarlo a otra función
+                  });
+                  courseList.appendChild(listItem);
+              });
+          } else {
+              console.error('No hay cursos registrados');
+          }
+      })
+      .catch(error => console.error('Error al obtener los cursos:', error));
+  }
+
+  // Llamar a la función para obtener los cursos cuando se abre el modal
+  const courseModal = document.getElementById('courseModal');
+  courseModal.addEventListener('show.bs.modal', fetchCourses);
+});
