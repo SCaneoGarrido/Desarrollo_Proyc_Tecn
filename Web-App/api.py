@@ -5,6 +5,7 @@ from flask_cors import CORS
 from io import BytesIO
 from Util.manejo_db import DatabaseManager
 from Util.manage_credential import CredentialsManager
+import numpy as np
 
 app = Flask(__name__, template_folder='templates', static_folder='static')
 app.secret_key = 'supersecretkey'  # Necesario para usar sesiones
@@ -325,10 +326,10 @@ def analytical_engine(user_id):
                 
                 # Verificar si la columna 'asistencia' existe en el DataFrame
                 if 'asistencia' not in df_asistencia.columns:
-                    df_asistencia['asistencia'] = None  # Inicializar la columna 'asistencia' si no existe
+                    df_asistencia['asistencia'] = np.nan  # Inicializar la columna 'asistencia' con NaN si no existe
                 
                 # Agregar la columna 'asistencia' con los datos de asistencia
-                df_asistencia['asistencia'] = df_asistencia.apply(lambda row: 'Presente' if row['asistencia'] else 'Ausente', axis=1)
+                df_asistencia['asistencia'] = df_asistencia['asistencia'].apply(lambda x: 'Presente' if pd.notna(x) and isinstance(x, (int, float)) else np.nan)
                 
                 print(f"DataFrame de asistencia:\n{df_asistencia}")
 
@@ -343,7 +344,6 @@ def analytical_engine(user_id):
 
     else:
         return jsonify({'error': 'Método inválido'}), 500
-    
 
 if __name__ == '__main__':
     app.run(debug=True)
