@@ -431,6 +431,12 @@ document.addEventListener('DOMContentLoaded', function() {
                   listItem.textContent = course[1]; // Asumiendo que el nombre del curso está en la segunda posición
                   listItem.dataset.courseId = course[0]; // Asignar el curso_id al elemento
                   listItem.addEventListener('click', function() {
+                      // Remover la clase 'selected' de todos los elementos
+                      document.querySelectorAll('.list-group-item').forEach(item => {
+                          item.classList.remove('selected');
+                      });
+                      // Agregar la clase 'selected' al elemento clicado
+                      this.classList.add('selected');
                       selectedCourseId = this.dataset.courseId;
                       console.log('Curso seleccionado ID:', selectedCourseId);
                       document.getElementById('analyzeButton').disabled = false; // Habilitar el botón "Analizar"
