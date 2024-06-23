@@ -331,5 +331,7 @@ def analytical_engine(user_id):
 
     else:
         return jsonify({'error': 'Método inválido'}), 500
+    
+    
 if __name__ == '__main__':
     app.run(debug=True)
