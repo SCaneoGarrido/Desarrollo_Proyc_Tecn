@@ -320,6 +320,18 @@ def analytical_engine(user_id):
                 """)
                 print(f"ripo de datos lista asistentes.\n {type(lista_asistentes)}")
 
+                # Crear un DataFrame con los datos de asistencia
+                df_asistencia = pd.DataFrame(lista_asistentes, columns=column_names)
+                
+                # Verificar si la columna 'asistencia' existe en el DataFrame
+                if 'asistencia' not in df_asistencia.columns:
+                    df_asistencia['asistencia'] = None  # Inicializar la columna 'asistencia' si no existe
+                
+                # Agregar la columna 'asistencia' con los datos de asistencia
+                df_asistencia['asistencia'] = df_asistencia.apply(lambda row: 'Presente' if row['asistencia'] else 'Ausente', axis=1)
+                
+                print(f"DataFrame de asistencia:\n{df_asistencia}")
+
                 return jsonify({'success': 'Ok'})
             else:
                 print("No se encontro el curso solicitado asociado al usuario")
@@ -332,6 +344,6 @@ def analytical_engine(user_id):
     else:
         return jsonify({'error': 'Método inválido'}), 500
     
-    
+
 if __name__ == '__main__':
     app.run(debug=True)
