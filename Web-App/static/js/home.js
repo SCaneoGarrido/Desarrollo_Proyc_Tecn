@@ -437,3 +437,20 @@ document.addEventListener('DOMContentLoaded', function() {
       });
   });
 });
+
+// Función para filtrar cursos
+function filterCourses() {
+  const searchInput = document.getElementById('searchInput').value.toLowerCase();
+  const courses = document.querySelectorAll('#analisis-cursos-lista .course-item');
+  courses.forEach(course => {
+      const courseText = course.textContent.toLowerCase();
+      if (courseText.includes(searchInput)) {
+          course.style.display = 'block';
+      } else {
+          course.style.display = 'none';
+      }
+  });
+}
+
+// Evento de búsqueda
+document.getElementById('searchInput').addEventListener('input', filterCourses);
