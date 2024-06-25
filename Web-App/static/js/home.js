@@ -111,6 +111,7 @@ document.getElementById('form-inscribir-curso').addEventListener('submit', funct
   const escuela            = document.getElementById('escuela').value;
   const actividad_servicio = document.getElementById('selectorAS').value;
   const institucion        = document.getElementById('institucion').value;
+  const totalClases        = document.getElementById('totalClases').value; //total de clases, nuevo campo agregado
   const user_id            = localStorage.getItem('user_id');
   
 
@@ -164,6 +165,7 @@ document.getElementById('form-inscribir-curso').addEventListener('submit', funct
     escuela:            escuela,
     actividad_servicio: actividad_servicio,
     institucion:        institucion,
+    totalClases:        totalClases,
     user_id:            user_id,
     asistentes:         asistentes
   };
@@ -193,7 +195,7 @@ document.getElementById('form-inscribir-curso').addEventListener('submit', funct
   modal.hide();
 });
 
-// Función para obtener los cursos inscritos desde la base de datos
+/// Función para obtener los cursos inscritos desde la base de datos
 function cargarCursos() {
   const user_id = localStorage.getItem('user_id');
   const div_cursos = document.getElementById('cursos-lista');
@@ -206,8 +208,6 @@ function cargarCursos() {
 
       if (data.cursos && data.cursos.length > 0) {
           data.cursos.forEach(course => {
-              
-
               const courseItem = document.createElement('div');
               courseItem.className = 'course-item card mb-3';
               courseItem.innerHTML = `
@@ -217,10 +217,10 @@ function cargarCursos() {
                       <p class="card-text"><strong>Mes: </strong> ${course[8]}</p>
                       <p class="card-text"><strong>Fecha de inicio: </strong> ${new Date(course[2]).toLocaleDateString()}</p>
                       <p class="card-text"><strong>Fecha de fin: </strong> ${new Date(course[3]).toLocaleDateString()}</p>
-                      <p class="card-text"><strong>Institucion </strong> ${course[7]}</p>
-                      <p class="card-text"><strong>Escuela </strong> ${course[5]}</p>
-                      <p class="card-text"><strong>Actividad o Servicio </strong> ${course[6]}</p>
-
+                      <p class="card-text"><strong>Institución: </strong> ${course[7]}</p>
+                      <p class="card-text"><strong>Escuela: </strong> ${course[5]}</p>
+                      <p class="card-text"><strong>Actividad o Servicio: </strong> ${course[6]}</p>
+                      <p class="card-text"><strong>Cantidad total de clases: </strong> ${course[9]}</p>
                   </div>
               `;
               div_cursos.appendChild(courseItem);
