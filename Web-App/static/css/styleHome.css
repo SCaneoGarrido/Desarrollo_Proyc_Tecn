@@ -236,3 +236,23 @@ body {
   .accordion-body {
     padding: 10px;
   }
+
+  /* Estilos para el modal */
+.modal-content {
+    color: #000; /* Cambia el color del texto a negro */
+}
+
+/* Estilos para la lista de cursos */
+.list-group-item {
+    cursor: pointer;
+}
+
+.list-group-item:hover {
+    background-color: #f1f1f1; /* Cambia el fondo al pasar el ratón */
+}
+
+/* Estilo para el elemento seleccionado */
+.list-group-item.selected {
+    background-color: #007bff; /* Color de fondo azul */
+    color: white; /* Color del texto blanco */
+}

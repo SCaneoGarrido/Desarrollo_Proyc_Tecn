@@ -5,6 +5,7 @@ from flask_cors import CORS
 from io import BytesIO
 from Util.manejo_db import DatabaseManager
 from Util.manage_credential import CredentialsManager
+import numpy as np
 
 app = Flask(__name__, template_folder='templates', static_folder='static')
 app.secret_key = 'supersecretkey'  # Necesario para usar sesiones
@@ -285,10 +286,8 @@ def getInfo_muniColab(user_id):
 #### RUTA DE MOTOR ANALITICO ####
 @app.route('/app/analytical_engine/<user_id>', methods=['GET'])
 def analytical_engine(user_id):
-    
     if request.method == 'GET':
-        data = request.get_json()
-        cursoID = data.get('cursoID')  # Mantener la variable original 'userID'
+        cursoID = request.args.get('cursoID')  # Obtener el cursoID de los parámetros de la solicitud
         DatabaseManager_instance = DatabaseManager()  # Instancia de DatabaseManager
         
         # transformar el CURSO ID A INT
@@ -311,10 +310,9 @@ def analytical_engine(user_id):
                     print(f"Archivo de asistencia encontrado \n{existing_file}")
                 else:
                     print("No se encontro archivo asociado al curso")
-                    return  jsonify({"error":"No existe un archivo de asistencia asociado al curso"})
+                    return jsonify({"error":"No existe un archivo de asistencia asociado al curso"})
 
                 # obtener lista de asistentes
-
                 lista_asistentes, column_names = DatabaseManager_instance.obtenerLista_asistentes(cursoID)
     
                 print(f"""
@@ -322,6 +320,18 @@ def analytical_engine(user_id):
                     lista de asistentes: {lista_asistentes}
                 """)
                 print(f"ripo de datos lista asistentes.\n {type(lista_asistentes)}")
+
+                # Crear un DataFrame con los datos de asistencia
+                df_asistencia = pd.DataFrame(lista_asistentes, columns=column_names)
+                
+                # Verificar si la columna 'asistencia' existe en el DataFrame
+                if 'asistencia' not in df_asistencia.columns:
+                    df_asistencia['asistencia'] = np.nan  # Inicializar la columna 'asistencia' con NaN si no existe
+                
+                # Agregar la columna 'asistencia' con los datos de asistencia
+                df_asistencia['asistencia'] = df_asistencia['asistencia'].apply(lambda x: 'Presente' if pd.notna(x) and isinstance(x, (int, float)) else np.nan)
+                
+                print(f"DataFrame de asistencia:\n{df_asistencia}")
 
                 return jsonify({'success': 'Ok'})
             else:
