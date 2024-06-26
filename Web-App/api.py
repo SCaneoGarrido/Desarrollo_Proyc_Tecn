@@ -46,6 +46,7 @@ def get_courses(user_id):
 # ruta que crea una pre-visualizacion, carga y vinculacion del archivo cargado
 @app.route('/app/recive_data/<user_id>', methods=['POST'])
 def recive_data(user_id):
+    # CREAR LOGICA DE MANEJO DE ASISTENCIA
     if request.method == 'POST':
         try:
             # Obtener los datos del formulario
@@ -108,7 +109,7 @@ def recive_data(user_id):
                     if existing_data is not None:
                         data.columns = existing_data.columns
                         # concatenamos
-                        merged_data = pd.concat([existing_data, data]).drop_duplicates(subset=['NOMBRES Y APELLIDOS'])
+                        merged_data = pd.concat([existing_data, data]).drop_duplicates(subset=['NOMBRE Y APELLIDOS'])
                     else:
                         merged_data = data
 
