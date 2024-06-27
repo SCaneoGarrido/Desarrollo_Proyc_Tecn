@@ -259,7 +259,7 @@ class DatabaseManager:
 
         except Exception as e:
             print(f"Error en 'obtenerLista_asistentes - DatabaseManager' \nError -> {e}")
-            return [], []  # Devuelve listas vacías en caso de excepción
+            return None  # Devuelve listas vacías en caso de excepción
         finally:
             if conn:
                 conn.close()
@@ -286,3 +286,49 @@ class DatabaseManager:
         finally:
             cursor.close()
             conn.close()
+    
+    
+    
+    
+    # ESTA FUNCION RECIBE EL CURSO ID ENVIADO POR EL USUARIO DESDE EL FRONT
+    # Y UNA LISTA DE ASISTENTES QUE SE VALIDO EN LA RUTA DE PRUEBA
+    # REALIZA UN UPDATE DEL CAMPO DE ASISTENCIA DE LA TABLA asistentes
+    def update_asistencia(self, cursoid, lista_presentes):
+        try:
+            conn = self.connect()
+            with conn:
+                with conn.cursor() as cursor:
+                    for asistente in lista_presentes:
+                        # Limpiar y normalizar el nombre
+                        asistente_limpio = asistente.strip().title()
+                        
+                        # Consulta de prueba para verificar coincidencia
+                        cursor.execute(
+                            """
+                            SELECT * FROM asistentes
+                            WHERE cursoid = %s AND nombre ILIKE %s
+                            """,
+                            (cursoid, asistente_limpio)
+                        )
+                        resultado = cursor.fetchone()
+                        if resultado:
+                            print(f"Se encontró coincidencia: {resultado}")
+                            # Ejecutar la actualización
+                            cursor.execute(
+                                """
+                                UPDATE asistentes
+                                SET asistencia = COALESCE(asistencia, 0) + 1
+                                WHERE cursoid = %s AND nombre ILIKE %s
+                                """,
+                                (cursoid, asistente_limpio)
+                            )
+                            print(f"Filas actualizadas: {cursor.rowcount}")
+                        else:
+                            print(f"No se encontró coincidencia para: {asistente_limpio}")
+            return True
+        except Exception as e:
+            print(f"Error en 'update_asistencia()'\n Error: {e}")
+            return False
+        finally:
+            if conn:
+                conn.close()
