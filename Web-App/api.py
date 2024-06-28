@@ -109,17 +109,54 @@ def recive_data(user_id):
                     
                     ## AQUI ANTES DE SUBIR EL ARCHIVO DEBEMOS REALIZAR LA ACTUALIZACION DE ASISTENCIA ##
                     # obtener la lista de asistentes
-                    #lista_asistentes = DatabaseManager_instance.obtenerLista_asistentes(curso_id)
-                    #if lista_asistentes is not None:
-                    #    print(f"Lista de asistentes del curso solicitado")
-                    #    tuplas = lista_asistentes[0]
-                    #    campos = lista_asistentes[1]
-                    #    indice_nombre = campos.index('nombre')
-                    #    nombres = [tupla[indice_nombre].strip().replace("  ", " ") for tupla in tuplas]  # Limpia espacios adicionales
-                    #    
-                    
+                    lista_asistentes = DatabaseManager_instance.obtenerLista_asistentes(curso_id)
+                    if lista_asistentes is not None:
+                        print("Se ha encontrado una lista de asistentes asociada al curso")
+                        tuplas = lista_asistentes[0]
+                        campos = lista_asistentes[1]
 
-                                        
+                        print(f"tuplas reconocidas -> {tuplas}")
+                        print(f"campos reconocidos -> {campos}")
+
+                        indice_nombre = campos.index('nombre')
+                        indice_asistenteID = campos.index('asistenteid')
+
+                        # extraemos y normalizamos los campos
+                        asistente_data = [
+                            (tupla[indice_asistenteID], ' '.join(tupla[indice_nombre].split()).title())
+                            for tupla in tuplas
+                        ]
+
+                        df_asistentes = pd.DataFrame(asistente_data, columns=['AsistenteID', 'Nombre'])
+
+                        # asistance_df = data
+                        data['NOMBRE Y APELLIDOS'] = data['NOMBRE Y APELLIDOS'].str.strip().replace(" ", " ")
+                        asistance_df_NamesCol = data['NOMBRE Y APELLIDOS'].apply(lambda x: ' '.join(x.split()).title())
+
+                        asistance_df_names_list = asistance_df_NamesCol.tolist()
+
+                        list_asist_presentes = []
+
+                        # Comparar nombres y añadir el ID a la lista de presentes si el nombre coincide
+                        
+                        for asistente_id, nombre in zip(df_asistentes['AsistenteID'], df_asistentes['Nombre']):
+                            if nombre in asistance_df_names_list:
+                                print(f"Se encontro un asistente en el archivo de asistencia subido: {nombre} - {asistente_id}")
+                                list_asist_presentes.append(asistente_id)
+                            else:
+                                print(f"El asistente {nombre} no se encuentra en el archivo de asistencia subido")
+
+                        # actualizamos la base de datos
+                        try:
+                            asistance_flag = DatabaseManager_instance.update_asistencia(curso_id, list_asist_presentes)
+
+                            if asistance_flag:
+                                print("Se ha actualizado la base de datos con la lista de asistentes")
+                            else:
+                                print("No se ha podido actualizar la base de datos con la lista de asistentes")
+                        except Exception as e:
+                            print(f"Ocurrior un error al ejecutar el método de actualización de asistencia: {e}")
+                            return jsonify({"error": "ocurrio un error al ejecutar el método de actualización de asistencia"}), 400
                     ####################################################################################
                     if existing_data is not None:
                         data.columns = existing_data.columns
@@ -151,102 +188,6 @@ def recive_data(user_id):
         except Exception as e:
             print(f"Error: {e}")
             return jsonify({"error": "ocurrió un error al procesar el archivo"}), 400
-##################################################################################################################################
-#                                     !!!!!!!!! REVISAR ESTA RUTA !!!!!!!!!!!!!!!!!                                              #   
-# LA RUTA A REVISAR ES: @app.route('/app/test/<curso_id>', methods=['GET'])                                                      #   
-# LAS PRUEBAS SE REALIZAN UTILIZANDO POSTMAN                                                                                     #   
-# PARA LA PETICION USA: http://127.0.0.1:5000/app/test/8                                                                         #   
-# EN LA PARTE DE BODY, SELECCIONAS:                                                                                              #       
-# - form-data                                                                                                                    #       
-# - CAMPO 'Key' pones file                                                                                                       #       
-# - CAMPO 'Value' cargas el archivo de asistencia de 'Asistencia Alfabetizacion Digital.xlsx' (esta en la carpeta test)          #
-# SE USA EL METODO DE update_asistencia DE LA INSTANCIA DatabaseManager                                                          #
-# EL METODO RECIBE LA LISTA DE ASISTENTES PRESENTES (list_asist_presentes) y el cursoid                                          #   
-# ======================================================================================================================= #      #
-#                  !!!!!!!! LO QUE SE DEBE REVISAR ES LO SIGUIENTE !!!!!!!!!!!!!!                                                #   
-#  LA COLUMNA ASISTENCIA DE LA TABLA asistentes NO SE ACTUALIZA                                                                  #                                                   
-#  EL POSIBLE PROBLEMA ES POR LA NORMALIZACION DE LOS CAMPOS                                                                     #
-#  ====================================================================================================================== #      #   
-#                                                                                                                                #           
-#                                          SUERTE MANIN :D                                                                       #       
-#                      deje una captura de pantalla de como deberia verse el postman                                             #      
-##################################################################################################################################
-@app.route('/app/test/<curso_id>', methods=['GET'])
-def test(curso_id):
-    if request.method == 'GET':
-        try:
-            file = request.files['file']
-            print(f"Nombre del archivo enviado -> {file.filename}")
-            print(f'curso id solicitado, {curso_id}')
-            DatabaseManager_instance = DatabaseManager()
-            lista_asistentes = DatabaseManager_instance.obtenerLista_asistentes(curso_id)
-
-            if lista_asistentes is not None:
-                print(f"Hay una lista de asistentes al curso solicitado\n")
-                tuplas = lista_asistentes[0]
-                campos = lista_asistentes[1]
-
-                print(f"tuplas reconocidas -> {tuplas}")
-                print(f"campos reconocidos -> {campos}")
-
-                indice_nombre = campos.index('nombre')
-                indice_asistenteID = campos.index('asistenteid')
-
-                # Extraer y normalizar los campos asistenteid y nombre
-                asistentes_data = [
-                    (tupla[indice_asistenteID], ' '.join(tupla[indice_nombre].split()).title())
-                    for tupla in tuplas
-                ]
-
-                # Crear un DataFrame con los campos extraídos
-                df_asistentes = pd.DataFrame(asistentes_data, columns=['AsistenteID', 'Nombre'])
-
-                if not os.path.exists('temp'):
-                    os.makedirs('temp')
-                ruta_archivo = os.path.join('temp', file.filename)
-                file.save(ruta_archivo)
-
-                asistance_df = pd.read_excel(ruta_archivo)  # Este es el Excel de asistencia
-                asistance_df['NOMBRE Y APELLIDOS'] = asistance_df['NOMBRE Y APELLIDOS'].str.strip().replace("  ", " ")  # Limpia espacios adicionales
-                asistance_df_NamesCol = asistance_df['NOMBRE Y APELLIDOS'].apply(lambda x: ' '.join(x.split()).title())
-
-                # Convertir la columna del DataFrame a una lista
-                asistance_df_names_list = asistance_df_NamesCol.tolist()
-
-                # Crear una lista donde se almacenarán los asistentes que fueron encontrados
-                list_asist_presentes = []
-
-                # Comparar nombres y añadir el ID a la lista de presentes si el nombre coincide
-                for asistente_id, nombre in zip(df_asistentes['AsistenteID'], df_asistentes['Nombre']):
-                    if nombre in asistance_df_names_list:
-                        print(f"Se encontró un asistente en el archivo de asistencia subido: {nombre}")
-                        list_asist_presentes.append(asistente_id)
-                    else:
-                        print(f"No se encontró el nombre - {nombre}")
-
-                # Actualizar la asistencia en la base de datos
-                try:
-                    asistance_flag = DatabaseManager_instance.update_asistencia(curso_id, list_asist_presentes)
-
-                    if asistance_flag:
-                        print('Asistencia actualizada correctamente')
-                    else:
-                        print('Algo salió mal al actualizar la asistencia')
-                except Exception as e:
-                    print(f'Ocurrió un error al ejecutar el método de actualización de asistencia: {e}')
-
-                return jsonify({'message': list_asist_presentes}), 200
-            else:
-                print(f"Hubo un error al obtener la lista de Asistentes del curso solicitado")
-                return jsonify({'error': 'El curso solicitado no posee una lista de asistentes'}), 404
-        except Exception as e:
-            print(f"Error en testeo: -> {e}")
-            return jsonify({'error': 'Error en la ejecución del test'}), 404
-
-    else:
-        print('Método no válido')
-        return jsonify({'error': 'Bad Request'}), 500
-
 
 @app.route('/app/register_courses/<user_id>', methods=['POST'])
 def register_courses(user_id):
