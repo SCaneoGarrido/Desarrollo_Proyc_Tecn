@@ -293,22 +293,20 @@ class DatabaseManager:
     # ESTA FUNCION RECIBE EL CURSO ID ENVIADO POR EL USUARIO DESDE EL FRONT
     # Y UNA LISTA DE ASISTENTES QUE SE VALIDO EN LA RUTA DE PRUEBA
     # REALIZA UN UPDATE DEL CAMPO DE ASISTENCIA DE LA TABLA asistentes
-    def update_asistencia(self, cursoid, lista_presentes):
+    def update_asistencia(self, cursoid, lista_id):
         try:
             conn = self.connect()
             with conn:
                 with conn.cursor() as cursor:
-                    for asistente in lista_presentes:
-                        # Limpiar y normalizar el nombre
-                        asistente_limpio = asistente.strip().title()
-                        
+                    for id in lista_id:
+                        print(f"Procesando id -> {id} de la lista de id presentes\n")
                         # Consulta de prueba para verificar coincidencia
                         cursor.execute(
                             """
                             SELECT * FROM asistentes
-                            WHERE cursoid = %s AND nombre ILIKE %s
+                            WHERE cursoid = %s AND asistenteid = %s
                             """,
-                            (cursoid, asistente_limpio)
+                            (cursoid, id)
                         )
                         resultado = cursor.fetchone()
                         if resultado:
@@ -318,13 +316,13 @@ class DatabaseManager:
                                 """
                                 UPDATE asistentes
                                 SET asistencia = COALESCE(asistencia, 0) + 1
-                                WHERE cursoid = %s AND nombre ILIKE %s
+                                WHERE cursoid = %s AND asistenteid = %s
                                 """,
-                                (cursoid, asistente_limpio)
+                                (cursoid, id)
                             )
                             print(f"Filas actualizadas: {cursor.rowcount}")
                         else:
-                            print(f"No se encontró coincidencia para: {asistente_limpio}")
+                            print(f"No se encontró coincidencia para id: {id}")
             return True
         except Exception as e:
             print(f"Error en 'update_asistencia()'\n Error: {e}")

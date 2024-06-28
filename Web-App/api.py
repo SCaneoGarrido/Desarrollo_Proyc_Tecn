@@ -186,64 +186,66 @@ def test(curso_id):
                 tuplas = lista_asistentes[0]
                 campos = lista_asistentes[1]
 
+                print(f"tuplas reconocidas -> {tuplas}")
+                print(f"campos reconocidos -> {campos}")
+
                 indice_nombre = campos.index('nombre')
-                nombres = [tupla[indice_nombre].strip().replace("  ", " ") for tupla in tuplas]  # Limpia espacios adicionales
+                indice_asistenteID = campos.index('asistenteid')
+
+                # Extraer y normalizar los campos asistenteid y nombre
+                asistentes_data = [
+                    (tupla[indice_asistenteID], ' '.join(tupla[indice_nombre].split()).title())
+                    for tupla in tuplas
+                ]
+
+                # Crear un DataFrame con los campos extraídos
+                df_asistentes = pd.DataFrame(asistentes_data, columns=['AsistenteID', 'Nombre'])
 
                 if not os.path.exists('temp'):
                     os.makedirs('temp')
                 ruta_archivo = os.path.join('temp', file.filename)
                 file.save(ruta_archivo)
-                
+
                 asistance_df = pd.read_excel(ruta_archivo)  # Este es el Excel de asistencia
-
-                asistance_df_NamesCol = asistance_df['NOMBRE Y APELLIDOS'].str.strip().replace("  ", " ")  # Limpia espacios adicionales
-
-                print(f"Tipo de dato de 'nombres' -> {type(nombres)}\n Tipo de dato de 'asistance_df_NamesCol' -> {type(asistance_df_NamesCol)}\n\n")
-
-                print(f"CONTENIDO DE 'nombres' -> {nombres}\n")
-                print(f"CONTENIDO DE 'asistance_df_NamesCol' :\n {asistance_df_NamesCol}\n")
+                asistance_df['NOMBRE Y APELLIDOS'] = asistance_df['NOMBRE Y APELLIDOS'].str.strip().replace("  ", " ")  # Limpia espacios adicionales
+                asistance_df_NamesCol = asistance_df['NOMBRE Y APELLIDOS'].apply(lambda x: ' '.join(x.split()).title())
 
                 # Convertir la columna del DataFrame a una lista
                 asistance_df_names_list = asistance_df_NamesCol.tolist()
 
-                # CREAR UNA LISTA DONDE SE ALMACENARAN LOS ASISTENTES QUE SI FUERON ENCONTRADOS
+                # Crear una lista donde se almacenarán los asistentes que fueron encontrados
                 list_asist_presentes = []
 
-                asistance_df_names_list = [nombre.strip().title() for nombre in asistance_df_names_list]
-
-
-                # REALIZAR COMPROBACION DE LA LISTA DE ASISTENTES CON EL DATAFRAME
-                for nombre in nombres:
+                # Comparar nombres y añadir el ID a la lista de presentes si el nombre coincide
+                for asistente_id, nombre in zip(df_asistentes['AsistenteID'], df_asistentes['Nombre']):
                     if nombre in asistance_df_names_list:
                         print(f"Se encontró un asistente en el archivo de asistencia subido: {nombre}")
-                        list_asist_presentes.append(nombre)
+                        list_asist_presentes.append(asistente_id)
                     else:
                         print(f"No se encontró el nombre - {nombre}")
 
-                # ACTUALIZAMOS LA ASISTENCIA
+                # Actualizar la asistencia en la base de datos
                 try:
                     asistance_flag = DatabaseManager_instance.update_asistencia(curso_id, list_asist_presentes)
 
                     if asistance_flag:
                         print('Asistencia actualizada correctamente')
                     else:
-                        print('algo salio mal al actualizar la asistencia')
+                        print('Algo salió mal al actualizar la asistencia')
                 except Exception as e:
-                    print(f'Ocurrio un error al ejecutar el metodo de actualizacion de asistencia')
+                    print(f'Ocurrió un error al ejecutar el método de actualización de asistencia: {e}')
 
-                
                 return jsonify({'message': list_asist_presentes}), 200
             else:
-                print(f"Hubo un error al obtener la lista de Asistenes del curso solicitado")
-                return jsonify({'error': 'el curso solicitado no posee una lista de asistentes'}), 404
+                print(f"Hubo un error al obtener la lista de Asistentes del curso solicitado")
+                return jsonify({'error': 'El curso solicitado no posee una lista de asistentes'}), 404
         except Exception as e:
             print(f"Error en testeo: -> {e}")
-            return jsonify({'error': 'Error en la ejecucion del test'}), 404
+            return jsonify({'error': 'Error en la ejecución del test'}), 404
 
     else:
-        print('Metodo no valido')
+        print('Método no válido')
         return jsonify({'error': 'Bad Request'}), 500
-
 
 
 @app.route('/app/register_courses/<user_id>', methods=['POST'])
