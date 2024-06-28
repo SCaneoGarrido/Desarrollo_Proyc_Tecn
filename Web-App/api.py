@@ -46,6 +46,7 @@ def get_courses(user_id):
 # ruta que crea una pre-visualizacion, carga y vinculacion del archivo cargado
 @app.route('/app/recive_data/<user_id>', methods=['POST'])
 def recive_data(user_id):
+    # CREAR LOGICA DE MANEJO DE ASISTENCIA
     if request.method == 'POST':
         try:
             # Obtener los datos del formulario
@@ -105,14 +106,65 @@ def recive_data(user_id):
                     print(" ############### Archivo a cargar ############### ")
                     print(data)
 
+                    
+                    ## AQUI ANTES DE SUBIR EL ARCHIVO DEBEMOS REALIZAR LA ACTUALIZACION DE ASISTENCIA ##
+                    # obtener la lista de asistentes
+                    lista_asistentes = DatabaseManager_instance.obtenerLista_asistentes(curso_id)
+                    if lista_asistentes is not None:
+                        print("Se ha encontrado una lista de asistentes asociada al curso")
+                        tuplas = lista_asistentes[0]
+                        campos = lista_asistentes[1]
+
+                        print(f"tuplas reconocidas -> {tuplas}")
+                        print(f"campos reconocidos -> {campos}")
+
+                        indice_nombre = campos.index('nombre')
+                        indice_asistenteID = campos.index('asistenteid')
+
+                        # extraemos y normalizamos los campos
+                        asistente_data = [
+                            (tupla[indice_asistenteID], ' '.join(tupla[indice_nombre].split()).title())
+                            for tupla in tuplas
+                        ]
+
+                        df_asistentes = pd.DataFrame(asistente_data, columns=['AsistenteID', 'Nombre'])
+
+                        # asistance_df = data
+                        data['NOMBRE Y APELLIDOS'] = data['NOMBRE Y APELLIDOS'].str.strip().replace(" ", " ")
+                        asistance_df_NamesCol = data['NOMBRE Y APELLIDOS'].apply(lambda x: ' '.join(x.split()).title())
+
+                        asistance_df_names_list = asistance_df_NamesCol.tolist()
+
+                        list_asist_presentes = []
+
+                        # Comparar nombres y añadir el ID a la lista de presentes si el nombre coincide
+                        
+                        for asistente_id, nombre in zip(df_asistentes['AsistenteID'], df_asistentes['Nombre']):
+                            if nombre in asistance_df_names_list:
+                                print(f"Se encontro un asistente en el archivo de asistencia subido: {nombre} - {asistente_id}")
+                                list_asist_presentes.append(asistente_id)
+                            else:
+                                print(f"El asistente {nombre} no se encuentra en el archivo de asistencia subido")
+
+                        # actualizamos la base de datos
+                        try:
+                            asistance_flag = DatabaseManager_instance.update_asistencia(curso_id, list_asist_presentes)
+
+                            if asistance_flag:
+                                print("Se ha actualizado la base de datos con la lista de asistentes")
+                            else:
+                                print("No se ha podido actualizar la base de datos con la lista de asistentes")
+                        except Exception as e:
+                            print(f"Ocurrior un error al ejecutar el método de actualización de asistencia: {e}")
+                            return jsonify({"error": "ocurrio un error al ejecutar el método de actualización de asistencia"}), 400
+                    ####################################################################################
                     if existing_data is not None:
                         data.columns = existing_data.columns
                         # concatenamos
-                        merged_data = pd.concat([existing_data, data]).drop_duplicates(subset=['NOMBRES Y APELLIDOS'])
+                        merged_data = pd.concat([existing_data, data]).drop_duplicates(subset=['NOMBRE Y APELLIDOS'])
                     else:
                         merged_data = data
 
-                    
                     
                     print(" ############### Archivo concatenado ############### ")
                     print(merged_data)
