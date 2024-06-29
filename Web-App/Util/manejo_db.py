@@ -136,14 +136,14 @@ class DatabaseManager:
             cursor.close()
             conn.close()
 
-    def insertCourseOnDB(self, nombre_curso,  fecha_inicio, fecha_fin, mes_curso, escuela, actividad_servicio, institucion, colab_id):
+    def insertCourseOnDB(self, nombre_curso,  fecha_inicio, fecha_fin, mes_curso, escuela, actividad_servicio, institucion, colab_id, total_clases):
         try:
             conn = self.connect()
             cursor = conn.cursor()
-            data = (nombre_curso, fecha_inicio, fecha_fin, colab_id, escuela, actividad_servicio, institucion, mes_curso)
+            data = (nombre_curso, fecha_inicio, fecha_fin, colab_id, escuela, actividad_servicio, institucion, mes_curso, total_clases)
             cursor.execute("""
-                INSERT INTO cursos (nombre_curso, fecha_inicio, fecha_fin, colab_id, escuela, actividad_servicio, institucion, mes)
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s) RETURNING CursoID
+                INSERT INTO cursos (nombre_curso, fecha_inicio, fecha_fin, colab_id, escuela, actividad_servicio, institucion, mes, total_clases)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING CursoID
             """, data)
             curso_id = cursor.fetchone()[0] 
             conn.commit()

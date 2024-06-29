@@ -204,13 +204,14 @@ def register_courses(user_id):
         escuela             = data.get('escuela')
         actividad_servicio  = data.get('actividad_servicio')
         institucion         = data.get('institucion')
+        totalClases         = data.get('totalClases')       
         user_id             = data.get('user_id')  # ESTO ES PARA VINCULAR AL COLABORADOR DE MUNICIPALIDAD CON EL CURSO QUE REGISTRÓ.
 
         # OBTENER DATOS DE ASISTENTES
         asistentes = data.get('asistentes', [])
 
         # COMPROBAR DATOS DE CURSOS
-        if not nombre_curso or not fecha_inicio or not fecha_termino or not escuela or not actividad_servicio or not institucion or not mes_curso:
+        if not nombre_curso or not fecha_inicio or not fecha_termino or not escuela or not actividad_servicio or not institucion or not mes_curso or not totalClases:
             return jsonify({"error": "faltan datos del curso"}), 400
         if not user_id:
             return jsonify({"error": "faltan datos del colaborador"}), 400
@@ -229,6 +230,7 @@ def register_courses(user_id):
             'escuela':              escuela,
             'actividad_servicio':   actividad_servicio,
             'institucion':          institucion,
+            'totalClases':          totalClases
         }
 
         print("Los datos del curso son: \n {} \n".format(datos_curso))
@@ -236,7 +238,7 @@ def register_courses(user_id):
         
         # INSERTAR DATOS EN BD
         try:
-            curso_id = DatabaseManager_instance.insertCourseOnDB(nombre_curso, fecha_inicio, fecha_termino, mes_curso, escuela, actividad_servicio, institucion, user_id,)
+            curso_id = DatabaseManager_instance.insertCourseOnDB(nombre_curso, fecha_inicio, fecha_termino, mes_curso, escuela, actividad_servicio, institucion, user_id, totalClases)
             if curso_id:
                 if len(asistentes) > 0:
                     for asistente in asistentes:
