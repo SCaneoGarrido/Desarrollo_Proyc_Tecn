@@ -31,6 +31,7 @@ def home():
     return render_template('home.html')
 # =========== TERMINO DE RENDERIZADOR ====================== #
 
+# ESTA RUTA TE OBTIENE LA LISTA DE CURSOS
 @app.route('/app/get_courses/<user_id>', methods=['GET'])
 def get_courses(user_id):
     try:
@@ -191,6 +192,7 @@ def recive_data(user_id):
             print(f"Error: {e}")
             return jsonify({"error": "ocurrió un error al procesar el archivo"}), 400
 
+# REGISTRAR UN CURSO
 @app.route('/app/register_courses/<user_id>', methods=['POST'])
 def register_courses(user_id):
     if request.method == 'POST':
@@ -324,6 +326,7 @@ def create_user():
     else:
         return jsonify({'error':'Invalid Method'}), 400
 
+# OBTENER LA INFORMACION PARA LA PANTALLA DE USUARIO
 @app.route('/app/get_info_User/<user_id>', methods=['GET'])
 def getInfo_muniColab(user_id):
     if request.method == 'GET':
@@ -419,7 +422,7 @@ def get_list_asistances(curso_id):
         return jsonify({'error':'Invalid Method'}), 400
 
 
-
+# ESTA RUTA TE SUBE EL CERTIFICADO A LA BASE DE DATOS
 @app.route('/app/add_certification/<curso_id>/<asistente_id>', methods=['POST'])
 def add_certification(curso_id, asistente_id):
     # RUTA DE SUBIR CERTIFICADO DE CURSO
