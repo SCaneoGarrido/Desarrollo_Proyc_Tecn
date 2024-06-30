@@ -322,7 +322,6 @@ def create_user():
     else:
         return jsonify({'error':'Invalid Method'}), 400
 
-
 @app.route('/app/get_info_User/<user_id>', methods=['GET'])
 def getInfo_muniColab(user_id):
     if request.method == 'GET':
@@ -335,7 +334,6 @@ def getInfo_muniColab(user_id):
         except Exception as e:
             print(f"Error: {e}")
             return jsonify({"error": "ocurrio un error al obtener la información del usuario"}), 400
-
 
 #### RUTA DE MOTOR ANALITICO ####
 @app.route('/app/analytical_engine/<user_id>', methods=['GET'])
@@ -399,5 +397,28 @@ def analytical_engine(user_id):
     else:
         return jsonify({'error': 'Método inválido'}), 500
 
+
+# ESTA RUTA TE ENVIA LA LISTA DE ASISTENTES DE UN CURSO
+# PARAMETROS NECESARIOS: CURSO_ID
+# SE DEBE PASAR POR URL
+@app.route('/app/get_list_asistances/<curso_id>', methods=['GET'])
+def get_list_asistances(curso_id):
+    if request.method == 'GET':
+        DatabaseManager_instance = DatabaseManager()
+        if curso_id:
+            asistentes = DatabaseManager_instance.obtenerLista_asistentes(curso_id)
+
+            if asistentes is not None or len(asistentes) > 0:
+                return jsonify(asistentes), 200
+            else:
+                return jsonify({'error': 'No se encontraron asistentes para el curso'}), 404
+    else:   
+        print('Invalid Method')
+        return jsonify({'error':'Invalid Method'}), 400
+
+@app.route('/app/add_certification/<user_id>', methods=['POST'])
+def add_certification(user_id):
+    # RUTA DE SUBIR CERTIFICADO DE CURSO
+    pass
 if __name__ == '__main__':
     app.run(debug=True)
