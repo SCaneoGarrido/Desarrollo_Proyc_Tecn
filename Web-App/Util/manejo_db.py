@@ -291,7 +291,7 @@ class DatabaseManager:
     
     
     # ESTA FUNCION RECIBE EL CURSO ID ENVIADO POR EL USUARIO DESDE EL FRONT
-    # Y UNA LISTA DE ASISTENTES QUE SE VALIDO EN LA RUTA DE PRUEBA
+    # Y UNA LISTA DE ASISTENTES QUE SE VALIDA EN LA RUTA DE recive_data
     # REALIZA UN UPDATE DEL CAMPO DE ASISTENCIA DE LA TABLA asistentes
     def update_asistencia(self, cursoid, lista_id):
         try:
@@ -358,4 +358,29 @@ class DatabaseManager:
             return False
         finally:
             if conn:
-                conn.close()
+                conn.close()    
+
+    def subir_certificado(self, cursoid, certificado_file, asistente_id, file_type):
+        try:
+            conn = self.connect()
+            if conn is None:
+                print(f"Error al realizar conexion con la base de datos")
+                return False
+            
+            with conn:
+                with conn.cursor() as cursor:
+                    cursor.execute(
+                        """
+                        INSERT INTO certificados (cursoid, asistenteid, archivocertificado, file_type)
+                        VALUES (%s, %s, %s, %s)
+                        """, (cursoid, asistente_id, certificado_file, file_type)
+                    )
+                    conn.commit()
+                    return True
+        except Exception as e:
+            print(f"Error en 'subir_certificado()'\n Error: {e}")
+            return None
+        
+        finally:
+            cursor.close()
+            conn.close()

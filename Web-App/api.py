@@ -1,11 +1,13 @@
 import os
 import pandas as pd
+import numpy as np
+from Util.auxiliar_functions import *
 from flask import Flask, request, jsonify, session, render_template, url_for
 from flask_cors import CORS
 from io import BytesIO
 from Util.manejo_db import DatabaseManager
 from Util.manage_credential import CredentialsManager
-import numpy as np
+
 
 app = Flask(__name__, template_folder='templates', static_folder='static')
 app.secret_key = 'supersecretkey'  # Necesario para usar sesiones
@@ -416,9 +418,56 @@ def get_list_asistances(curso_id):
         print('Invalid Method')
         return jsonify({'error':'Invalid Method'}), 400
 
-@app.route('/app/add_certification/<user_id>', methods=['POST'])
-def add_certification(user_id):
+
+
+@app.route('/app/add_certification/<curso_id>/<asistente_id>', methods=['POST'])
+def add_certification(curso_id, asistente_id):
     # RUTA DE SUBIR CERTIFICADO DE CURSO
-    pass
+    if request.method == 'POST':
+        certificado = request.files['file']
+
+        if not curso_id or not certificado or not asistente_id:
+            return jsonify({'error': 'faltan datos'}), 400
+        
+        if 'file' not in request.files:
+            return jsonify({'error': 'no se ha proporcionado ningun archivo'}), 400
+        
+        if certificado.filename == '':
+            return jsonify({'error': 'No se ha seleccionado ningun archivo'}), 400
+
+        # Guardamos el certificado en una ruta temporal 
+        if not os.path.exists('certificados_temp'):
+            os.makedirs('certificados_temp')
+        ruta_certificado = os.path.join('certificados_temp', certificado.filename)
+        certificado.save(ruta_certificado)
+
+        try:
+            # Leer el archivo y obtener el tipo
+            file_data = read_file(ruta_certificado)
+            file_type = get_file_type(ruta_certificado)
+
+            # Instancia de DatabaseManager
+            DatabaseManager_instance = DatabaseManager()
+
+            # Insertar el archivo en la base de datos
+            success = DatabaseManager_instance.subir_certificado(curso_id, file_data, asistente_id, file_type)
+            if not success:
+                return jsonify({'error': 'Error al insertar la certificación en la base de datos'}), 500
+
+        except Exception as e:
+            print(f'Error al subir certificado de curso\n Error -> {e}')
+            return jsonify({'error': 'Internal Server Error'}), 500
+        finally:
+            # Eliminar el archivo temporal
+            os.remove(ruta_certificado)
+        
+        print(f"Datos recibidos:\n Curso UID: {curso_id}\n Asistente UID: {asistente_id}\n Certificado: {certificado.filename}")
+        return jsonify({'success': 'Se han recibido los datos correctamente'}), 200
+
+    else:
+        print("Invalid Method")
+        return jsonify({'error': 'Invalid Method'}), 405
+
+
 if __name__ == '__main__':
     app.run(debug=True)
