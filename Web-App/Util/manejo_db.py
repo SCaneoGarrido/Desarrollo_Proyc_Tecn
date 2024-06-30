@@ -298,6 +298,22 @@ class DatabaseManager:
             conn = self.connect()
             with conn:
                 with conn.cursor() as cursor:
+                    # Obtener el total de clases para el curso
+                    cursor.execute(
+                        """
+                        SELECT total_clases FROM cursos
+                        WHERE cursoid = %s
+                        """,
+                        (cursoid,)
+                    )
+                    total_clases = cursor.fetchone()
+                    
+                    if not total_clases:
+                        print(f"No se encontró el curso con id: {cursoid}")
+                        return False
+
+                    total_clases = total_clases[0]
+                    
                     for id in lista_id:
                         print(f"Procesando id -> {id} de la lista de id presentes\n")
                         # Consulta de prueba para verificar coincidencia
@@ -317,13 +333,26 @@ class DatabaseManager:
                                 UPDATE asistentes
                                 SET asistencia = COALESCE(asistencia, 0) + 1
                                 WHERE cursoid = %s AND asistenteid = %s
+                                RETURNING asistencia
                                 """,
                                 (cursoid, id)
+                            )
+                            asistencia_actualizada = cursor.fetchone()[0]
+                            # Calcular el promedio de asistencia sin redondear y convertirlo a porcentaje
+                            promedio_asistencia = (asistencia_actualizada / total_clases) * 100
+                            print(f"El promedio de asistencia es: {promedio_asistencia}%")
+                            cursor.execute(
+                                """
+                                UPDATE asistentes
+                                SET asistencia_promedio = %s
+                                WHERE cursoid = %s AND asistenteid = %s
+                                """,
+                                (promedio_asistencia, cursoid, id)
                             )
                             print(f"Filas actualizadas: {cursor.rowcount}")
                         else:
                             print(f"No se encontró coincidencia para id: {id}")
-            return True
+                return True
         except Exception as e:
             print(f"Error en 'update_asistencia()'\n Error: {e}")
             return False
