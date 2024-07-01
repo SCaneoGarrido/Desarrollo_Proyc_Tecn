@@ -1,6 +1,7 @@
 import os
 from datetime import datetime
 import psycopg2
+import math
 import pandas as pd
 from dotenv import load_dotenv
 from io import BytesIO
@@ -101,27 +102,40 @@ class DatabaseManager:
         except Exception as e:
             print(f"Error: {e}")
             return None
+    def validar_edad(self,edad):
+        if isinstance(edad, (int, float)):
+            if math.isnan(edad):
+                return None  # Convertir NaN a None
+            else:
+                return int(edad)  # Convertir a entero si es posible
+        else:
+            return None  # Manejar otros tipos de datos
 
     def CargarAsistentes_cursos(self, asistentes):
         try:
             conn = self.connect()
             cursor = conn.cursor()
+            
             for asistente in asistentes:
+                edad = self.validar_edad(asistente['EDAD'])
+                dv = asistente['DV'] if asistente['DV'] and len(str(asistente['DV'])) == 1 else None
+
                 data = (
-                    asistente['rut_noDV'],
-                    asistente['rut_DV'],
-                    asistente['nombre_completo'],
-                    asistente['telefono'],
-                    asistente['email'],
-                    asistente['genero'],
-                    asistente['edad'],
-                    asistente['nacionalidad'],
-                    asistente['comuna'],
-                    asistente['barrio'],
+                    asistente['RUT'],
+                    dv,
+                    asistente['NOMBRE Y APELLIDOS'],
+                    asistente['TELEFONO'],
+                    asistente['CORREO'],
+                    asistente['GENERO'],
+                    edad,
+                    asistente['NACION.'],
+                    asistente['COMUNA'],
+                    asistente['BARRIO'],
                     asistente['curso_id'],  # Asegúrate de tener este campo en la tupla data
                 )
                 
-                print(f"Mensaje 'CargarAsistentes_cursos' data de asistentes -> \n {data}")
+                print(f"Data a insertar: {data}")
+
                 cursor.execute("""
                     INSERT INTO asistentes (rut, digito_v, nombre, telefono, correo, genero, edad, nacionalidad, comuna, barrio, cursoid)
                     VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
@@ -289,7 +303,8 @@ class DatabaseManager:
     
     
     
-    
+    def obtenerTotalClases(self, user_id, cursoid):
+        pass
     # ESTA FUNCION RECIBE EL CURSO ID ENVIADO POR EL USUARIO DESDE EL FRONT
     # Y UNA LISTA DE ASISTENTES QUE SE VALIDA EN LA RUTA DE recive_data
     # REALIZA UN UPDATE DEL CAMPO DE ASISTENCIA DE LA TABLA asistentes

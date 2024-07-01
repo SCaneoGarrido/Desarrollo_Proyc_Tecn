@@ -95,7 +95,7 @@
                   <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                  <form id="form-inscribir-curso">
+                  <form id="form-inscribir-curso" enctype="multipart/form-data">
                     <div class="mb-3">
                       <label for="nombreCurso" class="form-label">Nombre del Curso</label>
                       <input type="text" class="form-control" id="nombreCurso" required>
@@ -148,17 +148,18 @@
                     <div class="form-group">
                         <label for="totalClases">Cantidad total de clases a impartir en el curso</label>
                         <input type="number" class="form-control" id="totalClases" name="totalClases" required>
-                      </div>
+                    </div>
 
                     <div id="asistentes-container">
-                      <h5>Asistentes</h5>
-                      <div class="accordion" id="accordionAsistentes">
-                        <!-- Aquí se añadirán los asistentes dinámicamente -->
-                      </div>
-                      
+                        <br>
+                        <h5 style="text-align: center;">Cargar Excel de formulario Google</h5>
+                        <br>
+                        <div id="inputs-container">
+                            <input type="file" name="google_form_excel" id="google-form-excel" accept=".xls,.xlsx">
+                            <button id="submit-button-course" type="submit"> Inscribir curso </button>
+                        </div>
+
                     </div>
-                    <button type="button" class="btn btn-secondary" id="add-asistente">Añadir Asistente</button>
-                    <button type="submit" class="btn btn-primary">Registrar</button>
                   </form>
                 </div>
               </div>
@@ -232,9 +233,10 @@
                 </button>
                 <div id="analisis-curso-card" class="card glass-card">
                     <div class="card-body">
-                        <h3>Resultados del Análisis</h3>
+                        <h3 id="analisis-curso-title">Resultados del Análisis</h3>
                         <div id="dataframe-container"></div>
                         <button id="clear-button" class="btn btn-primary">Limpiar</button>
+                        <button id="get-report-button" class="btn btn-primary" style="display: none;"> Obtener Reporte </button>
                     </div>
                 </div>
         </section>

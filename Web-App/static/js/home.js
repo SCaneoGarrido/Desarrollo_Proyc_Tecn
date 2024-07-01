@@ -50,6 +50,9 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // Evento de clic para agregar un asistente
+/**
+ * 
+
 document.getElementById('add-asistente').addEventListener('click', function() {
   const asistentesContainer = document.getElementById('accordionAsistentes');
   const newAsistenteId = `asistente-${Date.now()}`;
@@ -98,12 +101,12 @@ document.getElementById('add-asistente').addEventListener('click', function() {
     newAsistente.remove();
   });
 });
-
+ */
 
 // Evento de clic para registrar el curso
 document.getElementById('form-inscribir-curso').addEventListener('submit', function(e) {
   e.preventDefault();
-  
+  formData = new FormData(this);
   const nombreCurso        = document.getElementById('nombreCurso').value;
   const fechaInicio        = document.getElementById('fechaInicio').value;
   const fechaTermino       = document.getElementById('fechaTermino').value;
@@ -112,72 +115,25 @@ document.getElementById('form-inscribir-curso').addEventListener('submit', funct
   const actividad_servicio = document.getElementById('selectorAS').value;
   const institucion        = document.getElementById('institucion').value;
   const totalClases        = document.getElementById('totalClases').value; //total de clases, nuevo campo agregado
+  const google_form_excel  = document.getElementById('google-form-excel').files[0];
   const user_id            = localStorage.getItem('user_id');
-  
+ 
+  formData.append('nombre', nombreCurso);
+  formData.append('fechaInicio', fechaInicio);
+  formData.append('fechaTermino', fechaTermino);
+  formData.append('mesCurso', mes_curso);
+  formData.append('escuela', escuela);
+  formData.append('actividadServicio', actividad_servicio);
+  formData.append('institucion', institucion);
+  formData.append('totalClases', totalClases);
+  formData.append('user_id', user_id);
+  formData.append('google_form_excel', google_form_excel);
 
-  const asistentes = [];
-  document.querySelectorAll('.accordion-item').forEach(asistente => {
-    const rut          = asistente.querySelector('input[name="rut"]').value;
-    const edad         = asistente.querySelector('input[name="edad"]').value;
-    const genero       = asistente.querySelector('select[name="genero"]').value;
-    const nombre       = asistente.querySelector('input[name="nombre"]').value;
-    const apellido     = asistente.querySelector('input[name="apellido"]').value;
-    const telefono     = asistente.querySelector('input[name="telefono"]').value;
-    const email        = asistente.querySelector('input[name="email"]').value;
-    const nacionalidad = asistente.querySelector('input[name="nacionalidad"]').value;
-    const comuna       = asistente.querySelector('input[name="comuna"]').value;
-    const barrio       = asistente.querySelector('input[name="barrio"]').value;
-    
-    // TRANSFORMACIONES PARA ENVIO
-    const nombre_completo = `${nombre} ${apellido}`;
-    const [rut_noDV, rut_DV] = rut.split('-'); // AQUI SEPARE EL DIGITO VERIFICADOR DEL RUT Y LOS PUSE EN VARIABLES DISTINTAS
-
-    /**
-     * ACTUALIZACION DE VARIABLES 
-     * rut_noDV: contiene el rut sin Digito Verificador ni guion
-     * rut_DV: contiene el Digito Verificador
-     * nombre_completo: contiene el nombre completo del asistente
-     * 
-     * SE QUITA ESTADO CIVIL, NO ES NECESARIO YA QUE EL FORMATO DE ASISTENCIA NO LO CONTIENE
-     * SE QUITA DIRECCION YA QUE NO ESTA EN EL FORMATO DE ASISTENCIA
-     */
-  
-    asistentes.push({ 
-      rut_noDV, 
-      rut_DV, 
-      edad, 
-      genero, 
-      nombre_completo,  
-      telefono, 
-      email, 
-      nacionalidad, 
-      comuna, 
-      barrio 
-    });
-
-  });
-
-  const data_to_send = {
-    nombre:             nombreCurso,
-    fechaInicio:        fechaInicio,
-    fechaTermino:       fechaTermino,
-    mes_curso:          mes_curso,
-    escuela:            escuela,
-    actividad_servicio: actividad_servicio,
-    institucion:        institucion,
-    totalClases:        totalClases,
-    user_id:            user_id,
-    asistentes:         asistentes
-  };
-
-  console.log('Data para api -> ', data_to_send);
+  console.log('Data para api -> ', formData);
 
   fetch(`http://127.0.0.1:5000/app/register_courses/${user_id}`, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(data_to_send)
+    body: formData
   })
   .then(response => response.json())
   .then(data => {
@@ -193,6 +149,7 @@ document.getElementById('form-inscribir-curso').addEventListener('submit', funct
   // Cerrar el modal
   const modal = bootstrap.Modal.getInstance(document.getElementById('inscribirCursoModal'));
   modal.hide();
+
 });
 
 /// Función para obtener los cursos inscritos desde la base de datos
@@ -454,12 +411,18 @@ document.addEventListener('DOMContentLoaded', function() {
   const courseModal = document.getElementById('courseModal');
   courseModal.addEventListener('show.bs.modal', fetchCourses);
 
+
+  /**
+   * EDITAR ESTE ANALITICO
+   * 
+   */
   // Manejar el clic en el botón "Analizar"
   document.getElementById('analyzeButton').addEventListener('click', function() {
       if (selectedCourseId) {
           const user_id = localStorage.getItem('user_id');
           const url = `/app/analytical_engine/${user_id}?cursoID=${selectedCourseId}`;
           const dataframe_container = document.getElementById('dataframe-container');
+          const get_report_button = document.getElementById('get-report-button');
           fetch(url, {
               method: 'GET',
               headers: {
@@ -470,7 +433,10 @@ document.addEventListener('DOMContentLoaded', function() {
           .then(data => {
               if (data.success) {
                   console.log('Análisis completado con éxito');
+                   
                   dataframe_container.innerHTML = data.dataframe;
+                  get_report_button.style.display = 'block';
+                  
               } else {
                   console.error('Error en el análisis:', data.error);
               }

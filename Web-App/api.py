@@ -7,6 +7,7 @@ from flask_cors import CORS
 from io import BytesIO
 from Util.manejo_db import DatabaseManager
 from Util.manage_credential import CredentialsManager
+from Class.EDA_REPORT import EDA_REPORT
 
 
 app = Flask(__name__, template_folder='templates', static_folder='static')
@@ -195,69 +196,73 @@ def recive_data(user_id):
 # REGISTRAR UN CURSO
 @app.route('/app/register_courses/<user_id>', methods=['POST'])
 def register_courses(user_id):
+    # AGREGAR LÓGICA PARA SUBIR ASISTENTES
     if request.method == 'POST':
-        data = request.get_json()
-
-        DatabaseManager_instance = DatabaseManager()
-
-        # OBTENER DATOS PARA EL REGISTRO DEL CURSO
-        nombre_curso        = data.get('nombre')
-        fecha_inicio        = data.get('fechaInicio')
-        fecha_termino       = data.get('fechaTermino')
-        mes_curso           = data.get('mes_curso')
-        escuela             = data.get('escuela')
-        actividad_servicio  = data.get('actividad_servicio')
-        institucion         = data.get('institucion')
-        totalClases         = data.get('totalClases')       
-        user_id             = data.get('user_id')  # ESTO ES PARA VINCULAR AL COLABORADOR DE MUNICIPALIDAD CON EL CURSO QUE REGISTRÓ.
-
-        # OBTENER DATOS DE ASISTENTES
-        asistentes = data.get('asistentes', [])
-
-        # COMPROBAR DATOS DE CURSOS
-        if not nombre_curso or not fecha_inicio or not fecha_termino or not escuela or not actividad_servicio or not institucion or not mes_curso or not totalClases:
-            return jsonify({"error": "faltan datos del curso"}), 400
-        if not user_id:
-            return jsonify({"error": "faltan datos del colaborador"}), 400
-
-        # COMPROBAR DATOS DE ASISTENTES
-        if len(asistentes) == 0:
-            print("No hay asistentes, lista vacia \n lista -> {} \n".format(asistentes))
-            return jsonify({"error": "No se ingresaron asistentes"}), 400
-        
-        # MOSTREMOS LOS DATOS
-        datos_curso = {
-            'nombre':               nombre_curso,
-            'fechaInicio':          fecha_inicio,
-            'fechaTermino':         fecha_termino,
-            'mes_curso':            mes_curso,
-            'escuela':              escuela,
-            'actividad_servicio':   actividad_servicio,
-            'institucion':          institucion,
-            'totalClases':          totalClases
-        }
-
-        print("Los datos del curso son: \n {} \n".format(datos_curso))
-        print("Los datos de los asistentes son: \n {} \n".format(asistentes))
-        
-        # INSERTAR DATOS EN BD
         try:
-            curso_id = DatabaseManager_instance.insertCourseOnDB(nombre_curso, fecha_inicio, fecha_termino, mes_curso, escuela, actividad_servicio, institucion, user_id, totalClases)
+            # Instancia de DatabaseManager
+            DatabaseManager_instance = DatabaseManager()
+
+            # OBTENER DATOS PARA EL REGISTRO DEL CURSO
+            nombre_curso = request.form.get('nombre')
+            fecha_inicio = request.form.get('fechaInicio')
+            fecha_termino = request.form.get('fechaTermino')
+            mes_curso = request.form.get('mesCurso')
+            escuela = request.form.get('escuela')
+            actividad_servicio = request.form.get('actividadServicio')
+            institucion = request.form.get('institucion')
+            totalClases = request.form.get('totalClases')
+            user_id = request.form.get('user_id')
+            google_form_excel = request.files.get('google_form_excel')
+
+            # Validar si no se ha subido el archivo de Excel
+            if 'google_form_excel' not in request.files:
+                print(f"Falta excel de asistentes \n Data ingresada: {request.files['google_form_excel']}")
+                return jsonify({"error": "faltan datos del excel de asistentes"}), 400
+
+            # Crear directorio temporal si no existe
+            if not os.path.exists('temp'):
+                os.makedirs('temp')
+
+            # Guardar el archivo de Excel en el directorio temporal
+            ruta_archivo = os.path.join('temp', google_form_excel.filename)
+            google_form_excel.save(ruta_archivo)
+
+            # Leer el archivo de Excel y seleccionar las columnas deseadas
+            dataframe_asistentes = pd.read_excel(ruta_archivo)
+            columnas_seleccionadas = ['RUT', 'DV', 'NOMBRE Y APELLIDOS', 'TELEFONO', 'CORREO',
+                                      'GENERO', 'EDAD', 'NACION.', 'COMUNA', 'BARRIO']
+            df_column_asistentes = dataframe_asistentes[columnas_seleccionadas]
+
+            # Convertir el DataFrame de pandas a una lista de diccionarios
+            asistentes = df_column_asistentes.to_dict(orient='records')
+
+
+            # Comprobar datos de asistentes
+            if not asistentes:
+                print("No se ingresaron asistentes")
+                return jsonify({"error": "No se ingresaron asistentes"}), 400
+
+            # INSERTAR DATOS EN BD
+            curso_id = DatabaseManager_instance.insertCourseOnDB(nombre_curso, fecha_inicio, fecha_termino,
+                                                                 mes_curso, escuela, actividad_servicio,
+                                                                 institucion, user_id, totalClases)
             if curso_id:
-                if len(asistentes) > 0:
-                    for asistente in asistentes:
-                        asistente['curso_id'] = curso_id  # aquí agrego una nueva clave 'curso_id' al diccionario 'asistente'
-                    if DatabaseManager_instance.CargarAsistentes_cursos(asistentes):
-                        return jsonify({"message":"Curso y asistentes registrados"}), 200
-                    else:
-                        return jsonify({"message":"Ocurrio un error al registrar asistentes"}), 400
+                # Agregar curso_id a cada asistente
+                for asistente in asistentes:
+                    asistente['curso_id'] = curso_id
+
+                # Cargar asistentes en la base de datos
+                if DatabaseManager_instance.CargarAsistentes_cursos(asistentes):
+                    return jsonify({"message": "Curso y asistentes registrados"}), 200
                 else:
-                    return jsonify({"message":"Curso cargado correctamente pero no se proporcionaron asistentes"}), 200
+                    return jsonify({"message": "Ocurrió un error al registrar asistentes"}), 400
             else:
-                return jsonify({"message":"Ocurrio un error al registrar el curso"}), 400
+                return jsonify({"message": "Ocurrió un error al registrar el curso"}), 400
+
         except Exception as e:
             print(f"Error: {e}")
-            return jsonify({"error": str(e)}), 500  # Devuelve el error como respuesta HTTP 500
+            return jsonify({"error": str(e)}), 500
+
     else:
         return jsonify({"error": "Invalid Method"}), 400
         
@@ -346,7 +351,7 @@ def analytical_engine(user_id):
     if request.method == 'GET':
         cursoID = request.args.get('cursoID')  # Obtener el cursoID de los parámetros de la solicitud
         DatabaseManager_instance = DatabaseManager()  # Instancia de DatabaseManager
-        
+        print(cursoID)
         # transformar el CURSO ID A INT
         cursoID = int(cursoID)
         # 1.- Recibimos tanto el User_ID como el Curso_ID.
@@ -378,14 +383,14 @@ def analytical_engine(user_id):
                 """)
                 print(f"ripo de datos lista asistentes.\n {type(lista_asistentes)}")
 
-                # Crear un DataFrame con los datos de asistencia
+                # Crear un DataFrame con los datos de asistencia (usar este)
                 df_asistencia = pd.DataFrame(lista_asistentes, columns=column_names)
                 
                 # Verificar si la columna 'asistencia' existe en el DataFrame
                 if 'asistencia' not in df_asistencia.columns:
                     df_asistencia['asistencia'] = np.nan  # Inicializar la columna 'asistencia' con NaN si no existe
-                
-                # Agregar la columna 'asistencia' con los datos de asistencia
+                    
+                # Agregar la columna 'asistencia' con los datos de asistencia 
                 df_asistencia['asistencia'] = df_asistencia['asistencia'].apply(lambda x: 'Presente' if pd.notna(x) and isinstance(x, (int, float)) else np.nan)
                 
                 print(f"DataFrame de asistencia:\n{df_asistencia}")
