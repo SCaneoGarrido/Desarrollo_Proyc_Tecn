@@ -459,6 +459,7 @@ document.addEventListener('DOMContentLoaded', function() {
       if (selectedCourseId) {
           const user_id = localStorage.getItem('user_id');
           const url = `/app/analytical_engine/${user_id}?cursoID=${selectedCourseId}`;
+          const dataframe_container = document.getElementById('dataframe-container');
           fetch(url, {
               method: 'GET',
               headers: {
@@ -469,7 +470,7 @@ document.addEventListener('DOMContentLoaded', function() {
           .then(data => {
               if (data.success) {
                   console.log('Análisis completado con éxito');
-                  // Aquí puedes manejar la respuesta del análisis, por ejemplo, mostrar resultados en la página
+                  dataframe_container.innerHTML = data.dataframe;
               } else {
                   console.error('Error en el análisis:', data.error);
               }
