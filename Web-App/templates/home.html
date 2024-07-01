@@ -222,7 +222,6 @@
                 </div>
             </div>
         </section>
-
         <!-- Sección de Análisis Cursos -->
         <section id="analisis-cursos" class="section" style="display:none;">
             <div class="container">
@@ -230,9 +229,15 @@
                 <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#courseModal">
                     Ver Cursos
                 </button>
-                <p>Selecciona un curso para ver el análisis.</p>
-            </div>
+                <div id="analisis-curso-card" class="card glass-card">
+                    <div class="card-body">
+                        <h3>Resultados del Análisis</h3>
+                        <div id="dataframe-container"></div>
+                        <button id="clear-button" class="btn btn-primary">Limpiar</button>
+                    </div>
+                </div>
         </section>
+
         <!-- Modal para Seleccionar Curso -->
         <div class="modal fade" id="courseModal" tabindex="-1" aria-labelledby="courseModalLabel" aria-hidden="true">
             <div class="modal-dialog">

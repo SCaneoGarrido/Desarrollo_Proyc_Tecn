@@ -390,7 +390,10 @@ def analytical_engine(user_id):
                 
                 print(f"DataFrame de asistencia:\n{df_asistencia}")
 
-                return jsonify({'success': 'Ok'})
+                # Convertir el DataFrame a HTML
+                df_html = df_asistencia.to_html(classes='table table-bordered table-striped')
+                return jsonify({'success': 'Ok', 'dataframe': df_html})
+
             else:
                 print("No se encontro el curso solicitado asociado al usuario")
                 return jsonify({"error":"No se encontro el curso solicitado o no se encontro en la base de datos"}), 404
