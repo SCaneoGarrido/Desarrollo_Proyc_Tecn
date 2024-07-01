@@ -17,7 +17,7 @@ function showSection(sectionId) {
 function hideProfileElements() {
   const profileElements = document.querySelectorAll('#perfil *');
   profileElements.forEach(element => {
-      element.style.display = 'none';
+    element.style.display = 'none';
   });
 }
 
@@ -25,23 +25,23 @@ function hideProfileElements() {
 function showProfileElements() {
   const profileElements = document.querySelectorAll('#perfil *');
   profileElements.forEach(element => {
-      element.style.display = 'block';
+    element.style.display = 'block';
   });
 }
 
 // Eventos de clic para los enlaces de la barra de navegación
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
   document.querySelectorAll('.nav-link').forEach(item => {
-      item.addEventListener('click', function(e) {
-          e.preventDefault(); // Previene el comportamiento por defecto de los enlaces
-          const sectionId = this.getAttribute('href').substring(1); // Obtiene el ID de la sección desde el href del enlace
-          showSection(sectionId);
-          if (sectionId === 'perfil') {
-              showProfileElements();
-          } else {
-              hideProfileElements();
-          }
-      });
+    item.addEventListener('click', function (e) {
+      e.preventDefault(); // Previene el comportamiento por defecto de los enlaces
+      const sectionId = this.getAttribute('href').substring(1); // Obtiene el ID de la sección desde el href del enlace
+      showSection(sectionId);
+      if (sectionId === 'perfil') {
+        showProfileElements();
+      } else {
+        hideProfileElements();
+      }
+    });
   });
 
   // Mostrar la sección de landing page por defecto al cargar la página
@@ -104,20 +104,20 @@ document.getElementById('add-asistente').addEventListener('click', function() {
  */
 
 // Evento de clic para registrar el curso
-document.getElementById('form-inscribir-curso').addEventListener('submit', function(e) {
+document.getElementById('form-inscribir-curso').addEventListener('submit', function (e) {
   e.preventDefault();
   formData = new FormData(this);
-  const nombreCurso        = document.getElementById('nombreCurso').value;
-  const fechaInicio        = document.getElementById('fechaInicio').value;
-  const fechaTermino       = document.getElementById('fechaTermino').value;
-  const mes_curso          = document.getElementById('selectorMES').value;
-  const escuela            = document.getElementById('escuela').value;
+  const nombreCurso = document.getElementById('nombreCurso').value;
+  const fechaInicio = document.getElementById('fechaInicio').value;
+  const fechaTermino = document.getElementById('fechaTermino').value;
+  const mes_curso = document.getElementById('selectorMES').value;
+  const escuela = document.getElementById('escuela').value;
   const actividad_servicio = document.getElementById('selectorAS').value;
-  const institucion        = document.getElementById('institucion').value;
-  const totalClases        = document.getElementById('totalClases').value; //total de clases, nuevo campo agregado
-  const google_form_excel  = document.getElementById('google-form-excel').files[0];
-  const user_id            = localStorage.getItem('user_id');
- 
+  const institucion = document.getElementById('institucion').value;
+  const totalClases = document.getElementById('totalClases').value; //total de clases, nuevo campo agregado
+  const google_form_excel = document.getElementById('google-form-excel').files[0];
+  const user_id = localStorage.getItem('user_id');
+
   formData.append('nombre', nombreCurso);
   formData.append('fechaInicio', fechaInicio);
   formData.append('fechaTermino', fechaTermino);
@@ -135,14 +135,14 @@ document.getElementById('form-inscribir-curso').addEventListener('submit', funct
     method: 'POST',
     body: formData
   })
-  .then(response => response.json())
-  .then(data => {
-    alert(data.message || data.error);
-  })
-  .catch(error => {
-    console.error("Error en la solicitud:", error);
-    alert("Error al registrar el curso. Por favor, intente nuevamente.");
-  });
+    .then(response => response.json())
+    .then(data => {
+      alert(data.message || data.error);
+    })
+    .catch(error => {
+      console.error("Error en la solicitud:", error);
+      alert("Error al registrar el curso. Por favor, intente nuevamente.");
+    });
 
   // Limpiar el formulario
   this.reset();
@@ -157,17 +157,17 @@ function cargarCursos() {
   const user_id = localStorage.getItem('user_id');
   const div_cursos = document.getElementById('cursos-lista');
   fetch(`http://127.0.0.1:5000/app/get_courses/${user_id}`)
-  .then(response => response.json())
-  .then(data => {
+    .then(response => response.json())
+    .then(data => {
       console.log(data);
       // Limpiar cualquier contenido previo
       div_cursos.innerHTML = '';
 
       if (data.cursos && data.cursos.length > 0) {
-          data.cursos.forEach(course => {
-              const courseItem = document.createElement('div');
-              courseItem.className = 'course-item card mb-3';
-              courseItem.innerHTML = `
+        data.cursos.forEach(course => {
+          const courseItem = document.createElement('div');
+          courseItem.className = 'course-item card mb-3';
+          courseItem.innerHTML = `
                   <div class="card-body">
                       <h3 class="card-title">${course[1]}</h3>
                       <p class="card-text"><strong>UID del curso: </strong> ${course[0]}</p>
@@ -180,16 +180,16 @@ function cargarCursos() {
                       <p class="card-text"><strong>Cantidad total de clases: </strong> ${course[9]}</p>
                   </div>
               `;
-              div_cursos.appendChild(courseItem);
-          });
+          div_cursos.appendChild(courseItem);
+        });
       } else {
-          div_cursos.textContent = 'No hay cursos inscritos.';
+        div_cursos.textContent = 'No hay cursos inscritos.';
       }
-  })
-  .catch(error => {
+    })
+    .catch(error => {
       console.error(error);
       div_cursos.textContent = 'Error al cargar los cursos.';
-  });
+    });
 }
 
 // Llamar a la función para cargar los cursos al cargar la página
@@ -200,40 +200,40 @@ function cargarCursos_modal() {
 
   if (userID) {
     fetch(`/app/get_courses/${userID}`)
-    .then(response => response.json())
-    .then(data => {
-      cursoSeleccionado = document.getElementById('cursoSeleccionado');
-      cursoSeleccionado.innerHTML = '';
+      .then(response => response.json())
+      .then(data => {
+        cursoSeleccionado = document.getElementById('cursoSeleccionado');
+        cursoSeleccionado.innerHTML = '';
 
-      if (data.cursos && data.cursos.length > 0) {
-        data.cursos.forEach(curso => {
-          const [id, nombre] = curso;
-          const option = document.createElement('option');
-          option.style = 'color: black;';
-          option.value = id;
-          option.textContent = nombre;
-          option.textContent = `${nombre} UID -> (${id})`;
-          cursoSeleccionado.appendChild(option);
-        })
-      }
-    })
-    .catch(error => console.error(error));
+        if (data.cursos && data.cursos.length > 0) {
+          data.cursos.forEach(curso => {
+            const [id, nombre] = curso;
+            const option = document.createElement('option');
+            option.style = 'color: black;';
+            option.value = id;
+            option.textContent = nombre;
+            option.textContent = `${nombre} UID -> (${id})`;
+            cursoSeleccionado.appendChild(option);
+          })
+        }
+      })
+      .catch(error => console.error(error));
   }
 }
 
 let archivoExcelGlobal = null; // Variable global para almacenar el archivo Excel
 
 // Manejar el formulario de carga de excels
-document.getElementById('form-cargar-excels').addEventListener('submit', function(e) {
+document.getElementById('form-cargar-excels').addEventListener('submit', function (e) {
   e.preventDefault();
   const archivoExcel = document.getElementById('archivoExcel').files[0];
   const uploadStatus = document.getElementById('upload-status');
-  
+
 
   if (!archivoExcel) {
-      uploadStatus.textContent = "Por favor, selecciona un archivo.";
-      uploadStatus.style.color = "#dc3545";
-      return;
+    uploadStatus.textContent = "Por favor, selecciona un archivo.";
+    uploadStatus.style.color = "#dc3545";
+    return;
   }
 
   uploadStatus.textContent = "Archivo cargado y listo para vincular.";
@@ -248,20 +248,20 @@ document.getElementById('form-cargar-excels').addEventListener('submit', functio
 });
 
 // Manejar el formulario de selección de curso
-document.getElementById('form-seleccionar-curso').addEventListener('submit', function(e) {
+document.getElementById('form-seleccionar-curso').addEventListener('submit', function (e) {
   e.preventDefault();
   const cursoSeleccionado = document.getElementById('cursoSeleccionado').value;
   const uploadStatus = document.getElementById('upload-status');
   const userID = localStorage.getItem('user_id');
 
   if (cursoSeleccionado === '') {
-      alert('Por favor, seleccione un curso.');
-      return;
+    alert('Por favor, seleccione un curso.');
+    return;
   }
 
   if (!archivoExcelGlobal) {
-      alert('Por favor, cargue un archivo antes de seleccionar un curso.');
-      return;
+    alert('Por favor, cargue un archivo antes de seleccionar un curso.');
+    return;
   }
 
   const formData = new FormData();
@@ -269,57 +269,57 @@ document.getElementById('form-seleccionar-curso').addEventListener('submit', fun
   formData.append("cursoId", cursoSeleccionado);
 
   fetch(`/app/recive_data/${userID}`, {
-      method: 'POST',
-      body: formData
+    method: 'POST',
+    body: formData
   })
-  .then(response => {
+    .then(response => {
       if (!response.ok) {
-          throw new Error('Error en la solicitud');
+        throw new Error('Error en la solicitud');
       }
       return response.json();
-  })
-  .then(data => {
+    })
+    .then(data => {
       if (data.success) {
-          // Cerrar el modal
-          const modal = bootstrap.Modal.getInstance(document.getElementById('seleccionarCursoModal'));
-          modal.hide();
-          // Mostrar el archivo cargado en el frontend
-          const excelPreview = document.getElementById('excel-preview');
-          excelPreview.innerHTML = data.data; // Asumiendo que `data.data` contiene el HTML del archivo Excel
-          alert('Archivo vinculado exitosamente al curso.');
-          // Agregar botón para limpiar y cargar otro archivo
-          const limpiarBtn = document.createElement('button');
-          limpiarBtn.textContent = 'Limpiar y cargar otro archivo';
-          limpiarBtn.className = 'btn btn-warning';
-          limpiarBtn.id = 'limpiar-btn'; // Asignar un ID al botón
-          limpiarBtn.addEventListener('click', function() {
-              excelPreview.innerHTML = '';
-              document.getElementById('archivoExcel').value = '';
-              uploadStatus.textContent = '';
-              archivoExcelGlobal = null; // Limpiar la variable global
-              // Ocultar el botón "Limpiar y cargar otro archivo"
-              limpiarBtn.style.display = 'none';
-              // Volver a mostrar el botón "Cargar"
-              document.getElementById('cargar-btn').style.display = 'block';
-          });
-          // Añadir el botón "Limpiar y cargar otro archivo" al contenedor
-          const buttonContainer = document.getElementById('button-container');
-          buttonContainer.appendChild(limpiarBtn);
-          // Ocultar el botón "Cargar"
-          document.getElementById('cargar-btn').style.display = 'none';
+        // Cerrar el modal
+        const modal = bootstrap.Modal.getInstance(document.getElementById('seleccionarCursoModal'));
+        modal.hide();
+        // Mostrar el archivo cargado en el frontend
+        const excelPreview = document.getElementById('excel-preview');
+        excelPreview.innerHTML = data.data; // Asumiendo que `data.data` contiene el HTML del archivo Excel
+        alert('Archivo vinculado exitosamente al curso.');
+        // Agregar botón para limpiar y cargar otro archivo
+        const limpiarBtn = document.createElement('button');
+        limpiarBtn.textContent = 'Limpiar y cargar otro archivo';
+        limpiarBtn.className = 'btn btn-warning';
+        limpiarBtn.id = 'limpiar-btn'; // Asignar un ID al botón
+        limpiarBtn.addEventListener('click', function () {
+          excelPreview.innerHTML = '';
+          document.getElementById('archivoExcel').value = '';
+          uploadStatus.textContent = '';
+          archivoExcelGlobal = null; // Limpiar la variable global
+          // Ocultar el botón "Limpiar y cargar otro archivo"
+          limpiarBtn.style.display = 'none';
+          // Volver a mostrar el botón "Cargar"
+          document.getElementById('cargar-btn').style.display = 'block';
+        });
+        // Añadir el botón "Limpiar y cargar otro archivo" al contenedor
+        const buttonContainer = document.getElementById('button-container');
+        buttonContainer.appendChild(limpiarBtn);
+        // Ocultar el botón "Cargar"
+        document.getElementById('cargar-btn').style.display = 'none';
       } else {
-          alert('Error al vincular el archivo al curso.');
+        alert('Error al vincular el archivo al curso.');
       }
-  })
-  .catch(error => {
+    })
+    .catch(error => {
       console.error(error);
       alert('Error al vincular el archivo al curso.');
-  });
-}); 
+    });
+});
 
 
 // Redirigir a la sección de inscripción de cursos
-document.getElementById('irAInscribirCurso').addEventListener('click', function() {
+document.getElementById('irAInscribirCurso').addEventListener('click', function () {
   const modal = bootstrap.Modal.getInstance(document.getElementById('seleccionarCursoModal'));
   modal.hide();
   showSection('cursos');
@@ -339,70 +339,70 @@ document.getElementById('irAInscribirCurso').addEventListener('click', function(
 */
 
 /// Manejar carga de datos de usuarios en seccion de usuarios
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
   // verificar un user_id en localstorage
   const userId = localStorage.getItem('user_id');
 
   if (userId) {
-      // si este existe hacemos una peticion a la API
-      fetch(`http://127.0.0.1:5000/app/get_info_User/${userId}`)
-          .then(response => response.json())
-          .then(data => {
-              console.log(data);
+    // si este existe hacemos una peticion a la API
+    fetch(`http://127.0.0.1:5000/app/get_info_User/${userId}`)
+      .then(response => response.json())
+      .then(data => {
+        console.log(data);
 
-              // Verificar si data.info existe y no está vacío
-              if (data.info) {
-                  const userInfo = data.info;
-                  document.getElementById('nombreUsuario').textContent = userInfo[1];
-                  document.getElementById('apellidoUsuario').textContent = userInfo[2];
-                  document.getElementById('emailUsuario').textContent = userInfo[0];
-                  document.getElementById('perfil').style.display = 'block'; // Mostrar la sección de perfil
-              } else {
-                  console.error('No se encontró información del usuario.');
-              }
-          })
-          .catch(error => console.error('Error al obtener la información del usuario:', error));
+        // Verificar si data.info existe y no está vacío
+        if (data.info) {
+          const userInfo = data.info;
+          document.getElementById('nombreUsuario').textContent = userInfo[1];
+          document.getElementById('apellidoUsuario').textContent = userInfo[2];
+          document.getElementById('emailUsuario').textContent = userInfo[0];
+          document.getElementById('perfil').style.display = 'block'; // Mostrar la sección de perfil
+        } else {
+          console.error('No se encontró información del usuario.');
+        }
+      })
+      .catch(error => console.error('Error al obtener la información del usuario:', error));
   }
 });
 
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
   let selectedCourseId = null;
 
   // Función para obtener los cursos desde la base de datos
   function fetchCourses() {
-      const user_id = localStorage.getItem('user_id');
-      fetch(`/app/get_courses/${user_id}`, {
-          method: 'GET',
-          headers: {
-              'Content-Type': 'application/json'
-          }
-      })
+    const user_id = localStorage.getItem('user_id');
+    fetch(`/app/get_courses/${user_id}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
       .then(response => response.json())
       .then(data => {
-          if (data.cursos) {
-              const courseList = document.getElementById('courseList');
-              courseList.innerHTML = ''; // Limpiar la lista antes de llenarla
-              data.cursos.forEach(course => {
-                  const listItem = document.createElement('li');
-                  listItem.classList.add('list-group-item');
-                  listItem.textContent = course[1]; // Asumiendo que el nombre del curso está en la segunda posición
-                  listItem.dataset.courseId = course[0]; // Asignar el curso_id al elemento
-                  listItem.addEventListener('click', function() {
-                      // Remover la clase 'selected' de todos los elementos
-                      document.querySelectorAll('.list-group-item').forEach(item => {
-                          item.classList.remove('selected');
-                      });
-                      // Agregar la clase 'selected' al elemento clicado
-                      this.classList.add('selected');
-                      selectedCourseId = this.dataset.courseId;
-                      console.log('Curso seleccionado ID:', selectedCourseId);
-                      document.getElementById('analyzeButton').disabled = false; // Habilitar el botón "Analizar"
-                  });
-                  courseList.appendChild(listItem);
+        if (data.cursos) {
+          const courseList = document.getElementById('courseList');
+          courseList.innerHTML = ''; // Limpiar la lista antes de llenarla
+          data.cursos.forEach(course => {
+            const listItem = document.createElement('li');
+            listItem.classList.add('list-group-item');
+            listItem.textContent = course[1]; // Asumiendo que el nombre del curso está en la segunda posición
+            listItem.dataset.courseId = course[0]; // Asignar el curso_id al elemento
+            listItem.addEventListener('click', function () {
+              // Remover la clase 'selected' de todos los elementos
+              document.querySelectorAll('.list-group-item').forEach(item => {
+                item.classList.remove('selected');
               });
-          } else {
-              console.error('No hay cursos registrados');
-          }
+              // Agregar la clase 'selected' al elemento clicado
+              this.classList.add('selected');
+              selectedCourseId = this.dataset.courseId;
+              console.log('Curso seleccionado ID:', selectedCourseId);
+              document.getElementById('analyzeButton').disabled = false; // Habilitar el botón "Analizar"
+            });
+            courseList.appendChild(listItem);
+          });
+        } else {
+          console.error('No hay cursos registrados');
+        }
       })
       .catch(error => console.error('Error al obtener los cursos:', error));
   }
@@ -417,31 +417,37 @@ document.addEventListener('DOMContentLoaded', function() {
    * 
    */
   // Manejar el clic en el botón "Analizar"
-  document.getElementById('analyzeButton').addEventListener('click', function() {
-      if (selectedCourseId) {
-          const user_id = localStorage.getItem('user_id');
-          const url = `/app/analytical_engine/${user_id}?cursoID=${selectedCourseId}`;
-          const dataframe_container = document.getElementById('dataframe-container');
-          const get_report_button = document.getElementById('get-report-button');
-          fetch(url, {
-              method: 'GET',
-              headers: {
-                  'Content-Type': 'application/json'
-              }
-          })
-          .then(response => response.json())
-          .then(data => {
-              if (data.success) {
-                  console.log('Análisis completado con éxito');
-                   
-                  dataframe_container.innerHTML = data.dataframe;
-                  get_report_button.style.display = 'block';
-                  
-              } else {
-                  console.error('Error en el análisis:', data.error);
-              }
-          })
-          .catch(error => console.error('Error al llamar al motor analítico:', error));
-      }
+  document.getElementById('analyzeButton').addEventListener('click', function () {
+    if (selectedCourseId) {
+      const user_id = localStorage.getItem('user_id');
+      const url = `/app/analytical_engine/${user_id}?cursoID=${selectedCourseId}`;
+      const dataframe_container = document.getElementById('dataframe-container');
+      const get_report_button = document.getElementById('get-report-button');
+      fetch(url, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            console.log('Análisis completado con éxito');
+            get_report_button.style.display = 'block';
+            dataframe_container.innerHTML = "<p>Analisis completo</p>"
+            get_report_button.addEventListener('click', function () {
+              const newWindow = window.open('', '_blank');
+              newWindow.document.write('<html><head><title>Información de Base de Datos</title></head><body>');
+              newWindow.document.write(data.dataframe);
+              newWindow.document.write('</body></html>');
+            });
+
+
+          } else {
+            console.error('Error en el análisis:', data.error);
+          }
+        })
+        .catch(error => console.error('Error al llamar al motor analítico:', error));
+    }
   });
 });
