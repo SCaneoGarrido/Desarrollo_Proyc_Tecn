@@ -4,7 +4,7 @@ function hideAllSections() {
   document.getElementById('cursos').style.display = 'none';
   document.getElementById('cargar-excels').style.display = 'none';
   document.getElementById('analisis-cursos').style.display = 'none';
-  document.getElementById('seleccionar-curso').style.display = 'none';
+  document.getElementById('certificado').style.display = 'none';
   document.getElementById('perfil').style.display = 'none';
 }
 
@@ -412,43 +412,74 @@ document.addEventListener('DOMContentLoaded', function () {
 
 });
 
-document.addEventListener('DOMContentLoaded', function() {
-  const seleccionarCursoForm = document.getElementById('seleccionar-curso-form');
-  const cursoSelect = document.getElementById('curso-select');
-  const mostrarAsistentesSection = document.getElementById('mostrar-asistentes');
-  const asistentesLista = document.getElementById('asistentes-lista');
-  const cargarCertificadoForm = document.getElementById('cargar-certificado-form');
 
-  // Manejar envío del formulario de seleccionar curso
-  seleccionarCursoForm.addEventListener('submit', function(event) {
-      event.preventDefault();
-      const selectedCourseId = cursoSelect.value;
+document.addEventListener('DOMContentLoaded', function () {
+  const user_id = localStorage.getItem('user_id');
+  const selectCurso = document.getElementById('select-curso-uid');
+  const selectAsistente = document.getElementById('select-asistente-uid');
+  const obtenerAsistentesBtn = document.getElementById('obtener-asistentes-btn');
 
-      // Simulación de respuesta exitosa del servidor después de 1 segundo (para prueba)
-      setTimeout(() => {
-          // Mostrar la sección de mostrar asistentes y carga de archivos
-          mostrarAsistentesSection.style.display = 'block';
-          // Ocultar la sección de seleccionar curso
-          seleccionarCursoForm.parentElement.style.display = 'none';
-
-          // Simulación de lista de asistentes (añadir elementos de prueba)
-          const mockAsistentes = ['Asistente 1', 'Asistente 2', 'Asistente 3'];
-          asistentesLista.innerHTML = '';
-          mockAsistentes.forEach(asistente => {
-              const li = document.createElement('li');
-              li.textContent = asistente;
-              asistentesLista.appendChild(li);
+  // Función para obtener los cursos desde la API
+  function cargarCursos() {
+      fetch(`http://127.0.0.1:5000/app/get_courses/${user_id}`)
+          .then(response => response.json())
+          .then(data => {
+              if (data.cursos && data.cursos.length > 0) {
+                  data.cursos.forEach(course => {
+                      const option = document.createElement('option');
+                      option.value = course[0]; // Asumiendo que el primer elemento es el UID del curso
+                      option.textContent = `Curso: ${course[1]}`; // Asumiendo que el segundo elemento es el nombre del curso
+                      selectCurso.appendChild(option);
+                  });
+              } else {
+                  alert(data.error || "No hay cursos registrados");
+              }
+          })
+          .catch(error => {
+              console.error("Error al obtener los cursos:", error);
+              alert("Ocurrió un error al obtener los cursos. Por favor, intente nuevamente.");
           });
+  }
 
-          // Lógica para manejar el envío del formulario de cargar archivo
-          cargarCertificadoForm.addEventListener('submit', function(event) {
-              event.preventDefault();
-              const formData = new FormData(cargarCertificadoForm);
-              // Aquí se enviaría formData al servidor para procesar el archivo
-              console.log('Formulario enviado con éxito:', formData);
-              // Puedes agregar lógica adicional para procesar la respuesta del servidor
-          });
-      }, 1000); // Tiempo de espera simulado de 1 segundo
+  // Llamar a la función para cargar los cursos al cargar la página
+  cargarCursos();
+
+  // Evento para manejar la obtención de asistentes
+  obtenerAsistentesBtn.addEventListener('click', function () {
+      const selectedCurso = selectCurso.value;
+      if (selectedCurso) {
+          fetch(`http://127.0.0.1:5000/app/get_list_asistances/${selectedCurso}`)
+              .then(response => response.json())
+              .then(data => {
+                  if (data.length > 0) {
+                      selectAsistente.innerHTML = ''; // Limpiar opciones previas
+                      data.forEach(asistente => {
+                          const option = document.createElement('option');
+                          option.value = asistente.id; // Asumiendo que el asistente tiene un campo 'id'
+                          option.textContent = asistente.nombre; // Asumiendo que el asistente tiene un campo 'nombre'
+                          selectAsistente.appendChild(option);
+                      });
+                      document.getElementById('select-asistente-container').style.display = 'block';
+                  } else {
+                      alert("No se encontraron asistentes para el curso seleccionado");
+                  }
+              })
+              .catch(error => {
+                  console.error("Error al obtener los asistentes:", error);
+                  alert("Ocurrió un error al obtener los asistentes. Por favor, intente nuevamente.");
+              });
+      } else {
+          alert("Por favor, seleccione un curso primero.");
+      }
+  });
+
+  // Evento para manejar la selección de un asistente
+  selectAsistente.addEventListener('change', function () {
+      const selectedAsistente = this.value;
+      if (selectedAsistente) {
+          document.getElementById('upload-file-container').style.display = 'block';
+      } else {
+          document.getElementById('upload-file-container').style.display = 'none';
+      }
   });
 });
-

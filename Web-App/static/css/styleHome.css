@@ -389,3 +389,41 @@ button {
 .btn-secondary {
     background-color: #00c853; /* Verde */
 }
+
+#certificado {
+    padding: 20px;
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    margin-top: 20px;
+}
+
+/* Estilos para los contenedores */
+#select-curso-container,
+#select-asistente-container,
+#upload-file-container {
+    margin-bottom: 15px;
+}
+
+/* Estilos para las etiquetas */
+#certificado label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+/* Estilos para los selectores */
+#certificado select {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: #fff;
+    font-size: 16px;
+}
+
+/* Estilos para el input de archivo */
+#certificado input[type="file"] {
+    display: block;
+    margin-top: 10px;
+}
