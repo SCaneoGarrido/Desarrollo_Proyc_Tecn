@@ -4,6 +4,7 @@ function hideAllSections() {
   document.getElementById('cursos').style.display = 'none';
   document.getElementById('cargar-excels').style.display = 'none';
   document.getElementById('analisis-cursos').style.display = 'none';
+  document.getElementById('cargar-certificado').style.display = 'none';
   document.getElementById('perfil').style.display = 'none';
 }
 
@@ -49,59 +50,6 @@ document.addEventListener('DOMContentLoaded', function () {
   hideProfileElements(); // Asegúrate de ocultar los elementos de "perfil" al cargar la página
 });
 
-// Evento de clic para agregar un asistente
-/**
- * 
-
-document.getElementById('add-asistente').addEventListener('click', function() {
-  const asistentesContainer = document.getElementById('accordionAsistentes');
-  const newAsistenteId = `asistente-${Date.now()}`;
-  const newAsistente = document.createElement('div');
-  newAsistente.classList.add('accordion-item');
-  newAsistente.innerHTML = `
-    <h2 class="accordion-header" id="heading-${newAsistenteId}">
-      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-${newAsistenteId}" aria-expanded="false" aria-controls="collapse-${newAsistenteId}">
-        Asistente
-      </button>
-    </h2>
-    <div id="collapse-${newAsistenteId}" class="accordion-collapse collapse" aria-labelledby="heading-${newAsistenteId}" data-bs-parent="#accordionAsistentes">
-      <div class="accordion-body">
-        <label for="rut" class="form-label">RUT</label>
-        <input type="text" class="form-control" name="rut" required>
-        <label for="edad" class="form-label">Edad</label>
-        <input type="number" class="form-control" name="edad" required>
-        <label for="genero" class="form-label">Género</label>
-        <select class="form-control" name="genero" required>
-          <option value="Masculino">Masculino</option>
-          <option value="Femenino">Femenino</option>
-          <option value="Otro">Otro</option>
-        </select>
-        <label for="nombre" class="form-label">Nombre</label>
-        <input type="text" class="form-control" name="nombre" required>
-        <label for="apellido" class="form-label">Apellido</label>
-        <input type="text" class="form-control" name="apellido" required>
-        <label for="Telefono" class="form-label">Telefono</label>
-        <input type="text" class="form-control" name="telefono" required>
-        <label for="email" class="form-label">Email</label>
-        <input type="email" class="form-control" name="email" required>
-        <label for="nacionalidad" class="form-label">Nacionalidad</label>
-        <input type="text" class="form-control" name="nacionalidad" required>
-        <label for="Comuna" class="form-label">Comuna</label>
-        <input type="text" class="form-control" name="comuna" required>
-        <label for="Barrio" class="form-label">Barrio</label>
-        <input type="text" class="form-control" name="barrio" required>
-        <button type="button" class="btn btn-danger remove-asistente mt-2">Eliminar</button>
-      </div>
-    </div>
-  `;
-
-  asistentesContainer.appendChild(newAsistente);
-  // Añadir evento para eliminar asistente
-  newAsistente.querySelector('.remove-asistente').addEventListener('click', function() {
-    newAsistente.remove();
-  });
-});
- */
 
 // Evento de clic para registrar el curso
 document.getElementById('form-inscribir-curso').addEventListener('submit', function (e) {
@@ -325,19 +273,6 @@ document.getElementById('irAInscribirCurso').addEventListener('click', function 
   showSection('cursos');
 });
 
-
-
-/**
-* MENSAJE PARA PANA BENJA EL FRONT END MAESTRO
-* puedes revisar este evento que carga los datos del usuario
-* bug:
-* cuando te logeas entras a la web y el cuadro o seccion del usuario
-* se ve en cada seccion. No de manera permantente pero es como si caminara 
-* entre secciones. 
-* 
-* INICIA LA APP LOGUEA Y VERAS EL BUG
-*/
-
 /// Manejar carga de datos de usuarios en seccion de usuarios
 document.addEventListener('DOMContentLoaded', function () {
   // verificar un user_id en localstorage
@@ -364,10 +299,6 @@ document.addEventListener('DOMContentLoaded', function () {
       .catch(error => console.error('Error al obtener la información del usuario:', error));
   }
 });
-
-function getReporte(){
-  fetch('/app/get_reporte')
-}
 
 document.addEventListener('DOMContentLoaded', function () {
   let selectedCourseId = null;
@@ -418,7 +349,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
   /**
    * EDITAR ESTE ANALITICO
-   * 
+   * const seleccionarCursoModal = new bootstrap.Modal(document.getElementById('seleccionarCursoModal'));
    */
   // Manejar el clic en el botón "Analizar"
   document.getElementById('analyzeButton').addEventListener('click', function () {
@@ -427,7 +358,9 @@ document.addEventListener('DOMContentLoaded', function () {
         const url = `/app/analytical_engine/${user_id}?cursoID=${selectedCourseId}`;
         const dataframe_container = document.getElementById('dataframe-container');
         const ver_tabla_bd = document.getElementById('get-report-button');
-        
+        const modal_get_report = new bootstrap.Modal(document.getElementById('reportModal'));
+        const clean_btn = document.getElementById('clear-button');
+
         fetch(url, {
             method: 'GET',
             headers: {
@@ -440,9 +373,10 @@ document.addEventListener('DOMContentLoaded', function () {
                 console.log('Análisis completado con éxito');
                 ver_tabla_bd.style.display = 'block';
                 ver_tabla_bd.style.marginTop = '20px';
-                dataframe_container.innerHTML = "<p>Analisis completo</p>";
+                clean_btn.style.display = 'block';
+                clean_btn.style.marginTop = '20px';
+                dataframe_container.innerHTML = "<p>Análisis completo</p>";
 
-                // Lógica existente del botón "ver tabla"
                 ver_tabla_bd.addEventListener('click', function () {
                     const newWindow = window.open('', '_blank');
                     newWindow.document.write('<html><head><title>Información de Base de Datos</title></head><body>');
@@ -450,18 +384,32 @@ document.addEventListener('DOMContentLoaded', function () {
                     newWindow.document.write('</body></html>');
                 });
 
-                // Lógica para la descarga automática del reporte
-                const downloadLink = document.createElement('a');
-                downloadLink.href = data.reporte_url;
-                downloadLink.download = 'reporte_curso.html';  // Nombre del archivo descargado
-                document.body.appendChild(downloadLink);
-                downloadLink.click();
-                document.body.removeChild(downloadLink);
+                modal_get_report.show();
+
+                const download_btn = document.getElementById('download-button');
+                const cancel_btn = document.getElementById('cancel-button');
+
+                download_btn.addEventListener('click', function () {
+                    const downloadLink = document.createElement('a');
+                    downloadLink.href = data.reporte_url;
+                    downloadLink.download = 'reporte_curso.html';
+                    document.body.appendChild(downloadLink);
+                    downloadLink.click();
+                    document.body.removeChild(downloadLink);
+                    modal_get_report.hide();
+                });
+
+                cancel_btn.addEventListener('click', function () {
+                    modal_get_report.hide();
+                });
             } else {
                 console.error('Error en el análisis:', data.error);
             }
         })
         .catch(error => console.error('Error al llamar al motor analítico:', error));
     }
+  });
+
 });
-});
+
+

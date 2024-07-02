@@ -377,13 +377,6 @@ def analytical_engine(user_id):
                 # Crear un DataFrame con los datos de asistencia (usar este)
                 df_asistencia = pd.DataFrame(lista_asistentes, columns=column_names)
                 
-                # Verificar si la columna 'asistencia' existe en el DataFrame
-                if 'asistencia' not in df_asistencia.columns:
-                    df_asistencia['asistencia'] = np.nan  # Inicializar la columna 'asistencia' con NaN si no existe
-                    
-                # Agregar la columna 'asistencia' con los datos de asistencia 
-                df_asistencia['asistencia'] = df_asistencia['asistencia'].apply(lambda x: 'Presente' if pd.notna(x) and isinstance(x, (int, float)) else np.nan)
-                
                 print(f"DataFrame de asistencia:\n{df_asistencia}")
 
                 EDA_REPORT_instance = EDA_REPORT(df_asistencia)

@@ -302,12 +302,6 @@ class DatabaseManager:
             conn.close()
     
     
-    
-    def obtenerTotalClases(self, user_id, cursoid):
-        pass
-    # ESTA FUNCION RECIBE EL CURSO ID ENVIADO POR EL USUARIO DESDE EL FRONT
-    # Y UNA LISTA DE ASISTENTES QUE SE VALIDA EN LA RUTA DE recive_data
-    # REALIZA UN UPDATE DEL CAMPO DE ASISTENCIA DE LA TABLA asistentes
     def update_asistencia(self, cursoid, lista_id):
         try:
             conn = self.connect()

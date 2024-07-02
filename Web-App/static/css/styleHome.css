@@ -294,3 +294,98 @@ h5 {
     color: black;
     transform:  scale(1.1);
 }
+
+
+.cargar-certificado-section {
+    display: none;
+    padding: 40px; /* Aumentar padding para más espacio interior */
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    border-radius: 10px;
+    margin: 40px auto; /* Centrar la sección horizontalmente */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    width: 80%; /* Más ancha */
+    min-height: 700px; /* Más alta */
+}
+
+#cargar-certificado-form {
+    display: flex;
+    align-items: flex-start;
+    gap: 40px; /* Aumentar espacio entre los elementos */
+    height: 100%;
+}
+
+.asistentes-lista-container {
+    flex: 1;
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    padding: 20px; /* Aumentar padding para más espacio interior */
+    height: 100%;
+    overflow-y: auto;
+    margin-right: 20px;
+    background: rgba(255, 255, 255, 0.096);
+    border-radius: 10px;
+}
+
+.asistentes-lista-container h3 {
+    margin-top: 0;
+    color: white;
+}
+
+.asistentes-lista {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.asistentes-lista li {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.asistentes-lista input[type="checkbox"] {
+    margin-right: 10px;
+}
+
+.curso-select-container, .archivo-input-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px; /* Aumentar espacio entre elementos dentro de cada contenedor */
+    width: 100%;
+}
+
+.curso-select-container label, .archivo-input-container label {
+    font-weight: bold;
+    margin-bottom: 5px;
+    color: white;
+}
+
+.curso-select-container select, .archivo-input-container input {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #fff;
+}
+
+.archivo-input-container input {
+    padding: 5px;
+}
+
+button {
+    padding: 10px 20px;
+    font-size: 16px;
+    border: none;
+    border-radius: 5px;
+    color: #fff;
+    cursor: pointer;
+}
+
+.btn-primary {
+    background-color: #6a1b9a; /* Morado */
+}
+
+.btn-secondary {
+    background-color: #00c853; /* Verde */
+}
