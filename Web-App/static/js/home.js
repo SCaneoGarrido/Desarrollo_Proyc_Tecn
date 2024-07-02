@@ -365,6 +365,10 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 });
 
+function getReporte(){
+  fetch('/app/get_reporte')
+}
+
 document.addEventListener('DOMContentLoaded', function () {
   let selectedCourseId = null;
 
@@ -419,35 +423,45 @@ document.addEventListener('DOMContentLoaded', function () {
   // Manejar el clic en el botón "Analizar"
   document.getElementById('analyzeButton').addEventListener('click', function () {
     if (selectedCourseId) {
-      const user_id = localStorage.getItem('user_id');
-      const url = `/app/analytical_engine/${user_id}?cursoID=${selectedCourseId}`;
-      const dataframe_container = document.getElementById('dataframe-container');
-      const get_report_button = document.getElementById('get-report-button');
-      fetch(url, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      })
+        const user_id = localStorage.getItem('user_id');
+        const url = `/app/analytical_engine/${user_id}?cursoID=${selectedCourseId}`;
+        const dataframe_container = document.getElementById('dataframe-container');
+        const ver_tabla_bd = document.getElementById('get-report-button');
+        
+        fetch(url, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
         .then(response => response.json())
         .then(data => {
-          if (data.success) {
-            console.log('Análisis completado con éxito');
-            get_report_button.style.display = 'block';
-            dataframe_container.innerHTML = "<p>Analisis completo</p>"
-            get_report_button.addEventListener('click', function () {
-              const newWindow = window.open('', '_blank');
-              newWindow.document.write('<html><head><title>Información de Base de Datos</title></head><body>');
-              newWindow.document.write(data.dataframe);
-              newWindow.document.write('</body></html>');
-            });
+            if (data.success) {
+                console.log('Análisis completado con éxito');
+                ver_tabla_bd.style.display = 'block';
+                ver_tabla_bd.style.marginTop = '20px';
+                dataframe_container.innerHTML = "<p>Analisis completo</p>";
 
+                // Lógica existente del botón "ver tabla"
+                ver_tabla_bd.addEventListener('click', function () {
+                    const newWindow = window.open('', '_blank');
+                    newWindow.document.write('<html><head><title>Información de Base de Datos</title></head><body>');
+                    newWindow.document.write(data.dataframe);
+                    newWindow.document.write('</body></html>');
+                });
 
-          } else {
-            console.error('Error en el análisis:', data.error);
-          }
+                // Lógica para la descarga automática del reporte
+                const downloadLink = document.createElement('a');
+                downloadLink.href = data.reporte_url;
+                downloadLink.download = 'reporte_curso.html';  // Nombre del archivo descargado
+                document.body.appendChild(downloadLink);
+                downloadLink.click();
+                document.body.removeChild(downloadLink);
+            } else {
+                console.error('Error en el análisis:', data.error);
+            }
         })
         .catch(error => console.error('Error al llamar al motor analítico:', error));
     }
-  });
+});
 });

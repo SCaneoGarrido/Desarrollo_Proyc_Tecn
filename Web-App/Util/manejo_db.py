@@ -346,9 +346,9 @@ class DatabaseManager:
                             cursor.execute(
                                 """
                                 UPDATE asistentes
-                                SET asistencia = COALESCE(asistencia, 0) + 1
+                                SET clases_asistidas = COALESCE(clases_asistidas, 0) + 1
                                 WHERE cursoid = %s AND asistenteid = %s
-                                RETURNING asistencia
+                                RETURNING clases_asistidas
                                 """,
                                 (cursoid, id)
                             )

@@ -2,7 +2,7 @@ import os
 import pandas as pd
 import numpy as np
 from Util.auxiliar_functions import *
-from flask import Flask, request, jsonify, session, render_template, url_for
+from flask import Flask, request, jsonify, session, render_template, url_for, send_file
 from flask_cors import CORS
 from io import BytesIO
 from Util.manejo_db import DatabaseManager
@@ -365,15 +365,6 @@ def analytical_engine(user_id):
                 print(f"Curso solicitado encontrado: {cursoSolicitado}")
                 print(f"Respuesta de curso solicitado typedata: {type(cursoSolicitado)}")
 
-                # comprobamos si existe un archivo asociado al curso
-                existing_file = DatabaseManager_instance.get_existing_file(cursoID)
-
-                if existing_file is not None:
-                    print(f"Archivo de asistencia encontrado \n{existing_file}")
-                else:
-                    print("No se encontro archivo asociado al curso")
-                    return jsonify({"error":"No existe un archivo de asistencia asociado al curso"})
-
                 # obtener lista de asistentes
                 lista_asistentes, column_names = DatabaseManager_instance.obtenerLista_asistentes(cursoID)
     
@@ -395,9 +386,29 @@ def analytical_engine(user_id):
                 
                 print(f"DataFrame de asistencia:\n{df_asistencia}")
 
+                EDA_REPORT_instance = EDA_REPORT(df_asistencia)
+                # Obtener el reporte
+                EDA_REPORT_instance.generar_reporte()
+
+                reporte = 'reporte_curso.html'
+                reporte_path = os.path.join(app.root_path, '..', reporte)
+
+                if os.path.exists(reporte_path):
+                    print(f"Se encontró el archivo de reporte en: {reporte_path}")
+                else:
+                    print(f"No se encontró el archivo de reporte en: {reporte_path}")
+                    return jsonify({"error": "No se pudo generar el reporte"}), 500
+
                 # Convertir el DataFrame a HTML
                 df_html = df_asistencia.to_html(classes='table table-bordered table-striped')
-                return jsonify({'success': 'Ok', 'dataframe': df_html})
+
+                # Enviar tanto el DataFrame HTML como el reporte
+                response = {
+                    'success': 'Ok',
+                    'dataframe': df_html,
+                    'reporte_url': f'/download_report/{reporte}'
+                }
+                return jsonify(response)
 
             else:
                 print("No se encontro el curso solicitado asociado al usuario")
@@ -410,8 +421,20 @@ def analytical_engine(user_id):
     else:
         return jsonify({'error': 'Método inválido'}), 500
 
-
-# ESTA RUTA TE ENVIA LA LISTA DE ASISTENTES DE UN CURSO
+@app.route('/download_report/<filename>', methods=['GET'])
+def download_report(filename):
+    try:
+        # Construir la ruta completa del archivo (un directorio más atrás)
+        file_path = os.path.join(app.root_path, '..', filename)
+        if not os.path.exists(file_path):
+            print(f"Archivo no encontrado: {file_path}")
+            return jsonify({"error": "Archivo no encontrado"}), 404
+        
+        # Enviar el archivo
+        return send_file(file_path, as_attachment=True)
+    except Exception as e:
+        print(f"Error al intentar descargar el archivo: {e}")
+        return jsonify({"error": "Error interno del servidor"}), 500
 # PARAMETROS NECESARIOS: CURSO_ID
 # SE DEBE PASAR POR URL
 @app.route('/app/get_list_asistances/<curso_id>', methods=['GET'])
