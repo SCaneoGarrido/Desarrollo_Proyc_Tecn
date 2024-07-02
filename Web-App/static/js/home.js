@@ -4,7 +4,7 @@ function hideAllSections() {
   document.getElementById('cursos').style.display = 'none';
   document.getElementById('cargar-excels').style.display = 'none';
   document.getElementById('analisis-cursos').style.display = 'none';
-  document.getElementById('cargar-certificado').style.display = 'none';
+  document.getElementById('seleccionar-curso').style.display = 'none';
   document.getElementById('perfil').style.display = 'none';
 }
 
@@ -412,4 +412,43 @@ document.addEventListener('DOMContentLoaded', function () {
 
 });
 
+document.addEventListener('DOMContentLoaded', function() {
+  const seleccionarCursoForm = document.getElementById('seleccionar-curso-form');
+  const cursoSelect = document.getElementById('curso-select');
+  const mostrarAsistentesSection = document.getElementById('mostrar-asistentes');
+  const asistentesLista = document.getElementById('asistentes-lista');
+  const cargarCertificadoForm = document.getElementById('cargar-certificado-form');
+
+  // Manejar envío del formulario de seleccionar curso
+  seleccionarCursoForm.addEventListener('submit', function(event) {
+      event.preventDefault();
+      const selectedCourseId = cursoSelect.value;
+
+      // Simulación de respuesta exitosa del servidor después de 1 segundo (para prueba)
+      setTimeout(() => {
+          // Mostrar la sección de mostrar asistentes y carga de archivos
+          mostrarAsistentesSection.style.display = 'block';
+          // Ocultar la sección de seleccionar curso
+          seleccionarCursoForm.parentElement.style.display = 'none';
+
+          // Simulación de lista de asistentes (añadir elementos de prueba)
+          const mockAsistentes = ['Asistente 1', 'Asistente 2', 'Asistente 3'];
+          asistentesLista.innerHTML = '';
+          mockAsistentes.forEach(asistente => {
+              const li = document.createElement('li');
+              li.textContent = asistente;
+              asistentesLista.appendChild(li);
+          });
+
+          // Lógica para manejar el envío del formulario de cargar archivo
+          cargarCertificadoForm.addEventListener('submit', function(event) {
+              event.preventDefault();
+              const formData = new FormData(cargarCertificadoForm);
+              // Aquí se enviaría formData al servidor para procesar el archivo
+              console.log('Formulario enviado con éxito:', formData);
+              // Puedes agregar lógica adicional para procesar la respuesta del servidor
+          });
+      }, 1000); // Tiempo de espera simulado de 1 segundo
+  });
+});
 
